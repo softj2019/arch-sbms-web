@@ -1,0 +1,161 @@
+logging:
+  file:
+    name: logs/application.log
+    path: ${user.dir}
+  config: classpath:logback-spring.xml
+  #config: ${user.dir}/config/logback-spring.xml
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    org.springframework.web.socket: OFF
+    io.undertow: DEBUG
+    root: ERROR
+    org.hibernate.SQL: INFO
+    org.hibernate.type: INFO
+    com:
+      archivsoft: INFO
+    jdbc:
+      audit: OFF
+      connection: OFF
+      resultset: OFF
+      resultsettable: OFF
+      sqlonly: OFF
+      sqltiming: DEBUG
+    org:
+      springframework:
+        boot: INFO
+app:
+  jwt:
+    secret_key: mySecretKey12345678901234567890123456789012
+
+#jdbc setting
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+  websocket:
+    max-text-message-size: 50MB
+    max-binary-message-size: 50MB
+  profiles:
+    active: local
+  datasource:
+#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    #    hikari:
+#      auto-commit: false
+#      connection-test-query: SELECT 1
+#      maximum-pool-size: 50
+#      minimum-idle: 5
+#      connection-timeout: 300000
+    #    initialize: false
+    #    url: jdbc:log4jdbc:mariadb://10.0.0.13:3306/sbms
+#    url: jdbc:log4jdbc:mariadb://10.0.0.13:3306/sbms
+    url: jdbc:p6spy:mysql://10.0.0.13:3306/sbms
+    username: sbms
+    password: Dkzlqmthvmxm1!
+  main:
+    banner-mode: 'off'
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    database-platform: org.hibernate.dialect.MariaDB103Dialect
+  pid:
+    file: .pid
+  security:
+    user:
+      algorithm: rms
+  thymeleaf:
+    cache: false
+    prefix: file:src/main/resources/templates/
+  messages:
+    basename: messages/common
+    encoding: UTF-8
+
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  #  mapper-locations: file://${user.dir}/ons/config/mapper/**/*.xml
+  mapper-locations: classpath:mapper/*.xml
+# Port setting
+server:
+  port: 8080
+  compression:
+    enabled: true
+  servlet:
+    session:
+      timeout: 86400
+---
+# 데이터베이스 설정
+server:
+  port: 8099
+spring:
+  websocket:
+    max-text-message-size: 50MB
+    max-binary-message-size: 50MB
+    task-execution:
+      pool:
+        core-size: 10  # 🔥 WebSocket 처리 속도를 높이기 위해 쓰레드 풀 증가
+        max-size: 50
+        queue-capacity: 1000
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  config:
+    activate:
+      on-profile: dev
+  web:
+    resources:
+      cache:
+        period: 0
+  logging:
+    level:
+      root: ERROR
+      com:
+        archivsoft: INFO
+      jdbc:
+        audit: OFF
+        connection: OFF
+        resultset: OFF
+        resultsettable: OFF
+        sqlonly: INFO
+        sqltiming: ERROR
+      org:
+        springframework:
+          boot: INFO
+#        hibernate:
+#          SQL: ERROR
+#          type.descriptor.sql: trace
+      net.sf.log4jdbc: INFO
+  datasource:
+#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    #    url: jdbc:log4jdbc:mariadb://10.0.0.13:3306/sbms
+    url: jdbc:p6spy:mysql://10.0.0.13:3306/sbms
+    username: sbms
+    password: Dkzlqmthvmxm1!
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        ddl-auto: none
+        format-sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+  messages:
+    basename: messages/common
+    encoding: UTF-8
+  spring:
+    resources:
+      static-locations: classpath:/static/,classpath:/public/,classpath:/resources/,classpath:/META-INF/resources/
+
+upload:
+  path: D:\\download\\uploads\\
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    type-handlers-package: org.apache.ibatis.type

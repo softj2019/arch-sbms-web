@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <!--tailwindcss-->
+  <link rel="stylesheet" href="/css/output.css">
+  <script src="/webjars/chart.js/3.7.0/dist/chart.min.js"></script>
+  <!--  1페이지구간-->
+  <div th:classappend="${page == 'dashboard2'} ? 'hidden' : ''">
+    <div class="content_title">
+      <h3 class="page_title">전체시스템현황</h3>
+      <ol class="page_breadcrumb">
+        <li>HOME</li>
+        <li><a href="#">대시보드</a></li>
+        <li><a href="#">전체시스템현황</a></li>
+      </ol>
+    </div>
+    <div class="content_area">
+      <div class="mb-8">
+        <div class="dashboard-chart" id="dashboard-chart"></div>
+      </div>
+    </div>
+  </div>
+
+<!--  2페이지구간-->
+  <div th:classappend="${page == 'dashboard1'} ? 'hidden' : ''">
+    <div class="content_title">
+      <h3 class="page_title">정류장현황</h3>
+      <ol class="page_breadcrumb">
+        <li>HOME</li>
+        <li><a href="#">대시보드</a></li>
+        <li><a href="#">정류장현황</a></li>
+      </ol>
+    </div>
+    <div class="content_area">
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot dot-normal"></div>
+          <span class="legend-text">정상</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot dot-warning"></div>
+          <span class="legend-text">주의</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot dot-off"></div>
+          <span class="legend-text">OFF</span>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Dashboard cards will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 space-y-4 lg:space-y-0">
+        <h2 class="text-xl font-bold">재실인원 통계</h2>
+        <div class="flex flex-wrap gap-4">
+          <div class="flex items-center space-x-2">
+            <label class="text-gray-600">연도:</label>
+            <select id="yearSelect" class="border rounded-md px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </select>
+          </div>
+<!--          <div class="flex items-center space-x-2">-->
+<!--            <label class="text-gray-600">기간:</label>-->
+<!--            <select id="periodSelect" class="border rounded-md px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">-->
+<!--              <option value="monthly">월간</option>-->
+<!--              <option value="yearly">년간</option>-->
+<!--            </select>-->
+<!--          </div>-->
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 rounded-lg">
+          <p class="text-gray-600 text-sm font-medium">총 재실인원</p>
+          <p id="totalCount" class="text-blue-600 text-3xl font-bold">0</p>
+        </div>
+        <div class="bg-gradient-to-r from-green-50 to-green-100 px-6 py-4 rounded-lg">
+          <p class="text-gray-600 text-sm font-medium">평균 재실인원</p>
+          <p id="avgCount" class="text-green-600 text-3xl font-bold">0</p>
+        </div>
+      </div>
+      <div class="h-80">
+        <canvas id="occupancyChart"></canvas>
+        <canvas id="hidChartEl" style="display: none"></canvas>
+      </div>
+    </div>
+  </div>
+  <th:block th:replace="fragments/popup :: popup_dashboard" />
+  <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+  <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+  <script type="text/javascript" th:src="@{/js/dashboard.js}"></script>
+
+</th:block>
+</html>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.UserMapper">
+    <!-- 로그인 접속 이력 조회 -->
+    <select id="getLoginHistory" resultType="UserHistoryDTO" parameterType="map">
+        SELECT    uh.user_id,
+        uh.user_nm,
+        uh.client_ip,
+        uh.action,
+        uh.created_at,
+        r.role_name AS roleName
+        FROM      tb_user_history uh
+        LEFT JOIN tb_user u ON uh.user_id = u.user_id
+        LEFT JOIN tb_role r ON u.role_id = r.role_id
+        WHERE     uh.action = '로그인'
+        <if test="i_userId != null and i_userId != ''">
+            AND   uh.user_id LIKE CONCAT('%', #{i_userId}, '%')
+        </if>
+        <if test="i_userNm != null and i_userNm != ''">
+            AND TRIM(SUBSTRING_INDEX(uh.user_nm, '(', 1)) = #{i_userNm}
+        </if>
+        <if test="i_client_ip != null and i_client_ip != ''">
+            AND   uh.client_ip LIKE CONCAT('%', #{i_client_ip}, '%')
+        </if>
+        <if test="i_s_date != null and i_s_date != ''">
+            AND   uh.created_at &gt; #{i_s_date}
+        </if>
+        <if test="i_e_date != null and i_e_date != ''">
+            AND   uh.created_at &lt; #{i_e_date}
+        </if>
+        ORDER BY  uh.created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 로그인 접속 이력 총 건 수 -->
+    <select id="getLoginHistoryCount" resultType="int" parameterType="map">
+        SELECT COUNT(1)
+        FROM tb_user_history uh
+        WHERE uh.action = '로그인'
+        <if test="i_userId != null and i_userId != ''">
+            AND uh.user_id LIKE CONCAT('%', #{i_userId}, '%')
+        </if>
+        <if test="i_userNm != null and i_userNm != ''">
+            AND TRIM(SUBSTRING_INDEX(uh.user_nm, '(', 1)) = #{i_userNm}
+        </if>
+    </select>
+
+    <!-- 로그인 이력 저장 -->
+    <insert id="insertLoginHistory" parameterType="UserHistoryDTO">
+        INSERT INTO tb_user_history (
+            user_id,
+            user_nm,
+            client_ip,
+            action,
+            created_at
+        ) VALUES (
+            #{userId},
+            #{userNm},
+            #{clientIp},
+            #{action},
+            NOW()
+        )
+        ON DUPLICATE KEY UPDATE
+            created_at = NOW();
+    </insert>
+
+    <!-- 오늘 방문자 수 -->
+    <select id="getTodayVisit" resultType="int">
+        SELECT COUNT(DISTINCT client_ip)
+        FROM tb_user_history
+        WHERE action = '로그인'
+          AND DATE(created_at) = CURDATE()
+    </select>
+
+    <!-- 이번 주 방문자 수 -->
+    <select id="getWeekVisit" resultType="int">
+        SELECT COUNT(*) FROM (
+            SELECT DISTINCT DATE(created_at), client_ip
+            FROM tb_user_history
+            WHERE action = '로그인'
+                AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)
+        ) AS daily_unique
+    </select>
+
+    <!-- 이번 달 방문자 수 -->
+    <select id="getMonthVisit" resultType="int">
+        SELECT COUNT(*) FROM (
+            SELECT DISTINCT DATE(created_at), client_ip
+            FROM tb_user_history
+            WHERE action = '로그인'
+                AND DATE_FORMAT(created_at, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+        ) AS daily_unique
+    </select>
+</mapper>

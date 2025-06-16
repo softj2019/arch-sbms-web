@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,user-scalable=no,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>layout_Admin</title>
+
+    <!--favicon-->
+    <!--  
+    <link rel="icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="196x196" href="img/favicon_196.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon_32.png" />
+    -->
+
+    <!-- css -->
+    <link rel="stylesheet" href="../lib/tui-grid/tui-grid.min.css" />
+    <link rel="stylesheet" href="../lib/tui-pagination/tui-pagination.min.css" />
+
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/component.css" />
+
+    <!-- js -->
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <script src="../lib/tui-grid/tui-grid.min.js"></script>
+    <script src="../lib/tui-pagination/tui-pagination.min.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/tui.js"></script>
+    <!-- 퍼블리싱 편의용 나중에 삭제 --><script src="../js/debug.js"></script><!-- 퍼블리싱 편의용 나중에 삭제 -->
+  </head>
+  <body>
+    <div class="skipmenu">
+      <a href="#">주메뉴 바로가기</a>
+      <a href="#">본문 바로가기</a>
+    </div>
+    <div class="wrap">
+      <header class="top_frame">
+        <div class="header">
+          <h1 class="logo">
+            <a href="#">
+              <img src="../images/admin_logo.svg" alt="로고이미지">
+              <span class="hide">한국석유공사</span>
+            </a>
+          </h1>
+          <div class="header_wrap">
+            <nav class="gnb">
+              <h2 class="hide">메뉴</h2>
+              <ul>
+                <li><a href="#">A (1Depth)</a></li>
+                <li><a href="#">B (1Depth)</a></li>
+                <li><a href="#">C (1Depth)</a></li>
+                <li><a href="#">D (1Depth)</a></li>
+                <li><a href="#">E (1Depth)</a></li>
+                <li><a href="#">F (1Depth)</a></li>
+              </ul>
+            </nav>            
+            <div class="utile">
+              <button type="button" class="model_btn notice_msg" model_target=".notice_msg_pop">
+                <span class="hide">알림메세지</span>
+                <span class="ntc_msg">10</span>
+              </button>
+              <a href="#" class="btn_logout">
+                <span>LOGOUT</span>
+              </a>
+            </div>
+
+            <!-- 알림 팝업 -->
+            <div class="notice_msg_pop">
+              <ul class="msg_pop_list">
+                <li>
+                  <a href="#">
+                    <p class="msg_title">
+                      <span>알림메세지 타이틀</span>
+                      <span class="msg_time">24-10-10</span>
+                    </p>
+                    <div class="msg_text">
+                      알림 메세지가 여기에 나옵니다.
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <p class="msg_title">
+                      <span>알림메세지 타이틀이 길어지면 두줄이 됩니다</span>
+                      <span class="msg_time">24-10-10</span>
+                    </p>
+                    <div class="msg_text">
+                      알림 메세지가 여기에 나옵니다. 알림 메세지가 여기에 나옵니다.
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <p class="msg_title">
+                      <span>알림메세지 타이틀</span>
+                      <span class="msg_time">24-10-10</span>
+                    </p>
+                    <div class="msg_text">
+                      알림 메세지가 여기에 나옵니다.
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <p class="msg_title">
+                      <span>알림메세지 타이틀이 길어지면 두줄이 됩니다</span>
+                      <span class="msg_time">24-10-10</span>
+                    </p>
+                    <div class="msg_text">
+                      알림 메세지가 여기에 나옵니다. 알림 메세지가 여기에 나옵니다.
+                    </div>
+                  </a>
+                </li>
+              </ul>
+
+            </div>
+
+            <!-- 태블릿 모바일 헤더 -->
+            <div class="m_header">
+              <button type="button" class="m_btn_menu">
+                <span class="hide">메뉴</span>
+                <i class="icon_menu"></i>
+              </button>
+              <h1 class="m_logo">
+                <a href="#">
+                  <img src="../images/admin_logo.svg" alt="로고이미지">
+                  <span class="hide">한국석유공사</span>
+                </a>
+              </h1>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 태블릿 모바일 전체메뉴 -->
+        <div class="m_menu">
+          <div class="m_menu_wrap">
+            <div class="m_menu_top">
+              <div class="utile">
+                <button type="button" class="notice_msg">
+                  <span class="hide">알림메세지</span>
+                  <span class="ntc_msg">10</span>
+                </button>
+                <a href="#" class="btn_logout">
+                  <span>LOGOUT</span>
+                </a>
+              </div>
+              <button type="button" class="m_btn_x">
+                <span class="hide">닫기</span>
+                <i class="icon_x"></i>
+              </button>
+            </div>
+            
+            <div class="m_gnb">
+              <ul class="m_gnb_dp1">
+                <li class="dp_arrow">
+                  <a href="#">A (1 Depth)</a>
+                  <ul class="m_gnb_dp2">
+                    <li class="dp_arrow">
+                      <a href="#">AA (2 Depth)</a>
+                      <ul class="m_gnb_dp3">
+                        <li><a href="#">AAA (3 Depth)</a></li>
+                        <li><a href="#">AAB (3 Depth)</a></li>
+                        <li><a href="#">AAC (3 Depth)</a></li>
+                      </ul>
+                    </li>
+                    <li class="">
+                      <a href="#">AB (2 Depth)</a>
+                    </li>
+                    <li class="dp_arrow">
+                      <a href="#">AC (2 Depth)</a>
+                      <ul class="m_gnb_dp3">
+                        <li><a href="index.html">ACA (3 Depth)</a></li>
+                        <li><a href="#">ACB (3 Depth)</a></li>
+                      </ul>
+                    </li>                    
+                  </ul>
+                </li>
+                <li class="dp_arrow">
+                  <a href="#">B (1 Depth)</a>
+                  <ul class="m_gnb_dp2">
+                    <li class="on dp_arrow">
+                      <a href="#">BA (2 Depth)</a>
+                      <ul class="m_gnb_dp3">
+                        <li><a href="#">BAA (3 Depth)</a></li>
+                        <li><a href="#">BAB (3 Depth)</a></li>
+                        <li><a href="#">BAC (3 Depth)</a></li>
+                      </ul>
+                    </li>
+                    <li class="">
+                      <a href="#">BB (2 Depth)</a>
+                    </li>
+                    <li class="dp_arrow">
+                      <a href="#">BC (2 Depth)</a>
+                      <ul class="m_gnb_dp3">
+                        <li><a href="#">BCA (3 Depth)</a></li>
+                        <li><a href="#">BCB (3 Depth)</a></li>
+                      </ul>
+                    </li>                    
+                  </ul>
+                </li>
+                <li class="dp_arrow">
+                  <a href="#">C (1 Depth)</a>
+                  <ul class="m_gnb_dp2">
+                    <li class="on dp_arrow">
+                      <a href="#">CA (2 Depth)</a>
+                      <ul class="m_gnb_dp3">
+                        <li><a href="#">CAA (3 Depth)</a></li>
+                        <li><a href="#">CAB (3 Depth)</a></li>
+                        <li><a href="#">CAC (3 Depth)</a></li>
+                      </ul>
+                    </li>
+                    <li class="">
+                      <a href="#">CB (2 Depth)</a>
+                    </li>
+                    <li class="expand">
+                      <a href="#">CC (2 Depth)</a>
+                      <ul class="m_gnb_dp3">
+                        <li><a href="#">CCA (3 Depth)</a></li>
+                        <li><a href="#">CCB (3 Depth)</a></li>
+                      </ul>
+                    </li>                    
+                  </ul>
+                </li>
+                
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </header>
+
+      <aside class="left_frame">
+        <ul class="left_menu left_dp1">
+          <li>
+            <a href="#" title="1Depth 메뉴이름">1Depth 메뉴이름</a>
+            <ul class="left_dp2">
+              <li class="on" >
+                <a href="#" title="2Depth 메뉴이름">2Depth 메뉴이름</a>
+                <ul class="left_dp3">
+                  <li><a href="#" title="3Depth">3Depth</a></li>
+                  <li><a href="#" title="3Depth">3Depth</a></li>
+                  <li><a href="#" title="3Depth">3Depth</a></li>
+                </ul>
+              </li>
+              <li>
+                <a href="#" title="2Depth 메뉴이름이 두줄이 되는 경우" class="">2Depth 메뉴이름이 두줄이 되는 경우 </a>
+                <ul class="left_dp3">
+                  <li><a href="#" title="3Depth">3Depth</a></li>
+                  <li><a href="#" title="3Depth">3Depth</a></li>
+                  <li><a href="#" title="3Depth 메뉴이름이 두줄이 되는 경우">3Depth 메뉴이름이 두줄이 되는 경우</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <button type="button" class="btn_left_tgl">
+          <span class="hide">메뉴 열기</span>
+        </button>
+      </aside>
+
+      <main class="work_frame">
+        <div class="content_wrap">
+          <div class="content_title">
+            <h3 class="page_title">페이지 타이틀</h3>
+            <ol class="page_breadcrumb">
+              <li>HOME</li>
+              <li><a href="#">1depth</a></li>
+              <li><a href="#">2depth</a></li>
+              <li><a href="#">3depth</a></li>
+            </ol>
+          </div>
+        
+          <div class="content_area">
+
+            <div class="area_title">
+              <h4 class="left_grp">
+                <span class="sub_title">서브 타이틀</span>
+              </h4>
+            </div>
+
+            <div>
+              가로 1920px 기준으로 작업 진행했습니다.<br>
+              가로 1024px 부터 태블릿/모바일 사이즈 대응합니다. <br>
+              레이아웃 외 컴포넌트는 컴포넌트 html에 링크되어 있습니다.
+            </div>
+
+          </div>
+        
+        </div>
+      </main>
+
+    </div>    
+  </body>
+</html>

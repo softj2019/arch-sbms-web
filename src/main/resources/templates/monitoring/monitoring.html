@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">시스템 모니터링</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">시스템 모니터링</a></li>
+      <li><a href="#">시스템 모니터링</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+
+    <div class="search_wrap">
+      <ul>
+        <li>
+          <p>정류장 ID</p>
+          <div class="rowbox">
+            <input type="text" id="s_terminalId" placeholder="정류장 ID 를 입력해주세요">
+          </div>
+        </li>
+        <li>
+          <p>정류장 명</p>
+          <div class="rowbox">
+            <input type="text" id="s_terminalNm" placeholder="정류장 명 을 입력해주세요">
+          </div>
+        </li>
+      </ul>
+
+      <div class="srch_btn">
+        <div class="type_grp type_single">
+          <button type="button" class="btn_def btn_point_clr" onclick="getStationName()">조회</button>
+          <button type="button" class="btn_def btn_red_clr" onclick="clearContents()">초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="area_title">
+      <h4 class="left_grp">
+        <span class="sub_title">조회결과</span>
+        <span class="sub_script">총 건수:
+          <span class="num"></span>건
+        </span>
+      </h4>
+    </div>
+
+    <div class="grid_board">
+      <div id="grid_tale"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+    </div>
+  </div>
+
+  <div id="datepicker_wrapper" style="margin-top: -1px;"></div>
+  <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+  <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+  <script type="text/javascript" th:src="@{/js/monitoring.js}"></script>
+</th:block>
+</html>

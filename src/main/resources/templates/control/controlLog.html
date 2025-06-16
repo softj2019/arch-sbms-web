@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<script src="../../static/js/facility.js"></script>
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">제어이력</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">제어</a></li>
+      <li><a href="#">제어이력</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+
+    <div class="search_wrap">
+
+      <ul>
+        <li>
+          <p>정류장 ID</p>
+          <div class="rowbox">
+            <input type="text" id="s_terminalId" placeholder="정류장 ID를 입력해주세요.">
+          </div>
+        </li>
+        <li>
+          <p>시설물</p>
+          <div class="rowbox">
+            <label class="hide">적용건수 선택</label>
+            <select id="s_deviceName" class="select_round" style="width:90%; color:#444;">
+              <option value="" selected disabled>시설물을 선택해주세요</option>
+              <option value="smartscreen" >스마트 스크린</option>
+              <option value="lte_router"  >LTE 라우터</option>
+              <option value="lcd_display" >공기질표출장치</option>
+              <option value="led_panel"   >승하차알림</option>
+              <option value="cv"          >재실감지카메라</option>
+              <option value="led_light"   >LED 전등</option>
+              <option value="fan"         >FAN</option>
+            </select>
+          </div>
+        </li>
+        <li>
+          <p>작업자</p>
+          <div class="rowbox">
+            <input type="text" id="s_userId" placeholder="정류장 명을 입력해주세요.">
+          </div>
+        </li>
+      </ul>
+
+      <div class="srch_btn">
+        <div class="type_grp type_single">
+          <button type="button" class="btn_def btn_point_clr" onclick="getLogList()">조회</button>
+          <button type="button" class="btn_def btn_red_clr" onclick="clearContents()">초기화</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="area_title">
+      <h4 class="left_grp">
+        <span class="sub_title">조회결과</span>
+        <span class="sub_script">
+          총 건수: <span class="num"></span>건
+        </span>
+      </h4>
+      <div class="right_grp btn_grp">
+        <div class="type_grp">
+          <label class="hide">적용건수 선택</label>
+          <select id="itemsPerPage" class="select_round" onchange="getLogList(0)">
+            <option value="10">10건</option>
+            <option value="100">100건</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid_board">
+      <div id="grid_tale"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+    </div>
+  </div>
+
+  <div id="datepicker_wrapper" style="margin-top: -1px;"></div>
+  <script type="text/javascript" th:src="@{/js/controlLog.js}"></script>
+</th:block>
+</html>

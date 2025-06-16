@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.archivsoft.sbms.mapper.HidLogMapper">
+
+    <!-- 데이터 저장 -->
+    <insert id="insertHidLog" parameterType="com.archivsoft.sbms.dto.HidLogDTO">
+        INSERT INTO tb_hid_log (terminal_id, people_count,stat_people_count, file_name, timestamp)
+        VALUES (#{terminalId}, #{peopleCount},#{statPeopleCount},#{fileName}, NOW())
+    </insert>
+
+    <!-- 전체 조회 -->
+    <select id="getAllHidLogs" resultType="com.archivsoft.sbms.dto.HidLogDTO">
+        SELECT thl.id,
+               thl.terminal_id,
+               tt.terminal_name as terminalNm,
+               thl.people_count,
+               thl.stat_people_count,
+               thl.file_name,
+               thl.timestamp
+        FROM tb_hid_log thl
+        INNER JOIN tb_terminal tt
+        ON thl.terminal_id = tt.terminal_id
+        <where>
+            <if test="s_terminalId != null and s_terminalId != ''">
+                AND thl.terminal_id LIKE CONCAT ('%', #{s_terminalId}, '%')
+            </if>
+            <if test="s_terminalNm != null and s_terminalNm != ''">
+                AND tt.terminal_name LIKE CONCAT ('%', #{s_terminalNm}, '%')
+            </if>
+        </where>
+        ORDER BY timestamp DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="getLogCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM (
+            SELECT thl.terminal_id
+            FROM tb_hid_log thl
+            LEFT JOIN tb_terminal tt
+            ON thl.terminal_id = tt.terminal_id
+            <where>
+                <if test="s_terminalId != null and s_terminalId != ''">
+                    AND thl.terminal_id LIKE CONCAT ('%', #{s_terminalId}, '%')
+                </if>
+                <if test="s_terminalNm != null and s_terminalNm != ''">
+                    AND tt.terminal_name LIKE CONCAT ('%', #{s_terminalNm}, '%')
+                </if>
+            </where>
+        ) sv
+    </select>
+
+    <!-- 선택된 연도의 월별 누적 statPeopleCount 조회 (각 정류장의 마지막 데이터 값만 사용) -->
+    <select id="getMonthlyStats" resultType="com.archivsoft.sbms.dto.HidLogDTO">
+        WITH last_entries AS (
+            SELECT
+            DATE(timestamp) AS log_date,
+            terminal_id,
+            MAX(id) AS last_id
+        FROM tb_hid_log
+        WHERE YEAR(timestamp) = #{year}
+        GROUP BY DATE(timestamp), terminal_id
+            )
+        SELECT
+            months.month AS month,
+            COALESCE(SUM(t.stat_people_count), 0) AS statPeopleCount
+        FROM (
+            SELECT 1 AS month UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+            UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8
+            UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12
+            ) months
+            LEFT JOIN last_entries le ON months.month = MONTH(le.log_date)
+            LEFT JOIN tb_hid_log t ON le.last_id = t.id
+        GROUP BY months.month
+        ORDER BY months.month;
+    </select>
+</mapper>

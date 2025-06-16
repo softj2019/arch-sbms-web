@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">공공wifi 모니터링</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">시스템 모니터링</a></li>
+      <li><a href="#">공공wifi 모니터링</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+
+      <div class="grid_board">
+      <div id="grid_tale"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+    </div>
+  </div>
+
+  <div id="datepicker_wrapper" style="margin-top: -1px;"></div>
+  <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+  <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+  <script type="text/javascript" th:src="@{/js/wifi.js}"></script>
+</th:block>
+</html>

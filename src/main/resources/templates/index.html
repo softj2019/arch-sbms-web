@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <!--/*
+  <div class="content_title">
+    <h3 th:if="${viewModel.viewType.name().equals('SELECT')}" class="page_title" th:text="#{ir.select.header}"></h3>
+    <h3 th:if="${viewModel.viewType.name().equals('CONFIRM')}" class="page_title" th:text="#{ir.confirm.header}"></h3>
+  </div>
+
+  <div class="content_area">
+
+    <div class="area_title">
+      <h4 class="left_grp">
+        <span class="sub_title">조회결과</span>
+        <span class="sub_script">
+          총 건수: <span class="num" th:text="${data.pagination.totalCount}">10</span>건
+        </span>
+      </h4>
+      <div class="right_grp btn_grp">
+        <div class="type_grp" th:if="${viewModel.viewType.name == 'SELECT'}">
+          <button type="button" class="btn_def btn_main_clr" onClick="clicked('select')"><span th:text='#{ir.button.select}'>기록물 선정</span></button>
+          <button type="button" class="btn_def btn_point_clr" onClick="clicked('deselect')"><span th:text='#{ir.button.deselect}'>선정 취소</span></button>
+        </div>
+        <div class="type_grp" th:if="${viewModel.viewType.name == 'CONFIRM'}">
+          <button type="button" class="btn_def btn_main_clr" onClick="clicked('confirm')"><span th:text='#{ir.button.confirm}'>기록물 확정</span></button>
+          <button type="button" class="btn_def btn_point_clr" onClick="clicked('unconfirm')"><span th:text='#{ir.button.unconfirm}'>확정 취소</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid_board">
+      <div id="grid_tale"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+      <script th:inline="javascript">
+        var grid1 = null;
+
+        function clicked(name) {
+          const checkedRows = grid1.getCheckedRows();
+          if (checkedRows.length > 0) {
+            $.ajax({
+                url: /*[[@{/ir/}]]*/ '/ir/'
+                    + name,
+                type: 'post',
+                data: {
+                    pageIndex: /*[[${data.pagination.page}]]*/ 1,
+                    checkedRecords: checkedRows.map(row => row['recordId']),
+                }
+            }).done(function(fragment) {
+              $('.work_frame').replaceWith(fragment);
+            });
+          } else {
+            /* maybe warn user? */
+          }
+        }
+
+        $(function(){
+          grid1 = new tui.Grid({
+            el: document.getElementById("grid_tale"),
+            scrollX: true,
+            scrollY: false,
+            rowHeaders: ['checkbox'],
+            columns: [
+              { name: "recordId", header: "ID", width : 80, align: 'left', hidden: true },
+              { name: "recordTitle", header: [[#{ir.list.column.title}]], align: 'left' },
+              { name: "irState", header: [[#{ir.list.column.status}]], width: 80, align: 'center',
+                formatter: (prop) => { return prop.value == 'SELECTED' ? [[#{ir.state.selected}]] : (prop.value == 'CONFIRMED' ? [[#{ir.state.confirmed}]] : ''); } },
+              { name: "folderTitle", header: [[#{ir.list.column.folderTitle}]], width: 350, align: 'left' },
+              { name: "prodTypeCd", header: [[#{ir.list.column.prodTypeCd}]], width: 80, align: 'center',
+                formatter: (prop) => { return prop.value == 'P' ? [[#{ir.pr.produced}]] : [[#{ir.pr.received}]]; } },
+              { name: "recordDetlSortCd", header: [[#{ir.list.column.recordDtlSortCd}]], width: 100, align: 'center',
+                formatter: (prop) => { return prop.value == '01' ? [[#{ir.sort.01}]] : (prop.value == '02' ? [[#{ir.sort.02}]] : (prop.value == '03' ? [[#{ir.sort.03}]] : (prop.value == '04' ? [[#{ir.sort.04}]] : [[#{ir.sort.05}]]))); } },
+              { name: "elecTypeCd", header: [[#{ir.list.column.elecTypeCd}]], width: 100,  align: 'center',
+                formatter: (prop) => { return prop.value == 'E' ? [[#{ir.elec.yes}]] : [[#{ir.elec.no}]]; } },
+            ],
+            columnOptions: {
+              resizable: true,
+              minWidth: 80
+            }
+          });
+          tuiGridApplyTheme();
+
+          // pagination
+          var pagination1 = new tui.Pagination('grid_pagination', {
+              page: /*[[${data.pagination.page}]]*/ 1,
+              totalItems: /*[[${data.pagination.totalCount}]]*/ 50,
+              itemsPerPage: 10,
+              visiblePages: 10
+          });
+
+          pagination1.on('afterMove', (event) => {
+            $.ajax({
+                url: /*[[@{#httpServletRequest.requestURI}]]*/ '/ir/list',
+                type: 'post',
+                data: {
+                    pageIndex: event.page
+                }
+            }).done(function(fragment) {
+              $('.work_frame').replaceWith(fragment);
+            });
+          });
+
+          // Paginated list of items to display
+          var rows = /*[[${data.contents}]]*/ [];
+          grid1.resetData(rows.map(row => {
+            row._attributes = { checkDisabled: row.checkDisabled, };
+            return row;
+          }));
+        });
+      </script>
+    </div>
+  </div>
+  */-->
+</th:block>
+</html>

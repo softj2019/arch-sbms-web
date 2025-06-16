@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.GrantMapper">
+    <resultMap id="RmmenuResultMap" type="com.archivsoft.sbms.entity.Rmmenu">
+        <id property="id.menuId" column="menu_id"/>
+        <result property="menuNm" column="menu_nm"/>
+        <result property="upperMenuId" column="upper_menu_id"/>
+        <result property="menuDivCd" column="menu_div_cd"/>
+        <result property="menuSortSno" column="menu_sort_sno"/>
+        <result property="useFlag" column="use_flag"/>
+        <result property="menuGrantLevl" column="menu_grant_levl"/>
+        <result property="workDtime" column="work_dtime"/>
+    </resultMap>
+
+    <!-- 메뉴 리스트 조회 -->
+    <select id="menuList" resultMap="RmmenuResultMap" parameterType="String">
+        SELECT    menu_id,
+                  menu_nm,
+                  upper_menu_id,
+                  menu_div_cd,
+                  menu_sort_sno,
+                  use_flag,
+                  menu_grant_levl,
+                  work_dtime
+        FROM      tb_rmmenu
+        WHERE     1=1
+        <if test="menuId == ''">
+            AND   upper_menu_id IS NULL
+        </if>
+        <if test="menuId != ''">
+            AND   upper_menu_id = #{menuId}
+        </if>
+        ORDER BY  menu_sort_sno
+    </select>
+
+
+    <!-- 사용여부 및 권한 레벨 수정 -->
+    <update id="update" parameterType="java.util.Map">
+        UPDATE  tb_rmmenu
+        SET     USE_FLAG = #{useFlag},
+                MENU_GRANT_LEVL = #{menuGrantLevl}
+        WHERE   MENU_ID = #{menuId}
+        AND     (USE_FLAG != #{useFlag} OR MENU_GRANT_LEVL != #{menuGrantLevl})
+    </update>
+
+</mapper>

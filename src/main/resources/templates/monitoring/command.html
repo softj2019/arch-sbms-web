@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+
+<head>
+  <link rel="stylesheet" href="/css/command.css" />
+</head>
+
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">COMMAND</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">시스템 모니터링</a></li>
+      <li><a href="#">COMMAND</a></li>
+    </ol>
+  </div>
+
+
+  <div class="content_area command_area">
+    <!--        s: 정류장 정보 -->
+    <h2>정류장 및 명령어 선택</h2>
+    <div class="command_row">
+      <div class="terminal_group">
+        <p>정류장 리스트 </p>
+        <select class="cmd_slt">
+          <option disabled selected value="">대상 정류장을 선택하세요</option>
+        </select>
+      </div>
+      <div class="shell_group">
+        <p>Shell 명령어</p>
+        <select class="cmd_sh">
+          <option disabled selected value="">명령어를 선택하세요</option>
+        </select>
+      </div>
+    </div>
+    <div class="command_row">
+      <div class="input_group terminal_id">
+        <label>Terminal ID (빈칸:전체 적용)</label>
+        <input type="text" class="cmd_input" id="terminalId" placeholder="예: ARCHRFC0000001">
+      </div>
+
+      <div class="input_group command">
+        <label>Shell Command</label>
+        <textarea id="command" class="cmd_txt" rows="4" style="resize:none" placeholder="예: sudo reboot"></textarea>
+      </div>
+
+      <div class="input_group command_btn">
+        <button class="btn_def btn_point_clr btn_model cmd_btn" onclick="sendCommand()">전송</button>
+      </div>
+
+      <div class="input_group command_btn">
+        <button class="btn_def btn_red_clr btn_model cmd_btn" onclick="clearText()">초기화</button>
+      </div>
+
+    </div>
+    <h2>응답 데이터</h2>
+    <div class="command_row">
+
+      <div class="pre_span">
+
+      </div>
+      <div id="result"></div>
+      <script>
+        if (!$('#result').text().trim()) {
+          $('#result').text('명령어를 전송하면 이곳에 응답값이 반환됩니다')
+        }
+      </script>
+    </div>
+
+    <!-- s: 최근 명령어 -->
+    <h2>최근 명령어 리스트</h2>
+    <!-- 그리드 -->
+    <div class="grid_board" style="margin-top:20px;">
+      <div id="grid_tale"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+    </div>
+    <!-- e: 최근 명령어 -->
+  </div>
+
+  <th:block th:replace="fragments/popup :: popup_image" />
+  <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+  <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+  <script type="text/javascript" th:src="@{/js/command.js}"></script>
+</th:block>
+</html>

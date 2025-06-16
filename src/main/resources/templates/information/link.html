@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">정보</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">정보</a></li>
+      <li><a href="#">연계정보</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+
+    <!-- search box type ex1 : 기본 4칸 + 버튼영역 -->
+    <div class="search_wrap">
+      <ul>
+        <li>
+          <p>정류장 ID</p>
+          <div class="rowbox">
+            <input type="text" placeholder="제목을 입력해주세요.">
+          </div>
+        </li>
+        <li>
+          <p>정류장 명</p>
+          <div class="rowbox">
+            <input type="text" placeholder="제목을 입력해주세요.">
+          </div>
+        </li>
+      </ul>
+
+      <div class="srch_btn">
+        <div class="type_grp type_single">
+          <button type="button" class="btn_def btn_point_clr">조회</button>
+          <button type="button" class="btn_def btn_red_clr">초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="area_title">
+      <h4 class="left_grp">
+        <span class="sub_title">조회결과</span>
+        <span class="sub_script">
+                  총 건수: <span class="num">10</span>건
+                </span>
+      </h4>
+      <div class="right_grp btn_grp">
+        <div class="type_grp">
+          <label class="hide">적용건수 선택</label>
+          <select class="select_round">
+            <option value="">전체</option>
+            <option value="">10건</option>
+            <option value="">100건</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid_board">
+      <div id="grid_tale"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+      <!-- 퍼블리싱 더미 데이터 - 나중에 삭제 -->
+      <script src="/test/grid_data_link.js"></script>
+      <!-- 퍼블리싱 더미 데이터 - 나중에 삭제 -->
+      <script>
+        $(function(){
+          const grid1 = new tui.Grid({
+            el: document.getElementById("grid_tale"),
+            scrollX: true,
+            scrollY: false,
+            rowHeaders: ['checkbox'],
+            columns: [
+              { name: "busStopId", header: "정류장ID", sortable: true, align: 'center' },
+              { name: "busStopNm", header: "정류장명", sortable: true, align: 'center' },
+              { name: "uri", header: "URI", sortable: true, align: 'center' },
+              { name: "weather", header: "날씨", sortable: true, align: 'center' },
+              { name: "pm", header: "미세먼지", sortable: true,  align: 'center' },
+              { name: "temp", header: "온도", sortable: true, align: 'center' },
+              { name: "humidity", header: "습도", sortable: true, align: 'center' },
+              { name: "co2", header: "이산화탄소", sortable: true, align: 'center' },
+              { name: "close", header: "폐쇄여부", sortable: true, align: 'center' },
+            ],
+            columnOptions: {
+              resizable: true,
+              minWidth: 80
+            }
+          });
+          tuiGridApplyTheme();
+
+          // pagination
+          var pagination1 = new tui.Pagination('grid_pagination', {
+            totalItems: 500,
+            itemsPerPage: 10,
+            visiblePages: 5
+          });
+
+          grid1.resetData(grid_data_link.slice(0, 10));
+          grid1.on('click', (e) => {
+            console.log(grid1.getRow(e.rowKey));
+            var row = grid1.getRow(e.rowKey);
+            $('#busStopId').text(row.busStopId);
+            $('#busStopNm').text(row.busStopNm);
+            $('#uri').text(row.uri);
+            $('#weather').val(row.weather === '연계' ? 'Y' : 'N');
+            $('#pm').val(row.pm === '연계' ? 'Y' : 'N');
+            $('#temp').val(row.temp === '연계' ? 'Y' : 'N');
+            $('#humidity').val(row.humidity === '연계' ? 'Y' : 'N');
+            $('#co2').val(row.co2 === '연계' ? 'Y' : 'N');
+            $('#close').val(row.close === '예' ? 'Y' : 'N');
+            const target = $('#popup_frame');
+
+            target.toggleClass('on');
+            return false;
+          });
+        });
+      </script>
+    </div>
+
+
+  </div>
+
+  <div id="datepicker_wrapper" style="margin-top: -1px;"></div>
+  <div id="popup_frame" class="popup_frame">
+    <div class="popup_wrap">
+      <div class="pop_title">
+        <h5>상세보기</h5>
+        <button type="button" class="btn_x btn_close">
+          <span class="hide">닫기</span>
+          <i class="icon_x"></i>
+        </button>
+      </div>
+
+      <div class="pop_content">
+        <div class="table_wrap">
+          <table class="align_center">
+            <caption class="hide">table</caption>
+            <colgroup>
+              <col style="width: 50%;">
+              <col style="width: 50%;">
+            </colgroup>
+            <tbody>
+            <tr>
+              <th scope="row">정류장ID</th>
+              <td id="busStopId"></td>
+            </tr>
+            <tr>
+              <th>정류장명</th>
+              <td id="busStopNm"></td>
+            </tr>
+            <tr>
+              <th>연계URI</th>
+              <td id="uri"></td>
+            </tr>
+            <tr>
+              <th>날씨</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">연계/미연계 선택</label>
+                  <select id="weather" class="select_box" required disabled>
+                    <option value="Y">연계</option>
+                    <option value="Y">미연계</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>미세먼지</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">연계/미연계 선택</label>
+                  <select id="pm" class="select_box" required disabled>
+                    <option value="Y">연계</option>
+                    <option value="Y">미연계</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>온도</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">연계/미연계 선택</label>
+                  <select id="temp" class="select_box" required disabled>
+                    <option value="Y">연계</option>
+                    <option value="Y">미연계</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>습도</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">연계/미연계 선택</label>
+                  <select id="humidity" class="select_box" required disabled>
+                    <option value="Y">연계</option>
+                    <option value="Y">미연계</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>이산화탄소</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">연계/미연계 선택</label>
+                  <select id="co2" class="select_box" required disabled>
+                    <option value="Y">연계</option>
+                    <option value="Y">미연계</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>페쇄여부</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">페쇄여부 선택</label>
+                  <select id="close" class="select_box" required disabled>
+                    <option value="Y">예</option>
+                    <option value="N">아니요</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="btn_grp btn_right">
+          <div class="type_grp type_single">
+            <button type="button" class="btn_def btn_point_clr">수정</button>
+            <button type="button" class="btn_close btn_def btn_gray">닫기</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</th:block>
+</html>

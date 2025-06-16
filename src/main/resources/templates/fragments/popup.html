@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="popup_dashboard">
+    <style>
+
+        /* 팝업 프레임 */
+        .popup_frame {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            width: 100%;
+            height: 100vh;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+        }
+        .popup_frame.on {
+            visibility: visible;
+            opacity: 1;
+        }
+        .popup_frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* 팝업 컨텐츠 */
+        .popup_wrap {
+            height: auto !important;
+            background-color: #fff;
+            border-radius: 10px;
+            width: 500px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+        .popup_wrap .pop_content {
+            height: auto !important;
+        }
+        .pop_title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .pop_title h5 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: #333;
+        }
+
+        .pop_title .popup-status-label {
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .popup-status-label .offline {
+            background-color: #e74c3c;
+        }
+
+        .popup-status-label .online {
+            background-color: #2ecc71;
+        }
+
+        /* 시스템 상세 현황 */
+        .popup-system-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .popup-status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 49%;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .dot-normal {
+            background-color: #2ecc71;
+        }
+
+        .dot-off {
+            background-color: #e74c3c;
+        }
+
+        /* 시스템 메트릭스 */
+        .popup-system-metrics {
+            display: flex;
+            gap: 8px;
+            justify-content: space-around;
+        }
+
+        .popup-metric {
+            width: 90px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            /*padding: 10px;*/
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .popup-metric-label {
+            font-weight: bold;
+            display: block;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .popup-metric-value {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .file_content {
+            display: flex;
+        }
+    </style>
+    <div id="popup_frame" class="popup_frame">
+        <div class="popup_wrap">
+            <div class="pop_title">
+                <h5 id="popup_title">상세보기</h5>
+                <button type="button" class="btn_x btn_close">
+                    <span class="hide">닫기</span>
+                    <i class="icon_x"></i>
+                </button>
+            </div>
+
+            <div class="pop_content da">
+                <div class="popup-status">
+                    <h4>정류장 상태</h4>
+                    <div>
+                        <div class="legend-dot dot-off"></div>
+                        <span id="popup-status-conn">오류</span>
+                    </div>
+                </div>
+
+                <h4>시스템 상세 현황</h4>
+                <div class="popup-system-status">
+                    <div class="popup-status-item">
+                        <span class="popup-status-label">통합제어보드</span>
+                        <div class="legend-dot dot-normal"></div>
+                    </div>
+                    <div class="popup-status-item">
+                        <span class="popup-status-label">스마트스크린</span>
+                        <div class="legend-dot dot-normal"></div>
+                    </div>
+                    <div class="popup-status-item">
+                        <span class="popup-status-label">재실감지카메라</span>
+                        <div class="legend-dot dot-normal"></div>
+                    </div>
+                    <div class="popup-status-item">
+                        <span class="popup-status-label">LED전광판</span>
+                        <div class="legend-dot dot-off"></div>
+                    </div>
+                    <div class="popup-status-item">
+                        <span class="popup-status-label">공기질표출장치</span>
+                        <div class="legend-dot dot-normal"></div>
+                    </div>
+                    <div class="popup-status-item">
+                        <span class="popup-status-label">LTE라우터</span>
+                        <div class="legend-dot dot-normal"></div>
+                    </div>
+                    <div class="popup-status-item">
+                        <span class="popup-status-label">LED전등</span>
+                        <div class="legend-dot dot-normal"></div>
+                    </div>
+                    <div class="popup-status-item">
+                        <span class="popup-status-label">FAN</span>
+                        <div class="legend-dot dot-normal"></div>
+                    </div>
+                </div>
+                <div class="popup-system-metrics">
+                    <div class="popup-metric">
+                        <span class="popup-metric-label">CPU</span>
+                        <span class="popup-metric-value">46</span><span>%</span>
+                    </div>
+                    <div class="popup-metric">
+                        <span class="popup-metric-label">온도</span>
+                        <span class="popup-metric-value">36°C</span><span>°C</span>
+                    </div>
+                    <div class="popup-metric">
+                        <span class="popup-metric-label">메모리</span>
+                        <span class="popup-metric-value">12%</span><span>%</span>
+                    </div>
+                    <div class="popup-metric">
+                        <span class="popup-metric-label">저장소</span>
+                        <span class="popup-metric-value">92%</span><span>%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<!--재실카메라-->
+<th:block th:fragment="popup_stream">
+    <style>
+
+    </style>
+    <!-- 팝업 레이어 -->
+    <div id="popup_layer" class="popup_layer">
+        <div class="popup_header">
+            <h5>카메라 보기</h5>
+            <button type="button" class="popup_close">&times;</button>
+        </div>
+        <div class="popup_content">
+            <img id="streamVideo" src="" alt="Streaming Video" style="width: 100%; border-radius: 10px;">
+        </div>
+    </div>
+</th:block>
+
+<!--hid 파일 뷰어-->
+<th:block th:fragment="popup_image">
+    <div id="imageModal" class="popup_frame">
+        <div class="popup_wrap">
+            <div class="pop_title">
+                <h5>이미지 보기</h5>
+            </div>
+            <div class="pop_content file_content" style="justify-content: center;align-items: center;">
+                <img id="modalImage" src="" alt="이미지 미리보기" style="height: 100%; border-radius: 10px;">
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</html>

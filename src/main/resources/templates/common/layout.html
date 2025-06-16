@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>스마트버스정류장 안전시스템</title>
+    <th:block th:replace="fragments/css :: favicon"></th:block>
+    <th:block th:replace="fragments/css :: tui"></th:block>
+    <th:block th:replace="fragments/css :: common"></th:block>
+    <th:block th:replace="fragments/js :: common"></th:block>
+    <th:block th:replace="fragments/js :: tui"></th:block>
+    <script type="text/javascript">
+      $(() => tui.Grid.setLanguage("ko"));
+    </script>
+</head>
+<body>
+<div class="skipmenu">
+    <a href="#">주메뉴 바로가기</a>
+    <a href="#">본문 바로가기</a>
+</div>
+<div class="wrap">
+    <th:block th:replace="common/header :: header"></th:block>
+    <th:block th:replace="common/aside :: aside"></th:block>
+
+    <main class="work_frame">
+        <div class="content_wrap">
+            <th:block layout:fragment="content"></th:block>
+        </div>
+    </main>
+
+    <!-- 에러 알림말 -->
+    <div th:class="${errorMessage != null ? 'dialog' : 'dialog hide'}">
+        <!-- 알림(경고) 창 : div.wrap 안에 위치합니다. -->
+        <div class="dialog_pop type_error">
+            <p id="error_message">
+                <span th:text="${#messages.msg(errorMessage)}" th:if="${errorMessage != null}"></span>
+            </p>
+            <button type="button" class="btn_x btn_close">
+                <span class="hide">닫기</span>
+                <i class="icon_x"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments/dialog :: all" />
+<th:block th:replace="fragments/lodingspn :: lodingSpinner" />
+</body>
+</html>

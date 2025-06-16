@@ -1,0 +1,211 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>날씨 정보</title>
+    <link rel="stylesheet" href="/webjars/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/output.css">
+    <script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#000000" data-border-radius="small"></script>
+    <style>
+        .gauge{
+            width: 7rem;
+            height: 7rem;
+        }
+        /* 🌞 낮 모드 스타일 */
+        .bg-day {
+            background-color: #003366; /* 어두운 파랑 */
+            color: #FFFFFF; /* 흰색 */
+        }
+
+        /* 🌙 밤 모드 스타일 */
+        .bg-night {
+            background-color: #000000; /* 검정 */
+            color: #FFD700; /* 노랑 */
+        }
+    </style>
+</head>
+<body class="font-[&#39;Noto_Sans_KR&#39;] bg-day">
+<div class="h-screen w-screen">
+    <div class="rounded-lg shadow-sm p-6 max-w-2xl mx-auto h-full">
+        <div class="flex items-start justify-between mb-6">
+<!--            기온-->
+            <div id="T1H_data">
+                <div class="text-6xl font-bold" th:text="${weatherAirQuality.T1H}+'°C'">4.2°C</div>
+<!--                <div class="text-sm text-gray-600 mt-2">체감(4.2°C)</div>-->
+<!--                <div class="text-sm text-gray-600 mt-1">어제보다 4°C 높아요</div>-->
+            </div>
+            <div class="font-bold text-3xl" id="currentTime">
+<!--                02.11.(화) 17:50 현재-->
+            </div>
+        </div>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+<!--            습도-->
+            <div class="text-center" id="REH_data">
+                <div class="mb-3">
+                    <div class="text-2xl" style="font-size:16px;"><i class="fa-solid fa-droplet mr-1"></i>습도</div>
+                </div>
+                <div><span class="text-4xl font-bold reh"></span><span class="text-2xl ml-2">%</span></div>
+            </div>
+<!--            바람-->
+            <div class="text-center" id="WSD_data">
+                <div class="mb-3">
+                    <span class="text-2xl" style="font-size:16px;"><i class="fas fa-wind mr-1"></i> 바람(<span id="vec">북</span>)</span>
+                </div>
+                <div class="text-4xl font-bold">
+                    <span class="wsd">0.1</span><span class="text-2xl ml-2">m/s</span>
+                </div>
+            </div>
+<!--            강수량-->
+            <div class="text-center" id="RN1_data">
+                <div class="mb-3">
+                    <span class="text-2xl" style="font-size:16px;"><i class="fas fa-cloud-rain mr-1"></i> 강수량 </span>
+                </div>
+                <div class="text-4xl font-bold " ><span class="rn1">0.1</span><span class="text-2xl ml-2">mm</span></div>
+            </div>
+        </div>
+<!--        <div class="flex justify-between items-center mb-6">-->
+<!--            <div class="flex items-center">-->
+<!--                <i class="fas fa-sun text-yellow-500 mr-2"></i>-->
+<!--                <span class="text-sm">일출 07:25</span>-->
+<!--            </div>-->
+<!--            <div class="flex items-center">-->
+<!--                <i class="fas fa-moon text-gray-600 mr-2"></i>-->
+<!--                <span class="text-sm">일몰 18:07</span>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <div class="grid grid-cols-3 gap-6">
+<!--            초미세먼지-->
+            <div class="text-center" id="pm10Value_data">
+                <div class="relative inline-block">
+                    <svg class="gauge">
+                        <circle cx="48" cy="48" r="45" fill="none" stroke="#E5E7EB" stroke-width="6"></circle>
+                        <circle class="pm10Grade-gauge"  cx="48" cy="48" r="45" fill="none" stroke="#F97316" stroke-width="6" stroke-dasharray="283" stroke-dashoffset="170"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div>
+                            <div class="text-xl font-bold pm10Grade-gauge-value">40</div>
+                            <div class="text-xs">μg/m³</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="text-2xl font-medium">초미세먼지</div>
+<!--                    <div class="text-sm ">(PM2.5)</div>-->
+                    <div class="text-2xl text-orange-500 pm10Grade-gauge-text bg-white-70">나쁨</div>
+                </div>
+            </div>
+<!--            미세먼지-->
+            <div class="text-center" id="khaiValue_data">
+                <div class="relative inline-block">
+                    <svg class="gauge">
+                        <circle cx="48" cy="48" r="45" fill="none" stroke="#E5E7EB" stroke-width="6"></circle>
+                        <circle class="khaiGrade-gauge" cx="48" cy="48" r="45" fill="none" stroke="#22C55E" stroke-width="6" stroke-dasharray="283" stroke-dashoffset="142"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div>
+                            <div class="text-xl font-bold khaiGrade-gauge-value">48</div>
+                            <div class="text-xs">μg/m³</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="text-2xl font-medium">미세먼지</div>
+<!--                    <div class="text-sm">(PM10)</div>-->
+                    <div class="text-2xl text-green-500 khaiGrade-gauge-text">보통</div>
+                </div>
+            </div>
+<!--            오존-->
+            <div class="text-center" id="o3Value_data">
+                <div class="relative inline-block">
+                    <svg class="gauge">
+                        <circle cx="48" cy="48" r="45" fill="none" stroke="#E5E7EB" stroke-width="6"></circle>
+                        <circle class="o3Grade-gauge" cx="48" cy="48" r="45" fill="none" stroke="#22C55E" stroke-width="6" stroke-dasharray="283" stroke-dashoffset="200"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div>
+                            <div class="text-xl font-bold o3Grade-gauge-class" >0.033</div>
+                            <div class="text-xs">ppm</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="text-2xl font-medium">오존</div>
+<!--                    <div class="text-sm">(O₃)</div>-->
+                    <div class="text-sm text-green-500 font-medium o3Grade-gauge-text">보통</div>
+                </div>
+            </div>
+        </div>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <div class="grid grid-cols-3 gap-6">
+<!--            이산화질소-->
+            <div class="text-center" id="no2Value_data">
+                <div class="relative inline-block">
+                    <svg class="gauge">
+                        <circle cx="48" cy="48" r="45" fill="none" stroke="#E5E7EB" stroke-width="6"></circle>
+                        <circle class="no2Grade-gauge"  cx="48" cy="48" r="45" fill="none" stroke="#F97316" stroke-width="6" stroke-dasharray="283" stroke-dashoffset="170"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div>
+                            <div class="text-xl font-bold no2Grade-gauge-value">40</div>
+                            <div class="text-xs">ppm</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="text-2xl font-medium">이산화질소</div>
+<!--                    <div class="text-sm">(NO₂)</div>-->
+                    <div class="text-sm text-orange-500 font-medium no2Grade-gauge-text">나쁨</div>
+                </div>
+            </div>
+<!--            일산화탄소-->
+            <div class="text-center" id="coValue_data">
+                <div class="relative inline-block">
+                    <svg class="gauge">
+                        <circle cx="48" cy="48" r="45" fill="none" stroke="#E5E7EB" stroke-width="6"></circle>
+                        <circle class="coGrade-gauge" cx="48" cy="48" r="45" fill="none" stroke="#22C55E" stroke-width="6" stroke-dasharray="283" stroke-dashoffset="142"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div>
+                            <div class="text-xl font-bold coGrade-gauge-value">48</div>
+                            <div class="text-xs">ppm</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="text-2xl font-medium">일산화탄소</div>
+<!--                    <div class="text-sm">(CO)</div>-->
+                    <div class="text-sm text-green-500 font-medium coGrade-gauge-text">보통</div>
+                </div>
+            </div>
+<!--            아황산가스-->
+            <div class="text-center" id="so2Value_data">
+                <div class="relative inline-block">
+                    <svg class="gauge">
+                        <circle cx="48" cy="48" r="45" fill="none" stroke="#E5E7EB" stroke-width="6"></circle>
+                        <circle class="so2Grade-gauge" cx="48" cy="48" r="45" fill="none" stroke="#22C55E" stroke-width="6" stroke-dasharray="283" stroke-dashoffset="200"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div>
+                            <div class="text-xl font-bold so2Grade-gauge-value" >0.033</div>
+                            <div class="text-xs">ppm</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="text-2xl font-medium">아황산가스</div>
+<!--                    <div class="text-sm">(SO₂)</div>-->
+                    <div class="text-sm text-green-500 font-medium so2Grade-gauge-text">보통</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/dist/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/weather.js}"></script>

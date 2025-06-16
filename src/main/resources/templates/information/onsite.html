@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">현장시설물</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">정보</a></li>
+      <li><a href="#">현장시설물</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+
+    <!-- search box type ex1 : 기본 4칸 + 버튼영역 -->
+    <div class="search_wrap">
+      <ul>
+        <li>
+          <p>정류장 ID</p>
+          <div class="rowbox">
+            <input type="text" placeholder="제목을 입력해주세요.">
+          </div>
+        </li>
+        <li>
+          <p>정류장 명</p>
+          <div class="rowbox">
+            <input type="text" placeholder="제목을 입력해주세요.">
+          </div>
+        </li>
+      </ul>
+
+      <div class="srch_btn">
+        <div class="type_grp type_single">
+          <button type="button" class="btn_def btn_point_clr">조회</button>
+          <button type="button" class="btn_def btn_red_clr">초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="area_title">
+      <h4 class="left_grp">
+        <span class="sub_title">조회결과</span>
+        <span class="sub_script">
+                  총 건수: <span class="num">10</span>건
+                </span>
+      </h4>
+      <div class="right_grp btn_grp">
+        <div class="type_grp">
+          <label class="hide">적용건수 선택</label>
+          <select class="select_round">
+            <option value="">전체</option>
+            <option value="">10건</option>
+            <option value="">100건</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid_board">
+      <div id="grid_tale"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+      <!-- 퍼블리싱 더미 데이터 - 나중에 삭제 -->
+      <script src="/test/grid_data_onsite.js"></script>
+      <!-- 퍼블리싱 더미 데이터 - 나중에 삭제 -->
+      <script>
+        $(function(){
+          const grid1 = new tui.Grid({
+            el: document.getElementById("grid_tale"),
+            scrollX: true,
+            scrollY: false,
+            rowHeaders: ['checkbox'],
+            columns: [
+              { name: "busStopId", header: "정류장ID", sortable: true, align: 'center' },
+              { name: "busStopNm", header: "정류장명", sortable: true, align: 'center' },
+              { name: "camera", header: "카메라", sortable: true, align: 'center' },
+              { name: "control", header: "컨트롤보드", sortable: true, align: 'center' },
+              { name: "screen", header: "스크린", sortable: true,  align: 'center' },
+              { name: "panel", header: "LED패널", sortable: true, align: 'center' },
+              { name: "chair", header: "온열의자", sortable: true, align: 'center' },
+              { name: "close", header: "폐쇄여부", sortable: true, align: 'center' },
+            ],
+            columnOptions: {
+              resizable: true,
+              minWidth: 80
+            }
+          });
+          tuiGridApplyTheme();
+
+          // pagination
+          var pagination1 = new tui.Pagination('grid_pagination', {
+            totalItems: 500,
+            itemsPerPage: 10,
+            visiblePages: 5
+          });
+
+          grid1.resetData(grid_data_onsite.slice(0, 10));
+          grid1.on('click', (e) => {
+            console.log(grid1.getRow(e.rowKey));
+            var row = grid1.getRow(e.rowKey);
+            $('#busStopId').text(row.busStopId);
+            $('#busStopNm').text(row.busStopNm);
+            $('#camera').val(row.camera === '보유' ? 'Y' : 'N');
+            $('#control').val(row.control === '보유' ? 'Y' : 'N');
+            $('#screen').val(row.screen === '보유' ? 'Y' : 'N');
+            $('#panel').val(row.panel === '보유' ? 'Y' : 'N');
+            $('#chair').val(row.chair === '보유' ? 'Y' : 'N');
+            $('#close').val(row.close === '예' ? 'Y' : 'N');
+            const target = $('#popup_frame');
+
+            target.toggleClass('on');
+            return false;
+          });
+        });
+      </script>
+    </div>
+
+
+  </div>
+
+  <div id="datepicker_wrapper" style="margin-top: -1px;"></div>
+  <div id="popup_frame" class="popup_frame">
+    <div class="popup_wrap">
+      <div class="pop_title">
+        <h5>상세보기</h5>
+        <button type="button" class="btn_x btn_close">
+          <span class="hide">닫기</span>
+          <i class="icon_x"></i>
+        </button>
+      </div>
+
+      <div class="pop_content">
+        <div class="table_wrap">
+          <table class="align_center">
+            <caption class="hide">table</caption>
+            <colgroup>
+              <col style="width: 50%;">
+              <col style="width: 50%;">
+            </colgroup>
+            <tbody>
+            <tr>
+              <th scope="row">정류장ID</th>
+              <td id="busStopId"></td>
+            </tr>
+            <tr>
+              <th>정류장명</th>
+              <td id="busStopNm"></td>
+            </tr>
+            <tr>
+              <th>카메라</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">보유/미보유 선택</label>
+                  <select id="camera" class="select_box" required disabled>
+                    <option value="Y">보유</option>
+                    <option value="N">미보유</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>컨트롤보드</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">보유/미보유 선택</label>
+                  <select id="control" class="select_box" required disabled>
+                    <option value="Y">보유</option>
+                    <option value="N">미보유</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>스크린</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">보유/미보유 선택</label>
+                  <select id="screen" class="select_box" required disabled>
+                    <option value="Y">보유</option>
+                    <option value="N">미보유</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>LED패널</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">보유/미보유 선택</label>
+                  <select id="panel" class="select_box" required disabled>
+                    <option value="Y">보유</option>
+                    <option value="N">미보유</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>온열의자</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">보유/미보유 선택</label>
+                  <select id="chair" class="select_box" required disabled>
+                    <option value="Y">보유</option>
+                    <option value="N">미보유</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>페쇄여부</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">페쇄여부 선택</label>
+                  <select id="close" class="select_box" required disabled>
+                    <option value="Y">예</option>
+                    <option value="N">아니요</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="btn_grp btn_right">
+          <div class="type_grp type_single">
+            <button type="button" class="btn_def btn_point_clr">수정</button>
+            <button type="button" class="btn_close btn_def btn_gray">닫기</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</th:block>
+</html>

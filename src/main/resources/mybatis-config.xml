@@ -1,0 +1,28 @@
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		<setting name="cacheEnabled" value="false" />
+		<setting name="useGeneratedKeys" value="true" />
+		<setting name="defaultExecutorType" value="REUSE" />
+		<setting name="aggressiveLazyLoading" value="false"/>
+		<setting name="jdbcTypeForNull" value="NULL" />
+		<setting name="callSettersOnNulls" value="true"/>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+	</settings>
+    
+	<typeAliases>
+		<typeAlias type="org.egovframe.rte.psl.dataaccess.util.EgovMap" alias="EgovMap"/>
+		<typeAlias type="com.archivsoft.sbms.dto.UserDTO" 				alias="UserDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.GrantDTO"				alias="GrantDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.ControlDTO"			alias="ControlDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.SettingDTO"			alias="SettingDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.CommandDTO"			alias="CommandDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.FacilityDTO"			alias="FacilityDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.MonitoringDTO"			alias="MonitoringDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.ControlLogDTO"			alias="ControlLogDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.ControlMessageDTO"		alias="ControlMessageDTO"/>
+		<package   name="com.archivsoft.sbms.dto" />
+	</typeAliases>
+
+</configuration>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="common">
+  <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/dist/jquery.min.js}"></script>
+  <script type="text/javascript" th:src="@{/js/common.js}"></script>
+  <script type="text/javascript" th:src="@{/js/debug.js}"></script>
+  <script src="/webjars/chart.js/3.7.0/dist/chart.min.js"></script>
+  <script src="/webjars/echarts/5.4.3/dist/echarts.min.js"></script>
+</th:block>
+
+<th:block th:fragment="tui">
+  <script type="text/javascript" th:src="@{/js/tui.js}"></script>
+  <script type="text/javascript" th:src="@{/lib/toastui-chart/toastui-chart.min.js}"></script>
+  <script type="text/javascript" th:src="@{/lib/tui-grid/tui-grid.min.js}"></script>
+  <script type="text/javascript" th:src="@{/lib/tui-pagination/tui-pagination.min.js}"></script>
+  <script type="text/javascript" th:src="@{/lib/tui-date-picker/tui-date-picker.js}"></script>
+  <script type="text/javascript" th:src="@{/lib/tui-time-picker/tui-time-picker.min.js}"></script>
+  <script src="/webjars/chartjs-plugin-datalabels/2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+</th:block>
+</html>

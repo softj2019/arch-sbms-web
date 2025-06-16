@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.ControlLogMapper">
+    <!-- 통합 제어 로그 조회 -->
+    <select id="getLogList" parameterType="map" resultType="ControlLogDTO">
+        SELECT   id
+                 , terminal_id
+                 , device_name
+                 , action
+                 , user_id
+                 , DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+        FROM     tb_control_log
+        WHERE    1=1
+        <if test = "s_terminalId != null and s_terminalId != ''">
+            AND  terminal_id LIKE CONCAT('%', #{s_terminalId}, '%')
+        </if>
+        <if test = "s_deviceName != null and s_deviceName != ''">
+            AND  device_name LIKE CONCAT('%', #{s_deviceName}, '%')
+        </if>
+        <if test = "s_userId != null and s_userId != ''">
+            AND  user_id LIKE CONCAT('%', #{s_userId}, '%')
+        </if>
+        ORDER BY created_at DESC
+        LIMIT    #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 로그 수 -->
+    <select id="getLogCount" parameterType="map" resultType="int">
+        SELECT COUNT(1)
+        FROM tb_control_log
+        WHERE 1=1
+        <if test = "s_terminalId != null and s_terminalId != ''">
+            AND  terminal_id LIKE CONCAT('%', #{s_terminalId}, '%')
+        </if>
+        <if test = "s_deviceName != null and s_deviceName != ''">
+            AND  device_name LIKE CONCAT('%', #{s_deviceName}, '%')
+        </if>
+        <if test = "s_userId != null and s_userId != ''">
+            AND  user_id LIKE CONCAT('%', #{s_userId}, '%')
+        </if>
+    </select>
+</mapper>

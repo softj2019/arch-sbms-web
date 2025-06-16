@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.MonitoringMapper">
+    <insert id="saveData" parameterType="MonitoringDTO">
+        INSERT INTO tb_monitoring (
+            cpu_temperature,
+            ctl_board_power,
+            fan,
+            ipaddress,
+            lcd_display_power,
+            led_light_power,
+            led_panel_power,
+            lte_router_power,
+            rfc_cpu,
+            rfc_memory_available,
+            rfc_memory_total,
+            rfc_memory_used,
+            rfc_storage_available,
+            rfc_storage_total,
+            rfc_storage_used,
+            smartscreen_power,
+            terminal_id,
+            vc_power
+        ) VALUES (
+             #{cpu_temperature},
+             #{ctl_board_power},
+             #{fan},
+             #{ipaddress},
+             #{lcd_display_power},
+             #{led_light_power},
+             #{led_panel_power},
+             #{lte_router_power},
+             #{rfc_cpu},
+             #{rfc_memory_available},
+             #{rfc_memory_total},
+             #{rfc_memory_used},
+             #{rfc_storage_available},
+             #{rfc_storage_total},
+             #{rfc_storage_used},
+             #{smartscreen_power},
+             #{terminal_id},
+             #{vc_power}
+         );
+    </insert>
+
+    <!--테이블 초기화-->
+    <delete id="truncateTable">
+        TRUNCATE TABLE tb_monitoring;
+    </delete>
+</mapper>

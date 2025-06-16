@@ -1,0 +1,23 @@
+{
+  "name": "sbms_workspace",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "watch": "tailwindcss -i ./src/main/resources/tailwind/styles.css -o ./src/main/resources/static/css/build/tailwind.css --watch",
+    "build": "tailwindcss -i ./src/main/resources/tailwind/styles.css -o ./src/main/resources/static/css/build/tailwind.css --minify",
+    "init": "tailwindcss init -p"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.jetbrains.space/archivsoft/solution/arch-sbms.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.1"
+  }
+}

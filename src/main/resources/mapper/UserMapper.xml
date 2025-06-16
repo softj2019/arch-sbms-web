@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.UserMapper">
+
+<!--    사용자 조회(추후 role 테이블 확장을 고려하여 join select 로 구현-->
+    <select id="getUser" resultType="UserDTO" parameterType="map">
+        SELECT    u.user_id,
+                  u.user_nm,
+                  u.user_email,
+                  u.user_telno,
+                  u.use_yn,
+                  u.created_at,
+                  r.role_name AS roleName
+        FROM      tb_user u
+        LEFT JOIN tb_role r
+        ON        u.role_id = r.role_id
+        WHERE     1=1
+        <if test="i_userId != null and i_userId != ''">
+            AND   u.user_id LIKE CONCAT('%', #{i_userId}, '%')
+        </if>
+        <if test="i_userName != null and i_userName != ''">
+            AND   u.user_nm LIKE CONCAT('%', #{i_userName}, '%')
+        </if>
+        <if test="i_userEmail != null and i_userEmail != ''">
+            AND   u.user_email LIKE CONCAT('%', #{i_userEmail}, '%')
+        </if>
+        <if test="i_s_date != null and i_s_date != ''">
+            AND   u.created_at &gt; #{i_s_date}
+        </if>
+        <if test="i_e_date != null and i_e_date != ''">
+            AND   u.created_at &lt; #{i_e_date}
+        </if>
+        ORDER BY  u.created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+<!--    사용자 수-->
+    <select id="getUserCount" resultType="int" parameterType="map">
+        SELECT      COUNT(1)
+        FROM        tb_user u
+        LEFT JOIN   tb_role r
+        ON          u.role_id = r.role_id
+        WHERE       1=1
+        <if test="i_userId != null and i_userId != ''">
+            AND u.user_id LIKE CONCAT('%', #{i_userId}, '%')
+        </if>
+        <if test="i_userName != null and i_userName != ''">
+            AND u.user_nm LIKE CONCAT('%', #{i_userName}, '%')
+        </if>
+        <if test="i_userEmail != null and i_userEmail != ''">
+            AND u.user_email LIKE CONCAT('%', #{i_userEmail}, '%')
+        </if>
+        <if test="i_s_date != null and i_s_date != ''">
+            AND u.created_at &gt;= #{i_s_date}
+        </if>
+        <if test="i_e_date != null and i_e_date != ''">
+            AND u.created_at &lt;= #{i_e_date}
+        </if>
+    </select>
+
+<!--    아이디 중복확인-->
+    <select id="findId" parameterType="String" resultType="String">
+        SELECT  user_id
+        FROM    tb_user
+        WHERE   user_id = #{userId}
+    </select>
+
+<!--    사용자 등록-->
+    <insert id="createUser" parameterType="UserDTO">
+        INSERT INTO tb_user (
+            user_id,
+            user_nm,
+            user_password,
+            user_email,
+            user_telno,
+            use_yn,
+            role_id
+        ) VALUES (
+            #{userId},
+            #{userNm},
+            #{userPassword},
+            #{userEmail},
+            #{userTelno},
+            #{useYn},
+            #{userRole}
+        )
+    </insert>
+
+<!--    사용자 삭제-->
+    <delete id="deleteUser" parameterType="UserDTO">
+        DELETE FROM tb_user
+        WHERE       user_id IN
+        <foreach item="userId" collection="userIdList" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+
+<!--    사용자 수정-->
+    <update id="updateUser" parameterType="UserDTO">
+        UPDATE      tb_user
+            <set>
+                <if test="userNm != null and userNm != ''">
+                    user_nm = #{userNm},
+                </if>
+                <if test="userPassword != null and userPassword != ''">
+                    user_password = #{userPassword},
+                </if>
+                <if test="userEmail != null and userEmail != ''">
+                    user_email = #{userEmail},
+                </if>
+                <if test="userTelno != null and userTelno != ''">
+                    user_telno = #{userTelno},
+                </if>
+                <if test="useYn != null and useYn != ''">
+                    use_yn = #{useYn},
+                </if>
+                <if test="userRole != null and userRole != ''">
+                    role_id = #{userRole},
+                </if>
+            </set>
+        WHERE       user_id = #{userId}
+    </update>
+</mapper>

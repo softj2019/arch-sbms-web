@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">시스템관리</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">시스템관리</a></li>
+      <li><a href="#">사용자관리</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+
+    <!-- search box type ex1 : 기본 4칸 + 버튼영역 -->
+    <div class="search_wrap">
+      <ul>
+        <li>
+          <p>아이디</p>
+          <div class="rowbox">
+            <input type="text" id="i_userId" placeholder="아이디를 입력해주세요.">
+          </div>
+        </li>
+        <li>
+          <p>이름</p>
+          <div class="rowbox">
+            <input type="text" id="i_userName" placeholder="이름을 입력해주세요.">
+          </div>
+        </li>
+        <li>
+          <p>EMAIL</p>
+          <div class="rowbox">
+            <input type="text" id="i_userEmail" placeholder="이메일을 입력해주세요.">
+          </div>
+        </li>
+        <li>
+          <p>등록일</p>
+          <div class="rowbox date_box">
+            <div>
+              <input type="text" id="datepicker-input1" aria-label="Date-Time">
+              <div class="datepicker-container" id="datepicker-input1-container"></div>
+            </div>
+            <span>~</span>
+            <div>
+              <input type="text" id="datepicker-input2" aria-label="Date-Time">
+              <div class="datepicker-container"  id="datepicker-input2-container"></div>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="srch_btn">
+        <div class="type_grp type_single">
+          <button type="button" class="btn_def btn_point_clr" onclick="getUserList()">조회</button>
+          <button type="button" class="btn_def btn_red_clr" onclick="clearSerchContents()">초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="area_title">
+      <h4 class="left_grp">
+        <span class="sub_title">조회결과</span>
+        <span class="sub_script">
+                  총 건수: <span class="num"></span>건
+                </span>
+      </h4>
+      <div class="right_grp btn_grp">
+        <div class="type_grp">
+          <label class="hide">적용건수 선택</label>
+          <select id="itemsPerPage" class="select_round" onchange="getUserList(0)">
+            <!--            <option value="">전체</option>-->
+            <option value="10">10건</option>
+            <option value="100">100건</option>
+          </select>
+        </div>
+        <div class="type_grp">
+          <button id="regist" type="button" class="btn_def btn_point_clr btn_model" model_target="#regist_popup_frame">등록</button>
+        </div>
+      </div>
+    </div>
+
+    <!--    s: 그리드-->
+    <div class="grid_board">
+      <div id="grid_tale"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+    </div>
+    <!--    e: 그리드-->
+
+  </div>
+
+  <!--  s: 수정팝업-->
+  <div id="datepicker_wrapper" style="margin-top: -1px;"></div>
+  <div id="popup_frame" class="popup_frame">
+    <div class="popup_wrap">
+      <div class="pop_title">
+        <h5>상세보기</h5>
+        <button type="button" class="btn_x btn_close">
+          <span class="hide">닫기</span>
+          <i class="icon_x"></i>
+        </button>
+      </div>
+
+      <div class="pop_content">
+        <div class="table_wrap">
+          <table class="align_center">
+            <caption class="hide">table</caption>
+            <colgroup>
+              <col style="width: 50%;">
+              <col style="width: 50%;">
+            </colgroup>
+            <tbody>
+            <tr>
+              <th scope="row">NO</th>
+              <td id="no"></td>
+            </tr>
+            <tr>
+              <th>이름</th>
+              <td id="new_userName"></td>
+            </tr>
+            <tr>
+              <th>이메일</th>
+              <td id="email"></td>
+            </tr>
+            <tr>
+              <th>핸드폰번호</th>
+              <td id="telno"></td>
+            </tr>
+            <tr>
+              <th>권한그룹</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">선택</label>
+                  <select id="menuGrpNm" class="select_box" required>
+                    <!--                    <option value="">선택</option>-->
+                    <option value="1">일반사용자</option>
+                    <option value="2">관리자</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>상태</th>
+              <td id="status"></td>
+            </tr>
+            <tr>
+              <th>생성일자</th>
+              <td id="regDt"></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="btn_grp btn_right">
+          <div class="type_grp type_single">
+            <button type="button" class="btn_def btn_point_clr" onclick="updateUser()">수정</button>
+            <button type="button" class="btn_close btn_def btn_gray">닫기</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <!--  e: 수정팝업-->
+
+  <!--  s: 등록팝업-->
+  <div id="regist_popup_frame" class="popup_frame">
+    <div class="popup_wrap">
+      <div class="pop_title">
+        <h5>상세보기</h5>
+        <button type="button" class="btn_x btn_close">
+          <span class="hide">닫기</span>
+          <i class="icon_x"></i>
+        </button>
+      </div>
+
+      <div class="pop_content">
+        <div class="table_wrap">
+          <table class="align_center">
+            <caption class="hide">table</caption>
+            <colgroup>
+              <col style="width: 50%;">
+              <col style="width: 50%;">
+            </colgroup>
+            <tbody>
+            <tr>
+              <th>이름</th>
+              <td>
+                <div class="rowbox">
+                  <input id="new_new_userName" type="text" placeholder="">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>아이디</th>
+              <td>
+                <div class="rowbox">
+                  <div class="btn_grp">
+                    <input id="new_id" type="text" placeholder="" style="max-width: 90%;">
+                    <button type="button" class="btn_def btn_red_clr" onclick="checkDuplicate()">중복확인</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>이메일</th>
+              <td>
+                <div class="rowbox">
+                  <input id="new_email" type="text" placeholder="">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>비밀번호</th>
+              <td>
+                <div class="rowbox">
+                  <input id="new_password" type="password" placeholder="">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>비밀번호(확인)</th>
+              <td>
+                <div class="rowbox">
+                  <input id="new_passwordCheck" type="password" placeholder="">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>권한그룹</th>
+              <td>
+                <div class="rowbox">
+                  <label class="hide">선택</label>
+                  <select id="new_menuGrpNm" class="select_box" required>
+                    <option value="" disabled selected>선택</option>
+                    <option value="1">일반사용자</option>
+                    <option value="2">관리자</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>휴대폰전화번호</th>
+              <td>
+                <div class="rowbox">
+                  <input id="new_telno" type="text" placeholder="">
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="btn_grp btn_center">
+          <div class="type_grp type_single">
+            <button type="button" class="btn_def btn_main_clr" onclick="createUser()">등록</button>
+            <button type="button" class="btn_def btn_red_clr btn_close" onclick="clearContents()" >취소</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <!--  e: 등록팝업-->
+
+  <script>
+    /* 전역변수 */
+    let grid1;       // 그리드
+    let pagination1; // 페이지네이션
+
+    /* 페이지 온로드 */
+    $(document).ready(function(){
+      getUserList();
+      initializeGrid();
+    });
+
+    /* 그리드 */
+    function initializeGrid() {
+      const gridElement = document.getElementById("grid_tale");
+      if (!gridElement) {
+        console.error("그리드를 초기화할 DOM 요소를 찾을 수 없습니다.");
+        return;
+      }
+
+      grid1 = new tui.Grid({
+        el         : gridElement,
+        scrollX    : true,
+        scrollY    : false,
+        rowHeaders : ['checkbox'],
+        columns: [
+          { name: "no"        , header: "NO", sortable: true, align: 'center' },
+          { name: "userId"    , header: "아이디", sortable: true, align: 'center' },
+          { name: "userName"  , header: "이름", sortable: true, align: 'center' },
+          { name: "userEmail" , header: "EMAIL", sortable: true, align: 'center' },
+          { name: "userTelno" , header: "휴대전화번호", sortable: true, align: 'center' },
+          { name: "userRole"  , header: "권한그룹", sortable: true, align: 'center' },
+          { name: "useYn"     , header: "상태", sortable: true, align: 'center' },
+          { name: "createdAt" , header: "등록일", sortable: true, align: 'center' },
+        ],
+        columnOptions: {
+          resizable: true,
+          minWidth: 80,
+        },
+      });
+
+      tuiGridApplyTheme();
+
+      // pagination
+      var pagination1 = new tui.Pagination('grid_pagination', {
+        totalItems: 11,
+        itemsPerPage: 10,
+        visiblePages: 5
+      });
+
+      pagination1.on('afterMove', function(eventData) {
+        const currentPage = eventData.page - 1;
+        getUserList(currentPage);
+      });
+
+      grid1.on('click', (e) => {
+        var row = grid1.getRow(e.rowKey);
+
+        $('#no'        ).text(row.no);
+        $('#userId'    ).text(row.userId);
+        $('#userName'  ).text(row.userName);
+        $('#userEmail' ).text(row.userEmail);
+        $('#userTelno' ).text(row.userTelno);
+        $('#userRole'  ).val(row.userRole);
+        $('#useYn'     ).text(row.useYn);
+        $('#createdAt' ).text(row.createdAt);
+
+        const target = $('#popup_frame');
+
+        target.toggleClass('on');
+        return false;
+      });
+    }
+
+    // 검색조건 엔터키 감지
+    $('#i_userId, #i_userName, #i_userEmail').on('keydown', function (event) {
+      if (event.key === 'Enter') {
+        getUserList();
+      }
+    });
+
+    /* 데이트피커 */
+    $(function(){
+      var datepicker = new tui.DatePicker('#datepicker-input1-container', {
+        // date: new Date(),
+        input: {
+          element: '#datepicker-input1',
+          format: 'yyyy-MM-dd'
+        }
+      });
+      var datepicker2 = new tui.DatePicker('#datepicker-input2-container', {
+        date: new Date(),
+        input: {
+          element: '#datepicker-input2',
+          format: 'yyyy-MM-dd'
+        }
+      });
+    });
+
+    $('#regist_popup_frame .btn_close').click(function(){
+      $(this).closest('.popup_frame').removeClass('on');
+    });
+
+    $('#regist_popup_frame .btn_main_clr').click(function(){
+      $(this).closest('.popup_frame').removeClass('on');
+    });
+
+    /* 사용자 조회 */
+    function getUserList(page = 0){
+      // 입력한 조건이 있다면 할당, 없다면 ""
+      let i_userId    = $('#i_userId'   ).val().trim();
+      let i_userName  = $('#i_userName' ).val().trim();
+      let i_userEmail = $('#i_userEmail').val().trim();
+      let i_s_date    = $('#datepicker-input1').val().trim();
+      let i_e_date    = $('#datepicker-input2').val().trim();
+      console.log(i_s_date);
+      console.log(i_e_date);
+
+      // 조회건수
+      const size = $('#itemsPerPage').val() || 10;
+
+      // 검색 조건(default = '')
+      const i_data = {
+        i_userId    : i_userId,
+        i_userName  : i_userName,
+        i_userEmail : i_userEmail,
+        i_s_date    : i_s_date,
+        i_e_date    : i_e_date
+      }
+
+      $.ajax({
+        url           : `/system/api/user/getUserList?page=${page}&size=${size}`,
+        method        : 'Post',
+        contentType   : 'application/json; charset=utf-8',
+        data          : JSON.stringify(i_data),
+        dataType      : 'json',
+        success: function(response){
+          const gridData = response.content.map((user, index) => ({
+            no        : index + 1 + page * size,
+            userId    : user.userId,
+            userName  : user.userName,
+            userEmail : user.userEmail,
+            userTelno : user.userTelno,
+            userRole  : user.userRole,
+            useYn     : user.useYn,
+            createdAt : user.createdAt,
+          }));
+
+          // TOAST UI Grid 데이터 초기화
+          grid1.resetData(gridData);
+
+          // 페이지네이션 초기화
+          initializePagination(response.totalElements, size);
+
+          // 총 건수 업데이트
+          $('.sub_script .num').text(response.totalElements);
+        },
+        error: function(xhr, status, error){
+          console.log("xhr: "+xhr+" status: "+status+" error: "+error);
+        }
+      });
+    }
+
+    /* 페이지네이션 초기화 */
+    function initializePagination(totalItems, itemsPerPage) {
+      // 페이지네이션 초기화된 경우 데이터만 유지
+      if (pagination1) {
+        pagination1.setTotalItems(totalItems);     // 총 데이터 개수 업데이트
+        pagination1.setItemsPerPage(itemsPerPage); // 페이지당 아이템 수 업데이트
+        return;
+      }
+
+      pagination1 = new tui.Pagination('grid_pagination', {
+        totalItems: totalItems,
+        itemsPerPage: itemsPerPage,
+        visiblePages: 5,
+      });
+
+      pagination1.on('afterMove', function (eventData) {
+        const currentPage = eventData.page - 1;
+        getUserList(currentPage);
+      });
+    }
+
+    /* 사용자 검색조건 초기화 */
+    function clearSerchContents(){
+      $('#i_userId'   ).val('');
+      $('#i_userName' ).val('');
+      $('#i_userEmail').val('');
+      $('#datepicker-input1').val('');
+    }
+
+    /* 사용자 중복확인 */
+    let isDuplicateId = false;
+
+    function checkDuplicate() {
+      const loginId = $('#new_id').val();
+
+      if (!loginId) {
+        console.warn("아이디를 입력하세요.");
+        return;
+      }
+
+      const data = { userId: loginId };
+
+      $.ajax({
+        url         : '/system/api/user/isDuplicateId',
+        method      : 'POST',
+        data        : JSON.stringify(data),
+        contentType : 'application/json; charset=utf-8',
+        dataType    : 'json',
+        success: function (response) {
+          if (response) {
+            console.log("이미 사용 중인 아이디입니다.");
+            isDuplicateId = false;
+          } else {
+            console.log("사용 가능한 아이디입니다.");
+            isDuplicateId = true;
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error(`요청 실패: ${status}, 오류: ${error}`);
+          isDuplicateId = false;
+        }
+      });
+    }
+
+    /* 아이디 입력값 변경 감지 */
+    $('#new_id').on('input', function () {
+      isDuplicateId = false;
+    });
+
+    /* 사용자 등록 */
+    function createUser(){
+      const user_name         = $('#new_new_userName' ).val();  // 이름
+      const user_id           = $('#new_id'           ).val();  // 아이디
+      const user_email        = $('#new_email'        ).val();  // 이메일
+      const user_password     = $('#new_password'     ).val();  // 비밀번호
+      const user_password_chk = $('#new_passwordCheck').val();  // 비밀번호(확인)
+      const user_role         = $('#new_menuGrpNm'    ).val();  // 권한그룹
+      const user_telno        = $('#new_telno'        ).val();  // 휴대폰전화번호
+
+      /* 유효성 검사 */
+      if (!user_name) {
+        console.log("이름을 입력하세요.");
+        return;
+      }
+      if (!user_id) {
+        console.log("아이디를 입력하세요.");
+        return;
+      }
+      if (!user_email) {
+        console.log("이메일을 입력하세요.");
+        return;
+      }
+      if (!user_password) {
+        console.log("비밀번호를 입력하세요.");
+        return;
+      }
+      if (!user_password_chk) {
+        console.log("비밀번호(확인)을 입력하세요.");
+        return;
+      }
+      if (!user_role) {
+        console.log("권한그룹을 선택하세요.");
+        return;
+      }
+      if (!user_telno) {
+        console.log("휴대폰번호을 입력하세요.");
+        return;
+      }
+      if (!isDuplicateId) {
+        console.log("아이디 중복확인이 안되었습니다.");
+        return;
+      }
+
+      const data = {
+        user_name     : user_name,
+        user_id       : user_id,
+        user_email    : user_email,
+        user_password : user_password,
+        user_role     : user_role,
+        user_telno    : user_telno
+      };
+
+      $.ajax({
+        url           : '/system/api/user/createUser',
+        method        : 'POST',
+        data          : JSON.stringify(data),
+        contentType   : 'application/json; charset=utf-8',
+        dataType      : 'json',
+        success: function (result) {
+          if (result.success){
+            console.log("result : "+result.message);
+            clearContents();
+            clearSerchContents();
+            getUserList();
+          } else {
+            console.log("result : "+result.message);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error(`요청 실패: ${status}, 오류: ${error}, 상태: ${xhr}`);
+        }
+      });
+    }
+
+    /* 회원등록시 입력값 초기화 */
+    function clearContents(){
+      isDuplicateId = false;
+      $('#new_userName'     ).val('');
+      $('#new_id'           ).val('');
+      $('#new_email'        ).val('');
+      $('#new_password'     ).val('');
+      $('#new_passwordCheck').val('');
+      $('#new_menuGrpNm'    ).val('');
+      $('#new_telno'        ).val('');
+    }
+
+    /* 사용자 수정 */
+    function updateUser(){
+
+    }
+  </script>
+</th:block>
+</html>

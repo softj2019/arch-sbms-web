@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,user-scalable=no,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>template</title>
+
+    <!--favicon-->
+    <!--  
+    <link rel="icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="196x196" href="img/favicon_196.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon_32.png" />
+    -->
+
+    <!-- css -->
+    <link rel="stylesheet" href="../lib/tui-date-picker/tui-date-picker.min.css" />
+    <link rel="stylesheet" href="../lib/tui-grid/tui-grid.min.css" />
+    <link rel="stylesheet" href="../lib/tui-pagination/tui-pagination.min.css" />
+
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/component.css" />
+
+    <!-- js -->
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <script src="../lib/tui-date-picker/tui-date-picker.min.js"></script>
+    <script src="../lib/tui-grid/tui-grid.min.js"></script>
+    <script src="../lib/tui-pagination/tui-pagination.min.js"></script>
+    
+    <script src="../js/common.js"></script>
+    <script src="../js/tui.js"></script>
+    <!-- 퍼블리싱 편의용 나중에 삭제 --><script src="../js/debug.js"></script><!-- 퍼블리싱 편의용 나중에 삭제 -->
+  </head>
+  <body>
+    <div class="skipmenu">
+      <a href="#">주메뉴 바로가기</a>
+      <a href="#">본문 바로가기</a>
+    </div>
+    <div class="wrap">
+      <header class="top_frame">
+        <div class="header">
+          <h1 class="logo">
+            <a href="#">
+              <img src="../images/admin_logo.svg" alt="로고이미지">
+              <span class="hide">한국석유공사</span>
+            </a>
+          </h1>
+          <div class="header_wrap">
+            <nav class="gnb">
+              <h2 class="hide">메뉴</h2>
+              <ul>
+                <li><a href="./01_component_search.html">컴포넌트</a></li>
+                <li><a href="./02_template_type01.html">템플릿</a></li>
+                <li><a href="#">C (1Depth)</a></li>
+                <li><a href="#">D (1Depth)</a></li>
+                <li><a href="#">E (1Depth)</a></li>
+                <li><a href="#">F (1Depth)</a></li>
+              </ul>
+            </nav>            
+            <div class="utile">
+              <button type="button" class="model_btn notice_msg" model_target=".notice_msg_pop">
+                <span class="hide">알림메세지</span>
+                <span class="ntc_msg">10</span>
+              </button>
+              <a href="#" class="btn_logout">
+                <span>LOGOUT</span>
+              </a>
+            </div>
+
+            <!-- 메세지 알림 팝업 -->
+            <div class="notice_msg_pop">
+              <ul class="msg_pop_list">
+                <li>
+                  <a href="#">
+                    <p class="msg_title">
+                      <span>알림메세지 타이틀</span>
+                      <span class="msg_time">24-10-10</span>
+                    </p>
+                    <div class="msg_text">
+                      알림 메세지가 여기에 나옵니다.
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <p class="msg_title">
+                      <span>알림메세지 타이틀이 길어지면 두줄이 됩니다</span>
+                      <span class="msg_time">24-10-10</span>
+                    </p>
+                    <div class="msg_text">
+                      알림 메세지가 여기에 나옵니다. 알림 메세지가 여기에 나옵니다.
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <p class="msg_title">
+                      <span>알림메세지 타이틀</span>
+                      <span class="msg_time">24-10-10</span>
+                    </p>
+                    <div class="msg_text">
+                      알림 메세지가 여기에 나옵니다.
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <p class="msg_title">
+                      <span>알림메세지 타이틀이 길어지면 두줄이 됩니다</span>
+                      <span class="msg_time">24-10-10</span>
+                    </p>
+                    <div class="msg_text">
+                      알림 메세지가 여기에 나옵니다. 알림 메세지가 여기에 나옵니다.
+                    </div>
+                  </a>
+                </li>
+              </ul>
+
+            </div>
+
+            <!-- 태블릿 모바일 헤더 -->
+            <div class="m_header">
+              <button type="button" class="m_btn_menu">
+                <span class="hide">메뉴</span>
+                <i class="icon_menu"></i>
+              </button>
+              <h1 class="m_logo">
+                <a href="#">
+                  <img src="../images/admin_logo.svg" alt="로고이미지">
+                  <span class="hide">한국석유공사</span>
+                </a>
+              </h1>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 태블릿 모바일 전체메뉴 -->
+        <div class="m_menu">
+          <div class="m_menu_wrap">
+            <div class="m_menu_top">
+              <div class="utile">
+                <button type="button" class="notice_msg">
+                  <span class="hide">알림메세지</span>
+                  <span class="ntc_msg">10</span>
+                </button>
+                <a href="#" class="btn_logout">
+                  <span>LOGOUT</span>
+                </a>
+              </div>
+              <button type="button" class="m_btn_x">
+                <span class="hide">닫기</span>
+                <i class="icon_x"></i>
+              </button>
+            </div>
+            
+            <div class="m_gnb">
+              <ul class="m_gnb_dp1">
+                <li class="dp_arrow">                  
+                  <a href="#">컴포넌트</a> <!-- 하위메뉴가 있는 상위메뉴에는 링크주소 # 으로 -->
+                  <ul class="m_gnb_dp2">
+                    <li class="dp_arrow">
+                      <a href="#">컴포넌트 UI</a> <!-- 하위메뉴가 있는 상위메뉴에는 링크주소 # 으로 -->
+                      <ul class="m_gnb_dp3">
+                        <li><a href="./01_component_search.html">검색박스</a></li>
+                        <li><a href="./01_component_table.html">표 타입 table</a></li>
+                        <li><a href="./01_component_dialog.html">다이알로그 알림창</a></li>
+                      </ul>
+                    </li>
+                    <li class="dp_arrow">
+                      <a href="#">그리드 : TUI그리드</a>
+                      <ul class="m_gnb_dp3">
+                        <li><a href="./01_component_tui_type1.html">Type 01</a></li>
+                        <li><a href="./01_component_tui_type2.html">Type 02</a></li>
+                      </ul>
+                    </li>                    
+                  </ul>
+                </li>
+                <li class="dp_arrow">
+                  <a href="#">템플릿</a>
+                  <ul class="m_gnb_dp2">
+                    <li class="dp_arrow">
+                      <a href="#">PPT 화면 모음</a>
+                      <ul class="m_gnb_dp3">
+                        <li><a href="./02_template_type01.html">비전자기록물 검색</a></li>
+                        <li><a href="./02_template_type02.html">대출관리-반입반출현황</a></li>
+                        <li><a href="./02_template_type03.html">대출관리-반입반출신청현황</a></li>
+                        <li><a href="./02_template_type04.html">대출관리-반입</a></li>
+                        <li><a href="./02_template_type05.html">대출관리-반출</a></li>
+                        <li><a href="./02_template_type06.html">열람</a></li>
+                        <li><a href="./02_template_type07.html">열람조회</a></li>
+                        <li><a href="./02_template_type08.html">기록물 폐기 관리-만료</a></li>
+                        <li><a href="./02_template_type09.html">기록물 폐기 관리-보류</a></li>
+                        <li><a href="./02_template_type10.html">기록물 폐기 관리-폐기의견등록</a></li>
+                        <li><a href="./02_template_type11.html">기록물 폐기 관리-폐기리스트</a></li>
+                        <li><a href="./02_template_type12.html">시스템관리-공지사항</a></li>
+                        <li><a href="./02_template_type13.html">시스템관리-권한관리</a></li>
+                        <li><a href="./02_template_type14.html">시스템관리-사용자관리</a></li>
+                        <li><a href="./02_template_type15.html">시스템관리-사용자 상세페이지</a></li>
+                        <li><a href="./02_template_type16.html">시스템관리-처리과관리</a></li>
+                        <li><a href="./02_template_type17.html">시스템관리-로고관리</a></li>
+                        <li><a href="./02_template_type18.html">시스템관리-기록물 현황 통계</a></li>
+                      </ul>
+                    </li>                                        
+                  </ul>
+                </li>                
+                
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </header>
+
+      <aside class="left_frame">
+        <ul class="left_menu left_dp1">
+          <li>
+            <a href="./02_template_type01.html" title="템플릿">템플릿</a>
+            <ul class="left_dp2">
+              <li class="" >
+                <a href="./02_template_type01.html" title="PPT 화면 모음">PPT 화면 모음</a>
+                <ul class="left_dp3">
+                  <li><a href="./02_template_type01.html" title="비전자기록물 검색">비전자기록물 검색</a></li>
+                  <li><a href="./02_template_type02.html" title="대출관리-반입반출현황">대출관리-반입반출현황</a></li>
+                  <li><a href="./02_template_type03.html" title="대출관리-반입반출신청현황">대출관리-반입반출신청현황</a></li>
+                  <li><a href="./02_template_type04.html" title="대출관리-반입">대출관리-반입</a></li>
+                  <li><a href="./02_template_type05.html" title="대출관리-반출">대출관리-반출</a></li>
+                  <li><a href="./02_template_type06.html" title="열람">열람</a></li>
+                  <li><a href="./02_template_type07.html" title="열람조회">열람조회</a></li>
+                  <li><a href="./02_template_type08.html" title="기록물 폐기 관리-만료">기록물 폐기 관리-만료</a></li>
+                  <li><a href="./02_template_type09.html" title="기록물 폐기 관리-보류">기록물 폐기 관리-보류</a></li>
+                  <li><a href="./02_template_type10.html" title="기록물 폐기 관리-폐기의견등록">기록물 폐기 관리-폐기의견등록</a></li>
+                  <li><a href="./02_template_type11.html" title="기록물 폐기 관리-폐기리스트">기록물 폐기 관리-폐기리스트</a></li>
+                  <li><a href="./02_template_type12.html" title="시스템관리-공지사항">시스템관리-공지사항</a></li>
+                  <li><a href="./02_template_type13.html" title="시스템관리-권한관리">시스템관리-권한관리</a></li>
+                  <li><a href="./02_template_type14.html" title="시스템관리-사용자관리">시스템관리-사용자관리</a></li>
+                  <li><a href="./02_template_type15.html" title="시스템관리-사용자 상세페이지">시스템관리-사용자 상세페이지</a></li>
+                  <li><a href="./02_template_type16.html" title="시스템관리-처리과관리">시스템관리-처리과관리</a></li>
+                  <li><a href="./02_template_type17.html" title="시스템관리-로고관리">시스템관리-로고관리</a></li>
+                  <li><a href="./02_template_type18.html" title="시스템관리-기록물 현황 통계">시스템관리-기록물 현황 통계</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <button type="button" class="btn_left_tgl">
+          <span class="hide">메뉴 열기</span>
+        </button>
+      </aside>
+
+      <main class="work_frame">
+        <div class="content_wrap">
+          <div class="content_title">
+            <h3 class="page_title">열람</h3>
+            <ol class="page_breadcrumb">
+              <li>HOME</li>
+              <li><a href="#">1depth</a></li>
+              <li><a href="#">2depth</a></li>
+              <li><a href="#">3depth</a></li>
+            </ol>
+          </div>
+        
+          <div class="content_area">
+
+            <!-- search box type ex1 : 기본 4칸 + 버튼영역 -->
+            <div class="search_wrap">
+              <ul>
+                <li>
+                  <p>열람자 소속 확인</p>
+                  <div class="rowbox">
+                    <input type="text" placeholder="열람자 소속">
+                  </div>
+                </li>
+                <li>
+                  <p>열람자 직급 확인</p>
+                  <div class="rowbox">
+                    <input type="text" placeholder="열람자 직급">
+                  </div>
+                </li>
+                <li>
+                  <p>열람자 성명 확인</p>
+                  <div class="rowbox">
+                    <input type="text" placeholder="열람자 성명">
+                  </div>
+                </li>
+                <li>
+                  <p>비고</p>
+                  <div class="rowbox">
+                    <input type="text" placeholder="비고">
+                  </div>
+                </li>
+              </ul>
+
+              <div class="srch_btn">
+                <div class="type_grp type_single">
+                  <button type="button" class="btn_def btn_point_clr">조회</button>
+                  <button type="button" class="btn_def btn_red_clr">초기화</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="area_title">
+              <h4 class="left_grp">
+                <span class="sub_title">조회결과</span>
+                <span class="sub_script">
+                  총 건수: <span class="num">10</span>건
+                </span>
+              </h4>
+              <div class="right_grp btn_grp">
+                <div class="type_grp">
+                  <button type="button" class="btn_def btn_point_clr">기록물 추가</button>
+                  <button type="button" class="btn_def btn_main_clr">열람신청</button>
+                </div>
+                <div class="type_grp">
+                  <button type="button" class="btn_def btn_gray">테이블 설정<i class="icon_setting"></i></button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="grid_board">
+              <div id="grid_tale"></div>
+              <div id="grid_pagination" class="tui-pagination"></div>
+              <!-- 퍼블리싱 더미 데이터 - 나중에 삭제 -->
+              <script src="../test/grid_data_sample.js"></script>
+              <!-- 퍼블리싱 더미 데이터 - 나중에 삭제 -->
+              <script>
+                $(function(){
+                  const grid1 = new tui.Grid({
+                    el: document.getElementById("grid_tale"),
+                    scrollX: true,
+                    scrollY: false,
+                    rowHeaders: ['checkbox'],
+                    columns: [
+                      { name: "column1", header: "생산년도", sortable: true, width: 80, align: 'center' },
+                      { name: "column2", header: "제목", sortable: true, minWidth : 180, align: 'left' }, 
+                      { name: "column3", header: "관리번호", sortable: true, width: 160, align: 'center' },
+                      { name: "column4", header: "부서명", sortable: true, align: 'center' },
+                      { name: "column5", header: "반출여부", sortable: true, width: 80,  align: 'center' },
+                      { name: "column6", header: "박스위치", sortable: true, align: 'center' },
+                      { name: "column7", header: "보존기간", sortable: true, width: 80, align: 'center' },
+                    ],
+                    columnOptions: {
+                      resizable: true,
+                      minWidth: 80 
+                    }
+                  });
+                  tuiGridApplyTheme();
+                  
+                  // pagination
+                  var pagination1 = new tui.Pagination('grid_pagination', {
+                      totalItems: 500,
+                      itemsPerPage: 10,
+                      visiblePages: 5
+                  });
+                  grid1.resetData(grid_data_sample.slice(0, 10));
+                });
+              </script>
+            </div>
+            
+
+          </div>
+        
+        </div>
+      </main>
+    </div>
+    <div id="datepicker_wrapper" style="margin-top: -1px;"></div>
+    <script>
+      $(function(){
+        var datepicker = new tui.DatePicker('#datepicker-input1-container', {
+            date: new Date(),
+            input: {
+                element: '#datepicker-input1',
+                format: 'yyyy-MM-dd'
+            }
+        });
+      });
+    </script>
+  </body>
+  
+</html>

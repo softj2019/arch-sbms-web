@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="favicon">
+    <!--favicon-->
+    <link rel="icon" th:href="@{/favicon.ico}" />
+    <!--<link rel="icon" type="image/png" sizes="196x196" href="img/favicon_196.png" />-->
+    <!--<link rel="icon" type="image/png" th:sizes="32x32" th:href="@{/images/favicon_32.png}" />-->
+</th:block>
+
+<th:block th:fragment="common">
+    <link rel="stylesheet" th:href="@{/css/font.css}">
+    <link rel="stylesheet" th:href="@{/css/reset.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/component.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+</th:block>
+<th:block th:fragment="tui">
+    <link rel="stylesheet" th:href="@{/lib/tui-grid/tui-grid.min.css}"/>
+    <link rel="stylesheet" th:href="@{/lib/tui-pagination/tui-pagination.min.css}"/>
+    <link rel="stylesheet" th:href="@{/lib/tui-date-picker/tui-date-picker.css}"/>
+    <link rel="stylesheet" th:href="@{/lib/tui-time-picker/tui-time-picker.min.css}"/>
+    <link rel="stylesheet" th:href="@{/lib/toastui-chart/toastui-chart.min.css}"/>
+
+</th:block>
+</html>

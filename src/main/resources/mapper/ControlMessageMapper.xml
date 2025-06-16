@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.ControlMessageMapper">
+
+    <!-- 비상메시지 데이터 조회 -->
+    <select id="getMsgList" parameterType="ControlMessageDTO" resultType="ControlMessageDTO">
+        SELECT    terminal_id
+                , terminal_name
+                , content
+                , DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updatedAt
+                , editor_id
+        FROM    tb_emergency_message
+        WHERE   1=1
+    </select>
+
+    <!-- 정류장 등록에 따른 비상메시지 테이블 데이터 등록 -->
+    <insert id="createMessage" parameterType="ControlMessageDTO">
+        INSERT INTO tb_emergency_message (
+              terminal_id
+            , terminal_name
+            , content
+            , editor_id
+        ) VALUES (
+              #{terminalId}
+            , #{terminalName}
+            , #{content}
+            , #{editorId}
+        )
+    </insert>
+
+    <!-- 비상메시지 변경 -->
+    <update id="updateMsg" parameterType="ControlMessageDTO">
+        UPDATE  tb_emergency_message
+        SET     content = #{content}
+        WHERE   terminal_id IN
+        <foreach collection="terminalIdList" item="tid" open="(" separator="," close=")">
+            #{tid}
+        </foreach>
+    </update>
+</mapper>

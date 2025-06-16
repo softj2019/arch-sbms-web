@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="aside">
+    <aside class="left_frame">
+        <ul class="left_menu left_dp1">
+            <li>
+                <a href="#" title="1Depth 메뉴이름">통합제어프로그램</a>
+                <ul class="left_menu left_dp2">
+                    <li data-th-each="menu : ${menuSeq}">
+                        <a th:href="@{/{url}(url=${menu.menuLinkSno.linkUrl})}" th:class="${menu.menuLinkSno.linkCss}"
+                           th:classappend="${menu.menuLinkSno.linkUrl} == ${#httpServletRequest.requestURI} ? 'active' : ''">
+                            [[${menu.menuNm}]]
+                        </a>
+                        <ul class="left_dp3" data-th-each="submenu : ${menu.subMenus}">
+                            <li th:classappend="${submenu.menuLinkSno.linkUrl} == ${#httpServletRequest.requestURI} ? 'active' : ''">
+                                <a th:href="@{/{url}(url=${submenu.menuLinkSno.linkUrl})}" th:title="${submenu.menuNm}">
+                                    [[${submenu.menuNm}]]
+                                </a>
+                                <ul class="left_dp4" data-th-each="subsubmenu : ${submenu.subMenus}">
+                                    <li th:classappend="${subsubmenu.menuLinkSno.linkUrl} == ${#httpServletRequest.requestURI} ? 'active' : ''">
+                                        <a th:href="@{/{url}(url=${subsubmenu.menuLinkSno.linkUrl})}" th:title="${subsubmenu.menuNm}">
+                                            [[${subsubmenu.menuNm}]]
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <button type="button" class="btn_left_tgl">
+            <span class="hide">메뉴 열기</span>
+        </button>
+    </aside>
+</th:block>
+</html>

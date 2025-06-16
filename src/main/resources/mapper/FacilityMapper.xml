@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.FacilityMapper">
+
+    <!-- 시설물 현황 조회 -->
+    <select id="getFacilityList" parameterType="FacilityDTO" resultType="map">
+        SELECT        t.terminal_id
+                    , t.terminal_name
+                    , MAX(CASE WHEN d.device_name = '통합제어보드'	THEN d.has_device ELSE NULL END) AS 'ctlBoard'
+                    , MAX(CASE WHEN d.device_name = '스마트스크린'	THEN d.has_device ELSE NULL END) AS 'smartscreen'
+                    , MAX(CASE WHEN d.device_name = '재실감지카메라'	THEN d.has_device ELSE NULL END) AS 'cv'
+                    , MAX(CASE WHEN d.device_name = '승하차알림시스템'	THEN d.has_device ELSE NULL END) AS 'ledPanel'
+                    , MAX(CASE WHEN d.device_name = '공기질표출장치'   THEN d.has_device ELSE NULL END) AS 'lcdDisplay'
+                    , MAX(CASE WHEN d.device_name = 'LTE라우터'	    THEN d.has_device ELSE NULL END) AS 'lteRouter'
+                    , MAX(CASE WHEN d.device_name = '공공WI-FI'	    THEN d.has_device ELSE NULL END) AS 'lteRouter2'
+                    , MAX(CASE WHEN d.device_name = 'LED전등'	    THEN d.has_device ELSE NULL END) AS 'ledLight'
+                    , MAX(CASE WHEN d.device_name = '냉각FAN'	    THEN d.has_device ELSE NULL END) AS 'fan'
+        FROM        tb_terminal t
+        LEFT JOIN   tb_terminal_devices d
+        ON          t.terminal_id = d.terminal_id
+        WHERE       1=1
+        <if test="s_terminalId != null and s_terminalId != ''">
+            AND     t.terminal_id LIKE CONCAT('%', #{s_terminalId}, '%')
+        </if>
+        <if test="s_terminalNm != null and s_terminalNm != ''">
+            AND     t.terminal_name LIKE CONCAT('%', #{s_terminalNm}, '%')
+        </if>
+        GROUP BY    t.terminal_id, t.terminal_name
+        ORDER BY    t.terminal_id ASC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 시설물 현황 수 -->
+    <select id="getFacilityCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM (
+            SELECT 	  t.terminal_id
+            FROM 	  tb_terminal t
+            LEFT JOIN tb_terminal_devices d
+            ON 		  t.terminal_id = d.terminal_id
+            WHERE     1=1
+            <if test="s_terminalId != null and s_terminalId != ''">
+                AND   t.terminal_id LIKE CONCAT('%', #{s_terminalId}, '%')
+            </if>
+            <if test="s_terminalNm != null and s_terminalNm != ''">
+                AND   t.terminal_name LIKE CONCAT('%', #{s_terminalNm}, '%')
+            </if>
+            GROUP BY  t.terminal_id, t.terminal_name
+        ) subView;
+    </select>
+
+    <!--    터미널 등록-->
+    <insert id="createTerminal" parameterType="FacilityDTO">
+        INSERT INTO tb_terminal (
+            terminal_id,
+            terminal_name
+        ) VALUES (
+            #{terminalId},
+            #{terminalName}
+        )
+    </insert>
+
+    <!-- 터미널 등록에 따른 디바이스 등록 -->
+    <insert id="createDevices" parameterType="FacilityDTO">
+        INSERT INTO tb_terminal_devices (
+            terminal_id,
+            device_sno,
+            device_name,
+            has_device
+        )
+        VALUES
+        <foreach collection="allDeviceSnoList" item="sno" index="index" separator=",">
+            (
+            #{terminalId},
+            #{sno},
+            <choose>
+                <when test="sno == 1">"통합제어보드"</when>
+                <when test="sno == 2">"스마트스크린"</when>
+                <when test="sno == 3">"재실감지카메라"</when>
+                <when test="sno == 4">"승하차알림시스템"</when>
+                <when test="sno == 5">"공기질표출장치"</when>
+                <when test="sno == 6">"LTE라우터"</when>
+                <when test="sno == 7">"공공WI-FI"</when>
+                <when test="sno == 8">"LED전등"</when>
+                <when test="sno == 9">"냉각FAN"</when>
+                <otherwise>0</otherwise>
+            </choose>,
+            <choose>
+                <when test="hasDeviceSnoList != null and hasDeviceSnoList.size > 0">
+                    CASE
+                        WHEN #{sno} IN
+                        <foreach collection="hasDeviceSnoList" item="hasSno" open="(" separator="," close=")">
+                            #{hasSno}
+                        </foreach> THEN 1
+                        ELSE 0
+                    END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+            )
+        </foreach>
+    </insert>
+
+    <!-- 터미널 이름 수정 -->
+    <update id="updateTerminal" parameterType="FacilityDTO">
+        UPDATE tb_terminal
+        SET    terminal_name = #{terminalName}
+        WHERE  terminal_id = #{terminalId}
+    </update>
+
+    <!-- 디바이스 보유여부 수정 -->
+    <update id="updateDevices" parameterType="FacilityDTO">
+        UPDATE  tb_terminal_devices
+        SET     has_device =
+            <choose>
+                <when test="hasDeviceSnoList != null and hasDeviceSnoList.size > 0">
+                    CASE
+                        WHEN    device_sno IN
+                        <foreach collection="hasDeviceSnoList" item="sno" open="(" separator="," close=")">
+                            #{sno}
+                        </foreach>
+                        THEN 1
+                        ELSE 0
+                    END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+        WHERE   terminal_id = #{terminalId}
+    </update>
+
+    <!-- 시설물 삭제 -->
+    <delete id="deleteFacility" parameterType="FacilityDTO">
+        DELETE FROM tb_terminal
+        WHERE       terminal_id IN
+        <foreach item="terminalId" collection="terminalIdList" open="(" separator="," close=")">
+            #{terminalId}
+        </foreach>
+    </delete>
+
+    <!--    아이디 중복확인-->
+    <select id="findId" parameterType="FacilityDTO" resultType="FacilityDTO">
+        SELECT  terminal_id
+        FROM    tb_terminal
+        WHERE   terminal_id = #{terminalId}
+    </select>
+
+    <!-- 정류장 정보 단순 조회(대시보드, 모니터링, 통합제어, 커맨드 등 사용) -->
+    <select id="getTerminalList" parameterType="FacilityDTO" resultType="map">
+        SELECT      t.terminal_id
+                  , t.terminal_name
+        FROM        tb_terminal t
+        WHERE       1=1
+        <if test="terminalId != null and terminalId != ''">
+            AND     t.terminal_id LIKE CONCAT('%', #{terminalId}, '%')
+        </if>
+        <if test="terminalName != null and terminalName != ''">
+            AND     t.terminal_name LIKE CONCAT('%', #{terminalName}, '%')
+        </if>
+        ORDER BY    t.terminal_id ASC
+    </select>
+
+    <!-- 시설물별 보유 총계 -->
+    <select id="getDevicesCnt" resultType="map">
+        SELECT      device_name
+                  , COUNT(*) AS cnt
+                  , MIN(device_sno) AS min_sno
+        FROM        tb_terminal_devices
+        WHERE       has_device = 1
+        GROUP BY    device_name
+        ORDER BY    min_sno ASC;
+    </select>
+</mapper>

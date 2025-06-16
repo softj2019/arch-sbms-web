@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">연계정보_공기질표출 항목 선택</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">정보</a></li>
+      <li><a href="#">연계정보</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+    <div class="grid_board">
+      <div id="grid_table"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+    </div>
+  </div>
+  <script type="text/javascript" th:src="@{/js/weatherStatus.js}"></script>
+</th:block>
+</html>

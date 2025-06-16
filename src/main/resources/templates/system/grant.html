@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">권한관리</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">시스템관리</a></li>
+      <li><a href="#">권한관리</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+    <div class="area_title">
+      <h4 class="left_grp">
+        <div class="right_grp btn_grp">
+          <button type="button" class="btn_def btn_point_clr" onClick="update()"><span>저장</span>
+          </button>
+        </div>
+      </h4>
+    </div>
+
+    <div class="grid_board">
+      <div id="grid_tale"></div>
+      <div id="menu_tree"></div>
+    </div>
+
+    <div id="create_frame" class="popup_frame">
+      <!-- 사용자 관리 -->
+      <div class="popup_wrap">
+        <div class="pop_title">
+          <h5>상세보기</h5>
+          <button type="button" class="btn_x btn_close">
+            <span class="hide">닫기</span>
+            <i class="icon_x"></i>
+          </button>
+        </div>
+
+        <div class="pop_content">
+          <div class="search_wrap">
+            <ul>
+              <li>
+                <p>제목</p>
+                <div class="rowbox">
+                  <input id="titleInput" type="text" placeholder="">
+                </div>
+              </li>
+              <li>
+                <p>등록자</p>
+                <div class="rowbox">
+                  <input id="registrantInput" type="text" placeholder="">
+                </div>
+              </li>
+            </ul>
+            <div class="srch_btn">
+              <div class="type_grp type_single">
+                <button type="button" class="btn_def btn_point_clr" onclick="searchData()">조회</button>
+                <button type="button" class="btn_def btn_red_clr" onclick="resethData()">초기화</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid_board">
+            <div id="grid_table2"></div>
+            <div id="grid_pagination2" class="tui-pagination"></div>
+          </div>
+
+          <div class="btn_grp btn_right">
+
+            <div class="type_grp">
+              <button type="button" class="btn_close btn_def btn_gray">닫기</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+  <script type="text/javascript" th:src="@{/js/grant.js}"></script>
+</th:block>
+</html>

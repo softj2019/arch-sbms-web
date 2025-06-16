@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="header">
+    <header class="top_frame">
+        <div class="header">
+            <h1 class="logo">
+                <a th:href="@{/}">
+                    <img th:src="@{/images/gunpo_logo.png}" alt="로고이미지" style="width: 100px; margin-left: 50px">
+                    <span class="hide">군포시</span>
+                </a>
+            </h1>
+            <div class="header_wrap">
+                <nav class="gnb">
+                    <h2 class="hide">메뉴</h2>
+                    <ul>
+                        <li data-th-each="menu : ${menuSeq}" >
+                            <a th:href="@{/{link}(link=${menu.menuLinkSno.linkUrl})}" th:class="${menu.menuLinkSno.linkCss}">[[${menu.menuNm}]]</a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="utile">
+
+                    <a href="#" class="btn_logout">
+                        <span>LOGOUT</span>
+                    </a>
+                </div>
+                <!-- 태블릿 모바일 헤더 -->
+                <div class="m_header">
+                    <button type="button" class="m_btn_menu">
+                        <span class="hide">메뉴</span>
+                        <i class="icon_menu"></i>
+                    </button>
+                    <h1 class="m_logo">
+                        <a href="#">
+                            <img th:src="@{/images/gunpo_logo.png}" alt="로고이미지">
+                            <span class="hide">한국석유공사</span>
+                        </a>
+                    </h1>
+                </div>
+            </div>
+        </div>
+        <div class="m_menu">
+            <div class="m_menu_wrap">
+                <div class="m_menu_top">
+<!--                    <div class="utile">-->
+<!--                        <button type="button" class="notice_msg">-->
+<!--                            <span class="hide">알림메세지</span>-->
+<!--                            <span class="ntc_msg">10</span>-->
+<!--                        </button>-->
+<!--                        <a href="#" class="btn_logout">-->
+<!--                            <span>LOGOUT</span>-->
+<!--                        </a>-->
+<!--                    </div>-->
+                    <button type="button" class="m_btn_x">
+                        <span class="hide">닫기</span>
+                        <i class="icon_x"></i>
+                    </button>
+                </div>
+                <div class="m_gnb">
+                    <ul class="m_gnb_dp1">
+                        <li th:each="menu : ${menuSeq}" class="dp_arrow">
+                            <a href="#" th:class="${menu.menuLinkSno.linkCss}">
+                                [[${menu.menuNm}]]
+                            </a>
+                            <ul class="m_gnb_dp2" th:if="${menu.subMenus != null and #lists.size(menu.subMenus) > 0}">
+                                <li th:each="subMenu : ${menu.subMenus}">
+                                    <a th:href="@{/{link}(link=${subMenu.menuLinkSno.linkUrl})}" th:class="${subMenu.menuLinkSno.linkCss}">
+                                        [[${subMenu.menuNm}]]
+                                    </a>
+                                    <ul class="m_gnb_dp3" th:if="${subMenu.subMenus != null and #lists.size(subMenu.subMenus) > 0}">
+                                        <li th:each="subSubMenu : ${subMenu.subMenus}">
+                                            <a th:href="@{/{link}(link=${subMenu.menuLinkSno.linkUrl})}" th:class="${subSubMenu.menuLinkSno.linkCss}">
+                                                [[${subSubMenu.menuNm}]]
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+</th:block>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">접속현황</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">시스템관리</a></li>
+      <li><a href="#">접속현황</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+    <div class="grid_board">
+      <div id="grid_table"></div>
+    </div>
+  </div>
+  <script type="text/javascript" th:src="@{/js/cnncStat.js}"></script>
+</th:block>
+</html>

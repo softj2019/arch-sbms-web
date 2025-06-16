@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<link rel="stylesheet" href="/webjars/font-awesome/6.4.2/css/all.min.css">
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">
+      일반설정
+      <span style="font-weight: normal; font-size:14px; color:#666; margin-left: 15px;">
+        <i class="fa fa-info-circle" style="color:#666; margin-right: 5px;"></i>설정값 클릭시 수정모드로 전환 됩니다.
+      </span>
+    </h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">제어</a></li>
+      <li><a href="#">일반설정</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+    <div class="led_text_settings">
+
+      <div class="bulk_settings">
+        <button type="button" class="btn_def btn_point_clr" style="margin-left: auto;" onclick="updateSetting()">저장</button>
+      </div>
+
+      <!--      그리드 구간-->
+      <div class="grid_board">
+        <div id="grid_tale"></div>
+      </div>
+
+    </div>
+  </div>
+  <script type="text/javascript" th:src="@{/js/setting.js}"></script>
+</th:block>
+</html>

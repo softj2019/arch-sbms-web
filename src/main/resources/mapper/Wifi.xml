@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.WifiMapper">
+    <!-- wifi 조회 -->
+    <select id="getWifi" resultType="com.archivsoft.sbms.dto.WifiDTO">
+        SELECT  sn
+              , install_loc
+              , ctn
+              , ip_addr
+              , wifi_mac
+              , wifi_enabled
+        FROM    tb_wifi_info
+        WHERE   user_id='archivsoft'
+    </select>
+</mapper>

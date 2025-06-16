@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <div class="content_title">
+    <h3 class="page_title">제어이력관리</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">시스템관리</a></li>
+      <li><a href="#">제어이력관리</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+
+    <!-- search box type ex1 : 기본 4칸 + 버튼영역 -->
+<!--    <div class="search_wrap">-->
+<!--      <ul>-->
+<!--        <li class="col_4cell">-->
+<!--          <p>통합컨트롤러</p>-->
+<!--          <div class="rowbox">-->
+<!--            <input type="text" placeholder="">-->
+<!--          </div>-->
+<!--        </li>-->
+<!--      </ul>-->
+
+<!--      <div class="srch_btn">-->
+<!--        <div class="type_grp type_single">-->
+<!--          <button type="button" class="btn_def btn_point_clr">적용</button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+    <div class="area_title">
+      <h4 class="left_grp">
+        <span class="sub_title">조회결과</span>
+        <span class="sub_script">
+                  총 건수: <span class="num">10</span>건
+                </span>
+      </h4>
+      <div class="right_grp btn_grp">
+        <div class="type_grp">
+          <label class="hide">적용건수 선택</label>
+          <select class="select_round">
+            <option value="">전체</option>
+            <option value="">10건</option>
+            <option value="">100건</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid_board">
+      <div id="grid_tale"></div>
+      <div id="grid_pagination" class="tui-pagination"></div>
+      <!-- 퍼블리싱 더미 데이터 - 나중에 삭제 -->
+      <script src="/test/grid_data_log.js"></script>
+      <!-- 퍼블리싱 더미 데이터 - 나중에 삭제 -->
+      <script>
+        $(function(){
+          const grid1 = new tui.Grid({
+            el: document.getElementById("grid_tale"),
+            scrollX: true,
+            scrollY: false,
+            rowHeaders: ['checkbox'],
+            columns: [
+              { name: "no", header: "NO", sortable: true, align: 'center' },
+              { name: "busStopId", header: "정류장ID", sortable: true, align: 'center' },
+              { name: "busStopNm", header: "정류장명", sortable: true, align: 'center' },
+              { name: "status", header: "처리결과", sortable: true, align: 'center' },
+              { name: "regDt", header: "실행일시", sortable: true, align: 'center' },
+            ],
+            columnOptions: {
+              resizable: true,
+              minWidth: 80
+            }
+          });
+          tuiGridApplyTheme();
+
+          // pagination
+          var pagination1 = new tui.Pagination('grid_pagination', {
+            totalItems: 500,
+            itemsPerPage: 10,
+            visiblePages: 5
+          });
+
+          grid1.resetData(grid_data_schedule.slice(0, 10));
+        });
+      </script>
+    </div>
+
+
+  </div>
+
+  <div id="datepicker_wrapper" style="margin-top: -1px;"></div>
+</th:block>
+</html>

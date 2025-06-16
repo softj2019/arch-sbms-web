@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+
+<th:block layout:fragment="content">
+    <div class="content_title">
+        <h3 class="page_title">접속이력관리</h3>
+        <ol class="page_breadcrumb">
+            <li>HOME</li>
+            <li><a href="#">시스템관리</a></li>
+            <li><a href="#">접속이력관리</a></li>
+        </ol>
+    </div>
+
+    <div class="content_area">
+        <div class="search_wrap">
+            <ul>
+                <li>
+                    <p>아이디</p>
+                    <div class="rowbox">
+                        <input type="text" id="userId" placeholder="아이디를 입력해주세요.">
+                    </div>
+                </li>
+                <li>
+                    <p>이름</p>
+                    <div class="rowbox">
+                        <input type="text" id="userNm" placeholder="이름을 입력해주세요.">
+                    </div>
+                </li>
+            </ul>
+
+            <div class="srch_btn">
+                <div class="type_grp type_single">
+                    <button type="button" class="btn_def btn_point_clr" onclick="getUserList()">조회</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="area_title">
+            <h4 class="left_grp">
+                <span class="sub_title">조회결과</span>
+                <span class="sub_script">총 건수:
+                    <span class="num"></span>건
+                </span>
+            </h4>
+            <div class="right_grp btn_grp">
+                <div class="type_grp">
+                    <label class="hide">적용건수 선택</label>
+                    <select id="itemsPerPage" class="select_round" onchange="getUserList(0)">
+                        <option value="10">10건</option>
+                        <option value="100">100건</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!--     그리드-->
+        <div class="grid_board">
+            <div id="grid_tale"></div>
+            <div id="grid_pagination" class="tui-pagination"></div>
+        </div>
+        <!--     그리드-->
+
+    </div>
+    <script type="text/javascript" th:src="@{/js/cnncHist.js}" defer></script>
+</th:block>
+</html>

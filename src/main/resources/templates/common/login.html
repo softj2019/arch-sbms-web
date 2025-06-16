@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,user-scalable=no,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>스마트버스정류장 안전시스템</title>
+
+    <!--favicon-->
+    <link rel="icon" href="favicon.ico" />
+    <!--<link rel="icon" type="image/png" sizes="196x196" href="img/favicon_196.png" />-->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_32.png" />
+
+    <!-- css -->
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/component.css" />
+
+    <!-- js -->
+    <script src="../lib/jquery/jquery.min.js"></script>
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+    <script type="text/javascript" th:src="@{/js/login.js}"></script>
+  </head>
+  <body class="login">
+    <div class="skipmenu">
+      <a href="#">주메뉴 바로가기</a>
+      <a href="#">본문 바로가기</a>
+    </div>
+    <div class="wrap">
+      <div class="login_layer">
+        
+        <div class="header">
+          <h1 class="logo">
+            <a href="#">
+<!--              <img src="../images/gkl_logo.svg" alt="로고이미지">-->
+<!--              <span class="hide"></span>-->
+            </a>
+          </h1>
+        </div>
+
+        <div class="content_area">
+          <div class="visual_title">
+            <p>군포시</p>
+            <h2>
+              <span>스마트버스정류장 </span>
+            </h2>
+          </div>
+          <div class="login_box">
+            <h3>LOGIN HERE</h3>
+
+            <form id="loginForm">
+              <div class="form_grp">
+                <div class="form_box">
+                  <p><label for="userId">ID</label></p>
+                  <input id="userId" name="userId" type="text">
+                </div>
+                <div class="form_box">
+                  <p><label for="password">PASSWORD</label></p>
+                  <input id="password" name="password" type="password" style="width: 100%">
+                </div>
+                <a href="#" class="login_btn">LOGIN</a>
+              </div>
+            </form>
+
+          </div>
+        </div>
+
+
+
+        <th:block th:replace="fragments/dialog :: all" />
+        <th:block th:replace="fragments/lodingspn :: lodingSpinner" />
+        <footer>
+          <p>&copy; Copyright 2024 Grand Korea Leisure Co.,Ltd. All Rights Reserved.</p>
+        </footer>
+
+      </div>
+    </div>
+    <script>
+      history.pushState(null, null, location.href);
+      window.onpopstate = function () {
+        history.pushState(null, null, location.href);
+        popupOpenDialog('error', "이전 페이지로 돌아갈 수 없습니다.", 2000);
+        return;
+      };
+    </script>
+  </body>
+</html>
