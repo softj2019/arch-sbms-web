@@ -47,8 +47,8 @@ spring:
 #    initialize: false
     #    url: jdbc:log4jdbc:mariadb://10.0.0.13:3306/sbms
 #    url: jdbc:log4jdbc:mysql://10.10.10.11:3306/sbms?allowPublicKeyRetrieval=true&useSSL=false
-#    url: jdbc:mysql://10.10.10.11:3306/sbms?allowPublicKeyRetrieval=true&useSSL=false
-    url: jdbc:p6spy:mysql://10.0.0.13:3306/sbms?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://10.10.10.11:3306/sbms?allowPublicKeyRetrieval=true&useSSL=false
+#    url: jdbc:p6spy:mysql://10.0.0.13:3306/sbms?allowPublicKeyRetrieval=true&useSSL=false
     username: sbms
     password: Gunpo1212!Q
   main:
