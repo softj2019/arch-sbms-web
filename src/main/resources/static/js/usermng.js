@@ -78,6 +78,7 @@ function handleGridClick(e) {
 
 // 상세보기 팝업 오픈 (더블클릭)
 function handleGridDoubleClick(e) {
+    resetSelection();
     if (e.columnName === '_checked') return; // 체크박스 열 제외
 
     const row = grid1.getRow(e.rowKey);
