@@ -103,7 +103,7 @@ function initializeGrid(data=[]) {
                 editor: {
                     type: CustomTextEditor,
                     options: {
-                        maxLength: 100
+                        maxLength: 500
                     }
                 }
             },
