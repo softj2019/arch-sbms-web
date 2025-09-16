@@ -42,10 +42,10 @@ spring:
 #      minimum-idle: 5
 #      connection-timeout: 300000
 #    initialize: false
-#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    #    url: jdbc:log4jdbc:mariadb://10.0.0.13:3306/sbms
-    url: jdbc:p6spy:mysql://10.0.0.13:3306/sbms
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    url: jdbc:mysql://10.0.0.13:3306/sbms
+#    url: jdbc:p6spy:mysql://10.0.0.13:3306/sbms
     username: sbms
     password: Dkzlqmthvmxm1!
   main:

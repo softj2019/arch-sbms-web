@@ -34,7 +34,7 @@ public class WeatherService {
     /**
      * 10초마다 기상 및 대기질 데이터를 가져와 저장
      */
-    @Scheduled(fixedRate = 600000) // 10초마다 실행
+    @Scheduled(fixedRate = 1000) // 10초마다 실행
 //    @Scheduled(cron = "5 0 * * * *") // 매시 정각 5초 후 실행
     public void fetchAndSaveWeatherData() {
         try {
