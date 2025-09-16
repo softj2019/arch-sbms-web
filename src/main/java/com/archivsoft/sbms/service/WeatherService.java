@@ -60,6 +60,11 @@ public class WeatherService {
             JsonNode weatherJson = objectMapper.readTree(weatherResponse.getBody());
             JsonNode airQualityJson = objectMapper.readTree(airQualityResponse.getBody());
 
+            if (weatherJson.path("response").isMissingNode()) {
+                logger.error("Invalid weather API response: {}", weatherResponse.getBody());
+                return;
+            }
+
             WeatherAirQuality data = new WeatherAirQuality();
             data.setStationId(1L);
 
@@ -106,7 +111,7 @@ public class WeatherService {
 
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("WeatherService fetchAndSaveWeatherData failed", e);
         }
     }
 
