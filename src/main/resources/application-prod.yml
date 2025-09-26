@@ -3,28 +3,22 @@ logging:
     name: logs/application.log
     path: ${user.dir}
   config: classpath:logback-spring.xml
-  #config: ${user.dir}/config/logback-spring.xml
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   level:
     root: ERROR
-    com:
-      archivsoft: WARN
-    jdbc:
-      audit: OFF
-      connection: OFF
-      resultset: OFF
-      resultsettable: OFF
-      sqlonly: WARN
-      sqltiming: ERROR
-    org:
-      springframework:
-        boot: WARN
-#      hibernate:
-#        SQL: ERROR
-#        type.descriptor.sql: trace
-#jdbc setting
+    com.archivsoft: WARN
+    org.springframework: WARN
+    org.mybatis: WARN
+    org.apache.ibatis: WARN
+    jdbc.audit: OFF
+    jdbc.connection: OFF
+    jdbc.resultset: OFF
+    jdbc.resultsettable: OFF
+    jdbc.sqlonly: WARN
+    jdbc.sqltiming: ERROR
+
 spring:
   websocket:
     max-text-message-size: 50MB
