@@ -16,11 +16,11 @@ logging:
       connection: OFF
       resultset: OFF
       resultsettable: OFF
-      sqlonly: INFO
+      sqlonly: WARN
       sqltiming: ERROR
     org:
       springframework:
-        boot: INFO
+        boot: WARN
 #      hibernate:
 #        SQL: ERROR
 #        type.descriptor.sql: trace
