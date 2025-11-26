@@ -116,14 +116,9 @@ spring:
       org:
         springframework:
           boot: INFO
-#        hibernate:
-#          SQL: ERROR
-#          type.descriptor.sql: trace
       net.sf.log4jdbc: INFO
   datasource:
-#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    #    url: jdbc:log4jdbc:mariadb://10.0.0.13:3306/sbms
     url: jdbc:p6spy:mysql://10.0.0.13:3306/sbms
     username: sbms
     password: Dkzlqmthvmxm1!
