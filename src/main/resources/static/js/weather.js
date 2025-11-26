@@ -133,7 +133,7 @@ $(document).ready(function () {
     fetchWeatherData();
 
     // 10초마다 데이터 업데이트
-    setInterval(fetchWeatherData, 60000);
+    setInterval(fetchWeatherData, 6000 * 60);
 });
 
 function getWeatherStatusList() {
