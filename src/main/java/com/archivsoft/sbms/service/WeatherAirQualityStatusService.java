@@ -15,32 +15,37 @@ public class WeatherAirQualityStatusService {
 
     // 전체 상태 목록 조회
     public List<WeatherAirQualityStatus> getAllWeatherStatuses() {
-        List<WeatherAirQualityStatus> dataList = weatherAirQualityMapper.getAllWeatherStatuses();
 
-        // 강수형태(pty)와 풍속(wsd) row 제거
-        dataList.removeIf(data -> "pty".equalsIgnoreCase(data.getDisplayName()));
-//        dataList.removeIf(data -> "khaiValue".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "khaiGrade".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "so2Grade".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "coGrade".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "o3Grade".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "no2Grade".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "pm10Grade".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "so2Flag".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "coFlag".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "o3Flag".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "no2Flag".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "pm10Flag".equalsIgnoreCase(data.getDisplayName()));
-        dataList.removeIf(data -> "VEC".equalsIgnoreCase(data.getDisplayName()));
+        // 최신 weather 1건만 조회
+        WeatherAirQuality latest = weatherAirQualityMapper.getLatestWeather();
 
-        // 풍향 -> 풍향,풍속 으로 합치기
-        dataList.stream()
-                .filter(data -> data.getId() == 5)
-                .findFirst()
-                .ifPresent(data -> data.setDisplayDescription("풍향•풍속"));
+        // 상태 리스트 조회
+        List<WeatherAirQualityStatus> list = weatherAirQualityMapper.getWeatherStatusOnly();
 
-        return dataList;
+        for (WeatherAirQualityStatus s : list) {
+            String name = s.getDisplayName();
+
+            switch (name) {
+                case "T1H": s.setCurrentValue(latest.getT1H() + " °C"); break;
+                case "RN1": s.setCurrentValue(latest.getRN1() + " mm"); break;
+                case "REH": s.setCurrentValue(latest.getREH() + " %"); break;
+                case "WSD": s.setCurrentValue(latest.getWSD() + " m/s"); break;
+
+                case "so2Value": s.setCurrentValue(latest.getSo2Value() + " ppm"); break;
+                case "coValue":  s.setCurrentValue(latest.getCoValue()  + " ppm"); break;
+                case "o3Value":  s.setCurrentValue(latest.getO3Value()  + " ppm"); break;
+                case "no2Value": s.setCurrentValue(latest.getNo2Value() + " ppm"); break;
+
+                case "pm10Value": s.setCurrentValue(latest.getPm10Value() + " μg/m³"); break;
+                case "khaiValue": s.setCurrentValue(latest.getKhaiValue() + " μg/m³"); break;
+
+                default: s.setCurrentValue(null);
+            }
+        }
+
+        return list;
     }
+
 
 
     // 특정 대기질 상태 업데이트

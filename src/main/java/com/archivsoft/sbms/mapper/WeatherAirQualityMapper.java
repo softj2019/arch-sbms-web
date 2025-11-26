@@ -22,4 +22,7 @@ public interface WeatherAirQualityMapper {
 
     // 특정 station_id의 상태 업데이트 (어노테이션 제거 -> XML 기반)
     void updateWeatherStatus(WeatherAirQualityStatus weatherAirQualityStatus);
+
+    WeatherAirQuality getLatestWeather();
+    List<WeatherAirQualityStatus> getWeatherStatusOnly();
 }

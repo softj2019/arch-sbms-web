@@ -87,6 +87,29 @@
         ORDER BY sno
     </select>
 
+    <select id="getLatestWeather" resultType="com.archivsoft.sbms.model.WeatherAirQuality">
+        SELECT *
+        FROM tb_weather_air_quality
+        ORDER BY recorded_at DESC
+            LIMIT 1
+    </select>
+
+    <select id="getWeatherStatusOnly" resultType="com.archivsoft.sbms.model.WeatherAirQualityStatus">
+        SELECT
+            id,
+            station_id,
+            is_active,
+            use_yn,
+            updated_at,
+            display_name,
+            display_description,
+            sno
+        FROM tb_weather_air_quality_status
+        ORDER BY sno
+    </select>
+
+
+
     <!-- 대기질 상태 업데이트 -->
     <update id="updateWeatherStatus">
         UPDATE tb_weather_air_quality_status
