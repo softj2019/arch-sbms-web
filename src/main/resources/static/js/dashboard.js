@@ -169,7 +169,8 @@ function funcCard(){
                         );
                     } else if (powerState === "OFF") {
                         const terminalName = getStationName(terminalId);
-                        const terminalDisplay = `${terminalName || '정보 없음'} (${terminalId})`;
+                        if (terminalName === "") return;
+                        const terminalDisplay = `${terminalName} (${terminalId})`;
 
                         // 로그는 승하차알림시스템만
                         if (key === 'led_panel_power') {
@@ -682,10 +683,7 @@ function getStationName(terminalId) {
     );
 
     if (!station) {
-        console.warn(
-            `[UNKNOWN TERMINAL] id:${terminalId} name:정보 없음`
-        );
-        return "정보 없음";
+        return;
     }
 
     return station.terminal_name;
