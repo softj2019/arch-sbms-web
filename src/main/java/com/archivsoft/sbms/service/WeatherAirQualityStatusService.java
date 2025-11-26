@@ -5,6 +5,8 @@ import com.archivsoft.sbms.model.WeatherAirQuality;
 import com.archivsoft.sbms.model.WeatherAirQualityStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,6 +23,8 @@ public class WeatherAirQualityStatusService {
 
         // 상태 리스트 조회
         List<WeatherAirQualityStatus> list = weatherAirQualityMapper.getWeatherStatusOnly();
+
+        List<WeatherAirQualityStatus> result = new ArrayList<>();
 
         for (WeatherAirQualityStatus s : list) {
             String name = s.getDisplayName();
@@ -41,12 +45,14 @@ public class WeatherAirQualityStatusService {
 
                 default: s.setCurrentValue(null);
             }
+
+            if (s.getCurrentValue() != null) {
+                result.add(s);
+            }
         }
 
-        return list;
+        return result;
     }
-
-
 
     // 특정 대기질 상태 업데이트
     public void updateWeatherStatus(WeatherAirQualityStatus weatherAirQualityStatus) {

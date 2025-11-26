@@ -108,8 +108,6 @@
         ORDER BY sno
     </select>
 
-
-
     <!-- 대기질 상태 업데이트 -->
     <update id="updateWeatherStatus">
         UPDATE tb_weather_air_quality_status
