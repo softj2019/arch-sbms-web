@@ -206,6 +206,7 @@ function funcCard(){
         });
     }
 
+    // 카드 상태 변경
     function updateExistingCard(card, data) {
         card.className   = `station ${data.rfc_cpu ? 'station-normal' : 'station-off'}`;
         // 헤더를 정상 상태로 변경
@@ -229,20 +230,37 @@ function funcCard(){
         metrics[2].textContent = `${memoryUsage}%`;
         metrics[3].textContent = `${storageUsage}%`;
 
+        // on/off 변환함수
+        function onOffTransfer(value) {
+            if (value === "1" || value === 1 || value === "ON" || value === true) {
+                return "ON";
+            }
+            return "OFF";
+        }
+
         const updatedStationData = {
             name: getStationName(data?.terminal_id),
             devices: {
-                통합제어보드		: data?.ctl_board_power 	|| 'OFF',
-                스마트스크린		: data?.smartscreen_power 	|| 'OFF',
-                재실감지카메라	    : data?.vc_power 			|| 'OFF',
-                LED전광판		: data?.led_panel_power 	|| 'OFF',
-                공기질표출장치	    : data?.lcd_display_power 	|| 'OFF',
-                LTE라우터		: data?.lte_router_power 	|| 'OFF',
-                LED전등			: data?.led_light_power 	|| 'OFF',
-                FAN				: data?.fan 				|| 'OFF',
+                통합제어보드     : onOffTransfer(data?.ctl_board_power),
+                스마트스크린     : onOffTransfer(data?.smartscreen_power),
+                재실감지카메라   : onOffTransfer(data?.vc_power),
+                LED전광판       : onOffTransfer(data?.led_panel_power),
+                공기질표출장치   : onOffTransfer(data?.lcd_display_power),
+                LTE라우터       : onOffTransfer(data?.lte_router_power),
+                LED전등         : onOffTransfer(data?.led_light_power),
+                FAN            : onOffTransfer(data?.fan),
             },
             metrics: [data?.rfc_cpu, data?.cpu_temperature, memoryUsage, storageUsage],
         };
+
+        console.log(
+            `[Request Data : ${data?.terminal_id}]`
+            + ` ctl:${data?.ctl_board_power}`
+            + ` scr:${data?.smartscreen_power}`
+            + ` vc:${data?.vc_power}`
+            + ` lcd:${data?.lcd_display_power}`
+            + ` lte:${data?.lte_router_power}`
+        );
 
         // **Map에 업데이트**
         if (stationDataMap.has(data.terminal_id)) {
