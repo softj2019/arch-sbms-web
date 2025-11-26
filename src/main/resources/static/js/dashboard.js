@@ -253,17 +253,6 @@ function funcCard(){
             metrics: [data?.rfc_cpu, data?.cpu_temperature, memoryUsage, storageUsage],
         };
 
-        if (String(data?.terminal_id).startsWith("264")) {
-            console.log(
-                `[${data?.terminal_id}] `
-                + `ctl:${onOffTransfer(data?.ctl_board_power)} `
-                + `scr:${onOffTransfer(data?.smartscreen_power)} `
-                + `vc:${onOffTransfer(data?.vc_power)} `
-                + `lcd:${onOffTransfer(data?.lcd_display_power)} `
-                + `lte:${onOffTransfer(data?.lte_router_power)}`
-            );
-        }
-
         // **Map에 업데이트**
         if (stationDataMap.has(data.terminal_id)) {
             stationDataMap.set(data.terminal_id, updatedStationData);
@@ -687,11 +676,20 @@ function renderCharts() {
 }
 
 /* terminalId를 기반으로 정류장명을 찾는 함수 */
-function getStationName(terminalId){
-    const station  = terminalList.find(item => String(item.terminal_id) === String(terminalId));
-    return station ? station.terminal_name : "정보 없음";
-}
+function getStationName(terminalId) {
+    const station = terminalList.find(
+        item => String(item.terminal_id) === String(terminalId)
+    );
 
+    if (!station) {
+        console.warn(
+            `[UNKNOWN TERMINAL] id:${terminalId} name:정보 없음`
+        );
+        return "정보 없음";
+    }
+
+    return station.terminal_name;
+}
 
 let hidChart;
 let peopleCounts;
@@ -762,7 +760,6 @@ $(document).ready(function () {
         // 데이터 구독
         stompClient.subscribe('/topic/hid', function (message) {
             const parsedData  = JSON.parse(message.body);
-            // console.log('Received data:', parsedData);
             const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
             // 수신된 데이터를 기반으로 peopleCounts 업데이트
             dataArray.forEach(entry => {
