@@ -273,14 +273,13 @@ customTooltip.style.border = "1px solid #ccc";
 customTooltip.style.padding = "8px 10px";
 customTooltip.style.borderRadius = "6px";
 customTooltip.style.color = "black";
-customTooltip.style.fontSize = "14px";
+customTooltip.style.fontSize = "12px";
 customTooltip.style.pointerEvents = "none";
 customTooltip.style.whiteSpace = "nowrap";
 customTooltip.style.height = "auto";
 customTooltip.style.opacity = 0;
 customTooltip.style.zIndex = 9999;
 document.body.appendChild(customTooltip);
-const tooltipRect = customTooltip.getBoundingClientRect();
 
 // 커스텀 툴팁 핸들러
 function customTooltipHandler(context) {
