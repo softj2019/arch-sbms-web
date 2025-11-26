@@ -56,46 +56,66 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
-    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
-    implementation ('org.springframework.boot:spring-boot-starter-web') {
-        exclude group: 'org.springframework.boot'
-//        , module: 'spring-boot-starter-tomcat'
-    }
+    /* -----------------------------------------------
+     * Spring Boot 기본 모듈
+     * ----------------------------------------------- */
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-//    implementation 'org.springframework.boot:spring-boot-starter-undertow'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-//    implementation 'io.undertow:undertow-websockets-jsr:2.2.19.Final'
-    implementation 'io.undertow:undertow-servlet'
     implementation 'org.springframework.boot:spring-boot-starter-tomcat'
-//    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
-    implementation 'p6spy:p6spy:3.9.1'
-    implementation 'com.google.code.gson:gson'
-    //implementation 'com.google.guava:guava:32.1.2-jre'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    /* -----------------------------------------------
+     * Thymeleaf / Layout / Security
+     * ----------------------------------------------- */
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+    /* -----------------------------------------------
+     * Validation (Jakarta)
+     * ----------------------------------------------- */
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+
+    /* -----------------------------------------------
+     * MyBatis
+     * ----------------------------------------------- */
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.2'
 
-    implementation fileTree(dir: 'lib', includes: ['*.jar'])
+    /* -----------------------------------------------
+     * DB Driver (Oracle / MariaDB / MySQL)
+     * ----------------------------------------------- */
+    implementation 'com.oracle.database.jdbc:ojdbc6:11.2.0.4'
+    implementation 'com.oracle.database.nls:orai18n:11.2.0.4'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:2.3.0'
+    implementation 'mysql:mysql-connector-java:8.0.28'
 
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor 'org.projectlombok:lombok'
-
+    /* -----------------------------------------------
+     * eGovFrame
+     * ----------------------------------------------- */
     implementation "org.egovframe.rte:org.egovframe.rte.psl.dataaccess:${egovframework_rte_version}"
     implementation "org.egovframe.rte:org.egovframe.rte.fdl.cmmn:${egovframework_rte_version}"
     implementation "org.egovframe.rte:org.egovframe.rte.ptl.mvc:${egovframework_rte_version}"
 
-    implementation 'com.oracle.database.jdbc:ojdbc6:11.2.0.4'
-    implementation 'com.oracle.database.nls:orai18n:11.2.0.4'
+    /* -----------------------------------------------
+     * JSON / YAML
+     * ----------------------------------------------- */
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.5'
+    implementation 'com.google.code.gson:gson'
 
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.3.0'
-    implementation 'mysql:mysql-connector-java:8.0.28'
+    /* -----------------------------------------------
+     * OpenAPI / Swagger
+     * ----------------------------------------------- */
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
 
-    //webjars
+    /* -----------------------------------------------
+     * WebJars (Front-end)
+     * ----------------------------------------------- */
     implementation 'org.webjars.bower:jquery:3.7.1'
     implementation 'org.webjars.npm:chart.js:3.7.0'
     implementation 'org.webjars.npm:echarts:5.4.3'
@@ -104,38 +124,38 @@ dependencies {
     implementation 'org.webjars:font-awesome:6.4.2'
     implementation 'org.webjars.npm:chartjs-plugin-datalabels:2.2.0'
 
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.5'
-
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-
-    // JSON 처리
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-
-    // 테스트 의존성
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    // JWT 관련 의존성 추가
+    /* -----------------------------------------------
+     * JWT
+     * ----------------------------------------------- */
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    /* -----------------------------------------------
+     * Undertow
+     * ----------------------------------------------- */
+    implementation 'io.undertow:undertow-servlet'
 
-    // log4j 버전 강제지정
-//    configurations.all {
-//        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-//            if (details.requested.group == 'net.sf.log4jdbc') {
-//                details.useTarget 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
-//            }
-//        }
-//    }
-//
-//    configurations.all {
-//        exclude group: 'net.sf.log4jdbc'
-//    }
+    /* -----------------------------------------------
+     * 기타 공통 유틸
+     * ----------------------------------------------- */
+    implementation 'p6spy:p6spy:3.9.1'
+    implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
+    /* -----------------------------------------------
+     * Lombok / Devtools
+     * ----------------------------------------------- */
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    /* -----------------------------------------------
+     * Test
+     * ----------------------------------------------- */
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
