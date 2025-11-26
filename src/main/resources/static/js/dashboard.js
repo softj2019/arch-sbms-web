@@ -264,6 +264,61 @@ function funcCard(){
     });
 }
 
+// 툴팁 커스터마이징
+const customTooltip = document.createElement("div");
+customTooltip.id = "custom-tooltip";
+customTooltip.style.position = "absolute";
+customTooltip.style.background = "white";
+customTooltip.style.border = "1px solid #ccc";
+customTooltip.style.padding = "8px 10px";
+customTooltip.style.borderRadius = "6px";
+customTooltip.style.color = "black";
+customTooltip.style.fontSize = "12px";
+customTooltip.style.maxHeight = "200px";
+customTooltip.style.overflowY = "auto";
+customTooltip.style.pointerEvents = "none";
+customTooltip.style.whiteSpace = "nowrap";
+customTooltip.style.opacity = 0;
+customTooltip.style.zIndex = 9999;
+document.body.appendChild(customTooltip);
+
+// 커스텀 툴팁 핸들러
+function customTooltipHandler(context) {
+    const tooltip = context.tooltip;
+
+    if (!tooltip || tooltip.opacity === 0) {
+        customTooltip.style.opacity = 0;
+        return;
+    }
+
+    const chart = context.chart;
+    const index = chart.$customIndex; // 아래에서 설정함
+
+    const terminals = dashboardData[index]?.terminals ?? [];
+
+    // Hover가 "OFF" 차트일 때만 표시
+    const label = tooltip.dataPoints?.[0]?.label;
+    if (label === "ON") {
+        customTooltip.style.opacity = 0;
+        return;
+    }
+
+    // Tooltip HTML 구성
+    if (terminals.length === 0) {
+        customTooltip.innerHTML = "<div>데이터 없음</div>";
+    } else {
+        customTooltip.innerHTML = terminals
+            .map(t => `<div>• ${t}</div>`)
+            .join("");
+    }
+
+    // 위치 설정
+    const canvasRect = chart.canvas.getBoundingClientRect();
+    customTooltip.style.opacity = 1;
+    customTooltip.style.left = canvasRect.left + window.scrollX + tooltip.caretX + "px";
+    customTooltip.style.top  = canvasRect.top  + window.scrollY + tooltip.caretY + "px";
+}
+
 // 차트 생성
 function createDashboardChart(item, index) {
     const existingCanvas = document.getElementById(`chart-${index}`);
@@ -328,30 +383,15 @@ function createDashboardChart(item, index) {
                         }
                     },
                     tooltip: {
-                        callbacks: {
-                            label: function (tooltipItem) {
-                                let value = tooltipItem.raw || 0;
-                                let labelText = `${tooltipItem.label}: ${value}%`;
-
-                                // 모든 정류장 목록 표시 (OFF + 소켓데이터가 없는 정류장 포함)
-                                if (tooltipItem.label != "ON") {
-                                    const terminals = dashboardData[index].terminals;
-                                    // console.log(`[tooltip] index=${index}, terminals=`, terminals);
-                                    if (terminals.length > 0) {
-                                        return [labelText, ...terminals.map(terminal => `• ${terminal}`)];
-                                    }
-                                }
-
-                                return labelText;
-                            }
-                        },
-                        yAlign: 'bottom',
-                        position: 'average'
+                        enabled: false,
+                        external: customTooltipHandler
                     }
                 },
                 cutout: '60%'
             }
         });
+        chartInstances[index].$customIndex = index;
+
     }, 0);
 
     return card;
