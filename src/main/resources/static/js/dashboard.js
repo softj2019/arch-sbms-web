@@ -204,15 +204,6 @@ function funcCard(){
             if (onElement) onElement.textContent = item.data.on;
             if (offElement) offElement.textContent = item.data.off;
         });
-
-        // 캐싱: 만약 OFF 정류장이 없으면 이전 리스트 유지
-        // dashboardData.forEach((item, index) => {
-        //     if (item.terminals.length === 0 && previousTerminalsCache.has(item.cd)) {
-        //         item.terminals = previousTerminalsCache.get(item.cd);
-        //     } else {
-        //         previousTerminalsCache.set(item.cd, [...item.terminals]);
-        //     }
-        // });
     }
 
     function updateExistingCard(card, data) {
@@ -353,7 +344,9 @@ function createDashboardChart(item, index) {
 
                                 return labelText;
                             }
-                        }
+                        },
+                        yAlign: 'bottom',
+                        position: 'average'
                     }
                 },
                 cutout: '60%'
@@ -730,3 +723,4 @@ $(document).ready(function () {
         hidChart.update();
     }
 });
+
