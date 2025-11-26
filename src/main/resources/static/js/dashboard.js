@@ -253,14 +253,16 @@ function funcCard(){
             metrics: [data?.rfc_cpu, data?.cpu_temperature, memoryUsage, storageUsage],
         };
 
-        console.log(
-            `[Request Data : ${data?.terminal_id}]`
-            + ` ctl:${data?.ctl_board_power}`
-            + ` scr:${data?.smartscreen_power}`
-            + ` vc:${data?.vc_power}`
-            + ` lcd:${data?.lcd_display_power}`
-            + ` lte:${data?.lte_router_power}`
-        );
+        if (String(data?.terminal_id).startsWith("264")) {
+            console.log(
+                `[${data?.terminal_id}] `
+                + `ctl:${onOffTransfer(data?.ctl_board_power)} `
+                + `scr:${onOffTransfer(data?.smartscreen_power)} `
+                + `vc:${onOffTransfer(data?.vc_power)} `
+                + `lcd:${onOffTransfer(data?.lcd_display_power)} `
+                + `lte:${onOffTransfer(data?.lte_router_power)}`
+            );
+        }
 
         // **Map에 업데이트**
         if (stationDataMap.has(data.terminal_id)) {
