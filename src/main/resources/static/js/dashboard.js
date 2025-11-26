@@ -169,7 +169,7 @@ function funcCard(){
                         );
                     } else if (powerState === "OFF") {
                         const terminalName = getStationName(terminalId);
-                        if (terminalName === "undefined") return;
+                        if (terminalName === "undefined" || terminalName === undefined) return;
                         const terminalDisplay = `${terminalName} (${terminalId})`;
 
                         // 로그는 승하차알림시스템만
