@@ -14,8 +14,12 @@ import java.sql.Timestamp;
 public class ControlLogDTO {
     private Long   id;               // 아이디
     private String terminalId;       // 정류장 아이디
+    private String        terminalName;// 정류장 이름
     private String deviceName;       // 시설물 이름
     private String action;           // 행위
     private String userId;           // 행위자
+    private String        os;          // OS
+    private String        browser;     // 브라우저
+    private String        ip;          // IP
     private String createdAt;        // 로그 생성일자
 }

@@ -1,5 +1,6 @@
 package com.archivsoft.sbms.controller.api;
 
+import com.archivsoft.sbms.common.ClientInfoUtil;
 import com.archivsoft.sbms.common.ResponseHandler;
 import com.archivsoft.sbms.dto.ControlDTO;
 import com.archivsoft.sbms.service.CommonService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
@@ -20,9 +22,10 @@ public class ControlRestController {
     private final ControlService controlService;
     private final CommonService commonService;
     private final ResponseHandler responseHandler;
+    private final ClientInfoUtil clientInfoUtil;
 
     @PostMapping("/addLog")
-    public ResponseEntity<Map<String, Object>> addLog (@RequestBody ControlDTO controlDTO){
+    public ResponseEntity<Map<String, Object>> addLog (@RequestBody ControlDTO controlDTO, HttpServletRequest request){
         boolean result = false;
         String userId;
 
@@ -33,7 +36,12 @@ public class ControlRestController {
             userId = "TEMP";
         }
 
+        String userAgent = request.getHeader("User-Agent");
+
         controlDTO.setUserId(userId);
+        controlDTO.setOs(clientInfoUtil.getOs(userAgent));
+        controlDTO.setBrowser(clientInfoUtil.getBrowser(userAgent));
+        controlDTO.setIp(clientInfoUtil.getClientIp(request));
 
         result = controlService.addLog(controlDTO);
 

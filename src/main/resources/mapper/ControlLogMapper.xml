@@ -4,13 +4,18 @@
 <mapper namespace="com.archivsoft.sbms.mapper.ControlLogMapper">
     <!-- 통합 제어 로그 조회 -->
     <select id="getLogList" parameterType="map" resultType="ControlLogDTO">
-        SELECT   id
-                 , terminal_id
-                 , device_name
-                 , action
-                 , user_id
-                 , DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
-        FROM     tb_control_log
+        SELECT   a.id
+                 , a.terminal_id
+                 , b.terminal_name
+                 , a.device_name
+                 , a.action
+                 , a.user_id
+                 , DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+                 , a.os
+                 , a.browser
+                 , a.ip
+        FROM     tb_control_log a
+        LEFT JOIN tb_terminal b ON a.terminal_id=b.terminal_id
         WHERE    1=1
         <if test = "s_terminalId != null and s_terminalId != ''">
             AND  terminal_id LIKE CONCAT('%', #{s_terminalId}, '%')
