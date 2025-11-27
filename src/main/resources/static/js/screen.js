@@ -25,7 +25,7 @@ function screenStatus(terminalId, action){
 
 function powerStatus(terminalId, device, status){
     const stationCard = $(`.station_card[data-terminal-id='${terminalId}']`);
-
+    console.log(`${terminalId} : ${status}`);
     if (status == null){
         status = "off";
     }
@@ -111,6 +111,7 @@ function addLog(terminalId, device, action){
     });
 }
 
+/* 카드 생성 */
 function createCard(){
     const socket = new SockJS('/sockjs-websocket'); // Spring Boot WebSocket 엔드포인트
     const stompClient = Stomp.over(socket);
@@ -146,7 +147,7 @@ function createCard(){
             const cv = statusDiv.find('.cv');
             cv.removeClass('ic-power-on ic-power-off');
             cv.addClass(`ic-power-${cvPower}`);
-            // ✅ 중복 체크 후 추가 또는 업데이트
+            // 중복 체크 후 추가 또는 업데이트
             if (!reqTerminalList.has(terminalId)) {
                 reqTerminalList.set(terminalId, data);
             } else {
@@ -295,7 +296,8 @@ $('#s_terminalId, #s_terminalNm').on('keydown', function (event) {
     }
 });
 
-let cvStartTerminalId;
+/* 카메라 스트리밍 */
+let cvStartTerminalId; // 스트리밍중인 정류장번호
 function open_stream(terminalId){
     if(reqTerminalList.has(terminalId)){
         document.getElementById('streamVideo').src = "";
@@ -313,44 +315,53 @@ function open_stream(terminalId){
 
 }
 
+/* 카메라 소켓 통신 */
+let cvStompClient = null; // 사용자 연결 통로
 function connectWebSocket(terminalId) {
     const socket = new SockJS('/sockjs-websocket'); // Spring Boot WebSocket 엔드포인트
-    const stompClient = Stomp.over(socket);
-    stompClient.debug = null;
-    stompClient.connect({}, function () {
-        stompClient.send('/api/cv/stream', {}, JSON.stringify({
+    const cvStompClient = Stomp.over(socket);
+    cvStompClient.debug = null;
+
+    cvStompClient.connect({}, function () {
+        cvStompClient.send('/api/cv/stream', {}, JSON.stringify({
             terminalId: terminalId,
             action: "start"
         }));
-        stompClient.subscribe("/topic/cv/stream", function (message) {
+        cvStompClient.subscribe("/topic/cv/stream", function (message) {
             const data = JSON.parse(message.body);
-            if (data.status === "fail") {  // ✅ RTSP 실패 응답 처리
+            if (data.status === "fail") {  // RTSP 실패 응답 처리
                 hideLoadingSpinner();
                 popupOpenDialog("error", "카메라 연결상태를 확인하세요.",4000);
                 closePopup();
                 return;
             }
+
             if (data.image) {
                 document.getElementById('streamVideo').src = "data:image/jpeg;base64," + data.image;
                 hideLoadingSpinner();
             }
         });
     });
+    
     cvStartTerminalId =terminalId;
 }
+
+/* 팝업닫기(카메라 종료) */
 function closePopup() {
-    const socket = new SockJS('/sockjs-websocket'); // Spring Boot WebSocket 엔드포인트
-    const stompClient = Stomp.over(socket);
     $('#popup_frame').removeClass('on');
 
-    if (stompClient !== null) {
-        stompClient.connect({}, function () {
-            stompClient.send("/api/cv/stream", {}, JSON.stringify({
-                terminalId: cvStartTerminalId,
-                action: "stop"
-            }));
-        });
+    if (cvStompClient) {
+        cvStompClient.send("/api/cv/stream", {}, JSON.stringify({
+            terminalId: cvStartTerminalId,
+            action: "stop"
+        }));
+
+        cvStompClient.disconnect();
+        cvStompClient = null;
     }
+
+    const popup = document.getElementById("popup_layer");
+    popup.classList.remove("active");
 }
 
 document.addEventListener("DOMContentLoaded", function () {
