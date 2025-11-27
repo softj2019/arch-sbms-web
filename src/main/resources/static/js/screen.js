@@ -336,6 +336,7 @@ function connectWebSocket(terminalId) {
         cvStompClient.subscribe("/topic/cv/stream", function (message) {
             const data = JSON.parse(message.body);
             if (data.status === "fail") {  // RTSP 실패 응답 처리
+                clearTimeout(cvConnectTimer);
                 hideLoadingSpinner();
                 popupOpenDialog("error", "카메라 연결상태를 확인하세요.",4000);
                 closePopup();
@@ -343,6 +344,7 @@ function connectWebSocket(terminalId) {
             }
 
             if (data.image) {
+                clearTimeout(cvConnectTimer);
                 document.getElementById('streamVideo').src = "data:image/jpeg;base64," + data.image;
                 hideLoadingSpinner();
             }
