@@ -312,15 +312,21 @@ function open_stream(terminalId){
         hideLoadingSpinner();
         addLog(terminalId, "cv", "FAIL");
     }
-
 }
 
 /* 카메라 소켓 통신 */
 let cvStompClient = null; // 사용자 연결 통로
+let cvConnectTimer = null; // 10초 시간제한
 function connectWebSocket(terminalId) {
     const socket = new SockJS('/sockjs-websocket');
     cvStompClient = Stomp.over(socket);
     cvStompClient.debug = null;
+
+    cvConnectTimer = setTimeout(() => {
+        hideLoadingSpinner();
+        popupOpenDialog("error", "카메라 연결시간이 초과되었습니다.", 4000);
+        closePopup();
+    }, 10000); // 10초
 
     cvStompClient.connect({}, function () {
         cvStompClient.send('/api/cv/stream', {}, JSON.stringify({
