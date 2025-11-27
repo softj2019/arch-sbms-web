@@ -318,8 +318,8 @@ function open_stream(terminalId){
 /* 카메라 소켓 통신 */
 let cvStompClient = null; // 사용자 연결 통로
 function connectWebSocket(terminalId) {
-    const socket = new SockJS('/sockjs-websocket'); // Spring Boot WebSocket 엔드포인트
-    const cvStompClient = Stomp.over(socket);
+    const socket = new SockJS('/sockjs-websocket');
+    cvStompClient = Stomp.over(socket);
     cvStompClient.debug = null;
 
     cvStompClient.connect({}, function () {
