@@ -9,11 +9,17 @@
             , device_name
             , action
             , user_id
+            , os
+            , browser
+            , ip
         ) VALUES (
               #{terminalId}
             , #{deviceName}
             , #{action}
             , #{userId}
+            , #{os}
+            , #{browser}
+            , #{ip}
         )
     </insert>
 </mapper>

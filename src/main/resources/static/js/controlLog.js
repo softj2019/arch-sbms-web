@@ -33,12 +33,16 @@ function initializeGrid() {
         minBodyHeight: 50,
         rowHeaders: ['checkbox'],
         columns: [
-            { name: "no"        , header: "NO", sortable: true, align: 'center', width: 20 },
-            { name: "terminalId", header: "정류장 ID", sortable: true, align: 'center' },
-            { name: "deviceName", header: "시설물", sortable: true, align: 'center' },
-            { name: "action"    , header: "작업내용", sortable: true, align: 'center' },
-            { name: "userId"    , header: "작업자 ID", sortable: true, align: 'center' },
-            { name: "createdAt" , header: "작업일자", sortable: true, align: 'center' },
+            { name: "no"            , header: "NO"        , sortable: true, align: 'center', width: 20 },
+            { name: "userId"    , header: "작업자 ID"  , sortable: true, align: 'center' },
+            { name: "terminalName"  , header: "정류장 이름" , sortable: true, align: 'center' },
+            { name: "terminalId"    , header: "정류장 ID"  , sortable: true, align: 'center' },
+            { name: "deviceName"    , header: "시설물"     , sortable: true, align: 'center' },
+            { name: "action"        , header: "작업내용"   , sortable: true, align: 'center' },
+            { name: "os"            , header: "OS"        , sortable: true, align: 'center' },
+            { name: "browser"       , header: "브라우저"    , sortable: true, align: 'center' },
+            { name: "ip"            , header: "IP"        , sortable: true, align: 'center' },
+            { name: "createdAt"     , header: "작업일자"    , sortable: true, align: 'center' },
         ],
         columnOptions: {
             resizable: true,
@@ -78,12 +82,16 @@ function getLogList(page = 0){
         success : function(response){
             const totalElements = response.totalElements;
             const gridData = response.content.map((logs, index) => ({
-                no         : totalElements - (page * size) - index,
-                terminalId : logs.terminalId,
-                deviceName : transChar(logs.deviceName),
-                action     : transChar(logs.action),
-                userId     : logs.userId,
-                createdAt  : logs.createdAt
+                no              : totalElements - (page * size) - index,
+                terminalName    : logs.terminalName,
+                terminalId      : logs.terminalId,
+                deviceName      : transChar(logs.deviceName),
+                action          : transChar(logs.action),
+                userId          : logs.userId,
+                os              : logs.os,
+                browser         : logs.browser,
+                ip              : logs.ip,
+                createdAt       : logs.createdAt,
             }));
 
             // 초기화작업

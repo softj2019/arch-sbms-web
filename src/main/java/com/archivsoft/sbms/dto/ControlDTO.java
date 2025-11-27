@@ -14,8 +14,12 @@ import java.time.LocalDateTime;
 public class ControlDTO {
     private int           id;          // 아이디(PK)
     private String        terminalId;  // 정류장 아이디
+    private String        terminalName;// 정류장 이름
     private String        deviceName;  // 시설물 이름
     private String        action;      // 행위 내용 (on, off, up, down, stop 등)
     private String        userId;      // 행위자 아이디
     private LocalDateTime createdAt;   // 로그 생성 일자
+    private String        os;          // OS
+    private String        browser;     // 브라우저
+    private String        ip;          // IP
 }
