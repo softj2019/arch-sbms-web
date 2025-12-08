@@ -84,7 +84,6 @@ public class WebSocketController {
     @MessageMapping("/iot/led/send")
     @SendTo("/topic/led/send")
     public Map<String, String> controlLedDisplay(Map<String, String> payload) {
-//        String terminalId = payload.get("terminalId");
         String action = payload.get("action");
         String status = payload.get("status");
         String sendMessage = payload.get("sendMessage");
@@ -98,7 +97,6 @@ public class WebSocketController {
         String dly_interval= payload.get("dly_interval");
         Map<String, String> response = new HashMap<>();
         response.put("status", status);
-//        response.put("terminalId", terminalId);
         response.put("sendMessage", sendMessage);
         response.put("color", color);
         response.put("font", font);
@@ -108,7 +106,6 @@ public class WebSocketController {
         response.put("fix", fix);
         response.put("dly_interval", dly_interval);
         response.put("emergencyMessageStatus", emergencyMessageStatus);
-//        response.put("message", "Screen action processed successfully");
 
         return response;
     }
@@ -132,8 +129,7 @@ public class WebSocketController {
             int peopleCount = Integer.parseInt(payload.get("people_count"));
             int statPeopleCount = Integer.parseInt(payload.get("stat_people_count"));
             String fileName = payload.get("file_name");
-//            log.info("📌 Terminal ID: {}, People Count: {}, File Name: {}", terminalId, peopleCount, fileName);
-            // 📌 HID 로그 저장
+            // HID 로그 저장
             hidLogService.insertHidLog(terminalId, peopleCount,statPeopleCount, fileName);
             Map<String, String> response = new HashMap<>();
             response.put("terminal_id", terminalId);
@@ -141,7 +137,7 @@ public class WebSocketController {
 
             return response;
         } catch (Exception e){
-            log.error("❌ WebSocket 메시지 처리 중 오류 발생: {}", e.getMessage(), e);
+            log.error("WebSocket 메시지 처리 중 오류 발생: {}", e.getMessage(), e);
             Map<String, String> response = new HashMap<>();
             return response;
         }
@@ -196,7 +192,7 @@ public class WebSocketController {
 
             return response;
         } catch (Exception e){
-            log.error("❌ WebSocket 메시지 처리 중 오류 발생: {}", e.getMessage(), e);
+            log.error("WebSocket 메시지 처리 중 오류 발생: {}", e.getMessage(), e);
             Map<String, String> response = new HashMap<>();
             return response;
         }
