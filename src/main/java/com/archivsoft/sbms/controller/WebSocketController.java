@@ -150,13 +150,6 @@ public class WebSocketController {
     @SendTo("/topic/config")
     public Map<String, String>  config(Map<String, String> payload) {
 
-        // kyh, 호출 횟수 테스트
-        long threadId = Thread.currentThread().getId();
-        LocalDateTime now = LocalDateTime.now();
-        String formatted = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-//        log.warn("[" + threadId +"] " + formatted + "  :   /iot/config 호출 시작");
-
-
         try{
             List<SettingDTO> settingDTOList = settingService.getSetting();
             // 최근 기온 데이터 추가
@@ -200,8 +193,6 @@ public class WebSocketController {
                         break;
                 }
             }
-
-//            log.warn("[" + threadId +"] " + formatted + "  :   /iot/config 호출 종료");
 
             return response;
         } catch (Exception e){
