@@ -154,7 +154,7 @@ public class WebSocketController {
         long threadId = Thread.currentThread().getId();
         LocalDateTime now = LocalDateTime.now();
         String formatted = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        System.out.println("[" + threadId +"] " + formatted + "  :   /iot/config 호출 시작");
+        log.info("[" + threadId +"] " + formatted + "  :   /iot/config 호출 시작");
 
 
         try{
@@ -201,7 +201,7 @@ public class WebSocketController {
                 }
             }
 
-            System.out.println("[" + threadId +"] " + formatted + "  :   /iot/config 호출 종료");
+            log.info("[" + threadId +"] " + formatted + "  :   /iot/config 호출 종료");
 
             return response;
         } catch (Exception e){
