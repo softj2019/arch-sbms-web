@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.HttpClientErrorException;
@@ -138,6 +139,7 @@ public class WeatherService {
     /**
      * 최근 기상 데이터 select, 캐싱 처리
      */
+    @Transactional(readOnly = true)
     @Cacheable(
             value = "latestWeatherCache",   // 캐시 이름
             key = "'latest'"                // 캐시 키
@@ -149,6 +151,7 @@ public class WeatherService {
     /**
      * 기상 데이터 insert, 기존 캐싱 무효화
      */
+    @Transactional
     @CacheEvict(
             value = "latestWeatherCache",   // 캐시 이름
             allEntries = true               // 캐시 내 모든 엔트리
