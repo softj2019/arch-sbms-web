@@ -7,17 +7,11 @@ $(document).ready(function(){
     getStationName(); // 정류장 데이터 조회
 });
 
-// 예제 데이터 생성 (IP 주소는 192.168.10.254 고정)
-// const exampleData = [
-//     { terminal_id: "26019", terminal_nm: "정류장 A", rfc_cpu: "30%", cpu_temperature: "50°C", memory: "8GB / 4GB / 4GB", storage: "500GB / 200GB / 300GB", ipaddress: "192.168.10.254" },
-//     { terminal_id: "26023", terminal_nm: "정류장 B", rfc_cpu: "25%", cpu_temperature: "45°C", memory: "16GB / 8GB / 8GB", storage: "1TB / 500GB / 500GB", ipaddress: "10.129.198.39" },
-//     { terminal_id: "26030", terminal_nm: "정류장 C", rfc_cpu: "35%", cpu_temperature: "55°C", memory: "4GB / 2GB / 2GB", storage: "256GB / 100GB / 156GB", ipaddress: "192.168.10.254" }
-// ];
-
 /* 그리드 그리기 */
 document.addEventListener('DOMContentLoaded', () => {
     const socket      = new SockJS('/sockjs-websocket'); // Spring Boot WebSocket 엔드포인트
     const stompClient = Stomp.over(socket);
+    window.stompClient = stompClient;
     stompClient.debug = null;
     // 그리드 초기화 코드
     grid1 = new tui.Grid({
@@ -106,38 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
             newWindow.location.href = dashboardUrl;
         }, 2000); // 2초 후 대시보드 이동
     }
-
-    // function loginAndRedirect(wanip) {
-    //     console.log("로그인 시도 중, 대상 IP:", wanip);
-    //
-    //     // NMS 로그인 URL
-    //     const loginUrl = `http://${wanip}:8080/status_wanlink.asp`;
-    //     const dashboardUrl = `http://${wanip}:8080/`;  // 로그인 후 이동할 대시보드 페이지
-    //
-    //     // Basic Authentication Credentials (Base64 인코딩)
-    //     const username = "lterouter";
-    //     const password = "1234admin#";
-    //     const authHeader = "Basic " + btoa(username + ":" + password); // Base64 인코딩
-    //
-    //     // 로그인 요청
-    //     fetch(loginUrl, {
-    //         method: "GET",
-    //         credentials: "include",  // 세션 유지 (쿠키 저장)
-    //         headers: {
-    //             "Authorization": authHeader
-    //         }
-    //     })
-    //         .then(response => {
-    //             if (response.ok) {
-    //                 console.log("로그인 성공! NMS 페이지로 이동합니다.");
-    //                 window.open(dashboardUrl, "_blank");  // NMS 페이지를 새 창으로 열기
-    //             } else {
-    //                 console.error("로그인 실패:", response.status);
-    //                 alert("로그인 실패! 아이디 또는 비밀번호를 확인하세요.");
-    //             }
-    //         })
-    //         .catch(error => console.error("오류 발생:", error));
-    // }
 
     // 현재 Grid 데이터 저장
     let gridData = [];
