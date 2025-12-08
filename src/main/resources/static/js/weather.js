@@ -132,8 +132,8 @@ $(document).ready(function () {
     // 페이지 로드 시 데이터 가져오기
     fetchWeatherData();
 
-    // 10초마다 데이터 업데이트
-    setInterval(fetchWeatherData, 6000 * 60);
+    // 1초 * 60 * 30 = 30분
+    setInterval(fetchWeatherData, 1000 * 60 * 30);
 });
 
 function getWeatherStatusList() {
