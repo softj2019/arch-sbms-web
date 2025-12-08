@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -119,7 +121,7 @@ public class WeatherService {
             data.setKhaiValue(airQualityItem.path("khaiValue").asInt());
             data.setKhaiGrade(airQualityItem.path("khaiGrade").asInt());
 
-            weatherMapper.insertWeatherData(data);
+            insertWeatherData(data);
             logger.info("[WeatherService] Weather/AirQuality data saved successfully at {}", now);
 
         } catch (ResourceAccessException e) {
@@ -133,7 +135,25 @@ public class WeatherService {
         }
     }
 
+    /**
+     * 최근 기상 데이터 select, 캐싱 처리
+     */
+    @Cacheable(
+            value = "latestWeatherCache",   // 캐시 이름
+            key = "'latest'"                // 캐시 키
+    )
     public List<WeatherAirQuality> getRecentWeatherData() {
         return weatherMapper.getRecentWeatherData();
+    }
+
+    /**
+     * 기상 데이터 insert, 기존 캐싱 무효화
+     */
+    @CacheEvict(
+            value = "latestWeatherCache",   // 캐시 이름
+            allEntries = true               // 캐시 내 모든 엔트리
+    )
+    public void insertWeatherData(WeatherAirQuality weatherAirQuality) {
+        weatherMapper.insertWeatherData(weatherAirQuality);
     }
 }

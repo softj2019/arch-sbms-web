@@ -52,6 +52,9 @@ spring:
   spring:
     resources:
       static-locations: classpath:/static/,classpath:/public/,classpath:/resources/,classpath:/META-INF/resources/
+    cache:
+      cache:
+        type: simple
 
 
 mybatis:
