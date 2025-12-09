@@ -142,6 +142,8 @@ public class WebSocketController {
             return response;
         }
     }
+
+    // kyh컨트롤러, 수정 불필요 보임, allowIpList가 기기에서 사용될지 확인은 필요하나 기존 그대로 맞춰주는 서비스단의 로직으로 case 4: 대체하면 될듯
     @MessageMapping("/iot/config")
     @SendTo("/topic/config")
     public Map<String, String>  config(Map<String, String> payload) {

@@ -22,6 +22,7 @@ public class SettingRestControler {
     private final ResponseHandler responseHandler;
     private final WeatherService weatherService;
 
+    // kyh, 수정 불필요로 보임, 기존 세팅 데이터는 남기되 허용 IP만 제외하면 화면단에서 알아처리 예상이지만 확인 필요
     /**
      * 기본 설정값 조회
      * */

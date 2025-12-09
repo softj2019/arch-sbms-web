@@ -19,6 +19,9 @@ public class SettingService {
     private final SettingMapper settingMapper;
     @Autowired
     private SqlSessionFactory sqlSessionFactory;
+    
+    
+    // kyh서비스, 수정 불필요로 보임, 그대로 리턴만 하는 방식으로 컨트롤러단에서 처리 함
     /**
      * 기본 설정값 조회
      * */
@@ -30,6 +33,9 @@ public class SettingService {
         }
     }
 
+    // kyh서비스, 추가, 모델링 되는 테이블의 허용 IP 가져와서 List<SettingDTO> getSetting() 와 같이 반환하는 메소드 추가 필요할지 검토
+
+    // kyh서비스, 수정 필요, 불필요한 코드 제거, 화면단에서 허용 IP 로우 자체를 빼버리면 로직에는 문제 없을듯
     /**
      * 기본 설정값 수정
      * */
@@ -83,6 +89,7 @@ public class SettingService {
         }
     }
 
+    // kyh서비스, 수정 필요, 리턴방식은 그대로 split 로직 제거
     // 접근가능 ip 가져오기
     public List<String> getIp() {
         String ipString = settingMapper.getIp();
