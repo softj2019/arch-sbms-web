@@ -106,18 +106,19 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
                 uri.equals("/favicon.ico") ||
                 uri.equals("/websocket") ||
                 uri.startsWith("/api/auth/login") ||
-                uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|woff2|ttf|map)$");
+                uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|woff2|ttf|map)$") ||
+                uri.startsWith("/login");
     }
 
     // 사용자 IP 가져오기
     private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
+        String ip = request.getHeader("X-Forwarded-For"); // 공인 IP 부터 중개되어 온 IP들을 ,(쉼표)구분으로 한줄 반환
         if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            ip = ip.split(",")[0].trim();
+            ip = ip.split(",")[0].trim(); // 공인 IP 반환
             return convertToIPv4IfNeeded(ip);
         }
 
-        String[] headers = {
+        String[] headers = { // 중개 되어 올 경우 존재할 수 있는 헤더들
                 "Proxy-Client-IP", "WL-Proxy-Client-IP",
                 "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"
         };
