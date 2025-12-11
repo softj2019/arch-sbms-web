@@ -39,6 +39,8 @@ public class MenuService {
             } catch (NumberFormatException e) {
                 userRoleId = 0;
             }
+
+            // rmmenulink 테이블에서 사용자의 권한에 맞는 url이 존재할 겨우
             boolean permissionCheck = rmmenuRepository.myPermissionUrlList(userRoleId, currentUriPattern) > 0;
 
             // 권한이없거나 특정 uri 제외 로그아웃처리
@@ -74,9 +76,9 @@ public class MenuService {
 
     @Transactional // 트랜잭션을 별도로 관리
     public List<Rmmenu> getMenuList(String userRole) {
-        List<Rmmenu> rmmenus = rmmenuRepository.getUpperMenu("1", userRole);
+        List<Rmmenu> rmmenus = rmmenuRepository.getUpperMenu("1", userRole); // 상위 메뉴  Select
         for (Rmmenu rmmenu : rmmenus) {
-            rmmenu.setSubMenus(rmmenuRepository.findByUseFlagAndUpperMenuIdOrderByMenuSortSno("1", rmmenu.getId().getMenuId()));
+            rmmenu.setSubMenus(rmmenuRepository.findByUseFlagAndUpperMenuIdOrderByMenuSortSno("1", rmmenu.getId().getMenuId())); // 하위 메뉴 Select
         }
         return rmmenus;
     }
