@@ -1,7 +1,11 @@
 package com.archivsoft.sbms.controller.api;
 
 import com.archivsoft.sbms.common.ResponseHandler;
-import lombok.RequiredArgsConstructor;
+import com.archivsoft.sbms.dto.ControlAllowedIpDTO;
+import com.archivsoft.sbms.service.ControlAllowedIpService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,47 +13,43 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/control/allowedIp")
 public class ControlAllowedIpRestController {
-
     private final ResponseHandler responseHandler;
-
-    @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createAllowedIp() {
-        Map<String, Object> response = new HashMap<>();
-
-        ResponseEntity<Map<String, Object>> responseEntity = responseHandler.generateResponse(true, null, null, response);
-
-        return responseEntity;
+    private final ControlAllowedIpService controlAllowedIpService;
+    public ControlAllowedIpRestController(ResponseHandler responseHandler, ControlAllowedIpService controlAllowedIpService) {
+        this.responseHandler = responseHandler;
+        this.controlAllowedIpService = controlAllowedIpService;
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Map<String, Object>> updateAllowedIp() {
-        Map<String, Object> response = new HashMap<>();
-
-        ResponseEntity<Map<String, Object>> responseEntity = responseHandler.generateResponse(true, null, null, response);
-
-        return responseEntity;
-    }
-
-    @DeleteMapping("/delete")
-    public ResponseEntity<Map<String, Object>> deleteAllowedIp() {
-        Map<String, Object> response = new HashMap<>();
-
-        ResponseEntity<Map<String, Object>> responseEntity = responseHandler.generateResponse(true, null, null, response);
-
-        return responseEntity;
-    }
-
-
+    //kyh, 예외처리 필요
     @GetMapping("/list")
-    public ResponseEntity<Map<String, Object>> getAllowedIpList() {
-        Map<String, Object> response = new HashMap<>();
-
-        ResponseEntity<Map<String, Object>> responseEntity = responseHandler.generateResponse(true, null, null, response);
-
-        return responseEntity;
+    public ResponseEntity<Page<ControlAllowedIpDTO>> getAllowedIpList(Pageable pageable) {
+        Page<ControlAllowedIpDTO> controlAllowedIps = controlAllowedIpService.getControlAllowedIpList((PageRequest) pageable);
+        return ResponseEntity.ok(controlAllowedIps);
     }
 
+    //kyh, 예외처리 필요
+    @PostMapping("/create")
+    public ResponseEntity<Map<String, Object>> createAllowedIp(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
+        Map<String, Object> response = new HashMap<>();
+        controlAllowedIpService.createControlAllowedIp(controlAllowedIpDTO);
+        return responseHandler.generateResponse(true, null, null, response);
+    }
+
+    //kyh, 예외처리 필요
+    @PutMapping("/update")
+    public ResponseEntity<Map<String, Object>> updateAllowedIp(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
+        Map<String, Object> response = new HashMap<>();
+        controlAllowedIpService.updateControlAllowedIp(controlAllowedIpDTO);
+        return responseHandler.generateResponse(true, null, null, response);
+    }
+
+    //kyh, 예외처리 필요
+    @DeleteMapping("/delete")
+    public ResponseEntity<Map<String, Object>> deleteAllowedIp(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
+        Map<String, Object> response = new HashMap<>();
+        controlAllowedIpService.deleteControlAllowedIp(controlAllowedIpDTO);
+        return responseHandler.generateResponse(true, null, null, response);
+    }
 }
