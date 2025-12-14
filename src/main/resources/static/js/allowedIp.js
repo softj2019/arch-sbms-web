@@ -2,6 +2,17 @@
 let grid1;               // 그리드
 let pagination1;         // 페이지네이션
 
+// kyh, 추후 통합 필요
+const colors = [
+    { 번호: "00", 글자색: "흰색", 색상코드: "#FFFFFF", 테두리색상: "#FFFFFF",back: "#000000" },
+    { 번호: "01", 글자색: "파랑", 색상코드: "#0000ff", 테두리색상: "#0000ff" ,back: "#000000"},
+    { 번호: "02", 글자색: "청록", 색상코드: "#00FFFF", 테두리색상: "#00FFFF" ,back: "#000000"},
+    { 번호: "03", 글자색: "녹색", 색상코드: "#008000", 테두리색상: "#008000" ,back: "#000000"},
+    { 번호: "04", 글자색: "노랑", 색상코드: "#FFFF00", 테두리색상: "#FFFF00" ,back: "#000000"},
+    { 번호: "05", 글자색: "빨강", 색상코드: "#FF0000", 테두리색상: "#FF0000" ,back: "#000000"},
+    { 번호: "06", 글자색: "분홍", 색상코드: "#FFC0CB", 테두리색상: "#FFC0CB" ,back: "#000000"},
+];
+
 /* 페이지 온로드 */
 $(document).ready(function(){
     getAllowedIpList();
@@ -46,6 +57,20 @@ function initializeGrid() {
                     options: {
                         maxLength: 500
                     }
+                },
+                formatter: function ({ row, value }) {
+                    const backgroundColor = "#FFF";
+                    return `<span class="cell-hover-effect" style="
+                            display: inline-block;
+                            width: 100%;
+                            height: 100%;
+                            line-height: 40px;
+                            text-align: center;
+                            background: ${backgroundColor};
+                            border-radius: 4px;
+                        ">
+                        ${value || ""}
+                    </span>`;
                 }
             },
             {
@@ -57,6 +82,20 @@ function initializeGrid() {
                     options: {
                         maxLength: 500
                     }
+                } ,
+                formatter: function ({ row, value }) {
+                    const backgroundColor = "#FFF";
+                    return `<span class="cell-hover-effect" style="
+                            display: inline-block;
+                            width: 100%;
+                            height: 100%;
+                            line-height: 40px;
+                            text-align: center;
+                            background: ${backgroundColor};
+                            border-radius: 4px;
+                        ">
+                        ${value || ""}
+                    </span>`;
                 }
             },
             {
@@ -89,11 +128,22 @@ function initializeGrid() {
             resizable   : true,
             minWidth    : 80,
         }
+        ,
+        editingEvent: "click"
     });
     tuiGridApplyTheme();
     grid1.on('click'      , handleOneClickBtn);
 }
 
+/* CSS 스타일 추가 */
+const style = document.createElement("style");
+style.innerHTML = `
+    .cell-hover-effect:hover {
+        cursor: pointer;
+        background-color: #f2f8fc !important;
+    }
+`;
+document.head.appendChild(style);
 // 그리드 한번 클릭 핸들러
 function handleOneClickBtn(e){
     // 수정, 삭제 필수 데이터

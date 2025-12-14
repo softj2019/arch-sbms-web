@@ -2,8 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.archivsoft.sbms.mapper.SettingMapper">
-
-<!--  kyh쿼리, 수정 필요, id = 4번 해당  -->
     <!-- 기본 설정값 조회 -->
     <select id="getSetting" parameterType="SettingDTO" resultType="SettingDTO">
         SELECT  id
@@ -45,17 +43,7 @@
               , 'option2' AS optionKey
         FROM    tb_general_setting
         WHERE   id = 3
-        UNION ALL
-        SELECT  id
-              , description
-              , option_1 AS setting
-              , value_1 AS value
-              , 'option1' AS optionKey
-        FROM    tb_general_setting
-        WHERE   id = 4
     </select>
-
-<!--  kyh쿼리, 수정 불 필요, 화면단 수정시 허용 IP는 들어오지 않게 됨으로 기존 세팅값은 그대로 사용가능.  -->
     <update id="updateSetting" parameterType="com.archivsoft.sbms.dto.SettingDTO">
         UPDATE tb_general_setting
         <set>
@@ -74,7 +62,7 @@
         WHERE id = #{setting.id}
     </update>
 
-<!-- kyh쿼리, 수정 필요   -->
+<!-- 허용 ip 테이블 생성으로 인해 현재 미사용  -->
     <!-- 접근가능 ip 조회 -->
     <select id="getIp" resultType="String">
         SELECT  value_1

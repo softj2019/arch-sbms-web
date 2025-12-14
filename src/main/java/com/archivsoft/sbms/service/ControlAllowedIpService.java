@@ -25,7 +25,7 @@ public class ControlAllowedIpService {
         this.controlAllowedMapper = controlAllowedMapper;
     }
 
-    //kyh, 예외처리 필요
+    // 허용 IP 리스트 조회 (페이지네이션)
     public Page<ControlAllowedIpDTO> getControlAllowedIpList(PageRequest pageable) {
         try {
             Map<String, Object> paramMap = new HashMap<>();
@@ -43,7 +43,7 @@ public class ControlAllowedIpService {
         }
     }
 
-    //kyh, 예외처리 필요
+    // 허용 IP 생성
     @Transactional(rollbackFor = Exception.class)
     public void createControlAllowedIp(ControlAllowedIpDTO allowedIpDTO) {
         try {
@@ -65,6 +65,7 @@ public class ControlAllowedIpService {
         }
     }
 
+    // 허용 IP 수정
     @Transactional(rollbackFor = Exception.class)
     public void updateControlAllowedIp(ControlAllowedIpDTO allowedIpDTO) {
         try {
@@ -85,6 +86,7 @@ public class ControlAllowedIpService {
         }
     }
 
+    // 허용 IP 삭제
     @Transactional(rollbackFor = Exception.class)
     public void deleteControlAllowedIp(ControlAllowedIpDTO allowedIpDTO) {
         try {
@@ -105,16 +107,39 @@ public class ControlAllowedIpService {
         }
     }
 
-    // 허용 IP 만 담아 LIST 반환
-    public List<String> getIpListByUseFlag(int useFlag){
+    // useFlag 조건으로 모든 허용 IP 조회
+    public List<ControlAllowedIpDTO> getAllAllowedIpListByUseFlag(int useFlag) {
+        List<ControlAllowedIpDTO> result;
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("useFlag", useFlag);
-        List<ControlAllowedIpDTO> allowedIpDTOList = controlAllowedMapper.getAllAllowedIpListByUseFlag(paramMap);
-        if(allowedIpDTOList == null) {
-            return Collections.emptyList(); // GC 효율을 위한 싱글톤 빈 리스트 반환
+
+        // NULL 반환 방지
+        result = controlAllowedMapper.getAllAllowedIpListByUseFlag(paramMap);
+        if(result == null || result.isEmpty()) {
+            result = Collections.emptyList();
+        }
+        return result;
+    }
+
+    // 허용 IP LIST 반환
+    public List<String> getIpListByUseFlag(int useFlag){
+        List<ControlAllowedIpDTO> allowedIpDTOList = getAllAllowedIpListByUseFlag(useFlag);
+        if(allowedIpDTOList.isEmpty()) {
+            return Collections.emptyList();
         }
         List<String> ipList = allowedIpDTOList.stream().map(dto -> dto.getIp()).collect(Collectors.toList());
         return ipList;
     }
 
+    // 허용 IP STRING 반환
+    public String getIpOneLineStringByUseFlag(int useFlag) {
+        List<ControlAllowedIpDTO> allowedIpDTOList = getAllAllowedIpListByUseFlag(useFlag);
+        if(allowedIpDTOList.isEmpty()) {
+            return "";
+        }
+        String result = allowedIpDTOList.stream()
+                .map(ControlAllowedIpDTO::getIp)
+                .collect(Collectors.joining(", "));
+        return result;
+    }
 }
