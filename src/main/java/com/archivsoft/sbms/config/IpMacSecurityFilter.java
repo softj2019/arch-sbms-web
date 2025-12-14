@@ -1,15 +1,11 @@
 package com.archivsoft.sbms.config;
 
-import com.archivsoft.sbms.controller.api.AuthRestController;
 import com.archivsoft.sbms.entity.SystemUserEntity;
-import com.archivsoft.sbms.service.MenuService;
-import com.archivsoft.sbms.service.SettingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.archivsoft.sbms.service.ControlAllowedIpService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,12 +19,10 @@ import java.util.List;
  * */
 @Component
 public class IpMacSecurityFilter extends OncePerRequestFilter {
-    private SettingService settingService;
-    private AuthRestController authRestController;
+    private final ControlAllowedIpService allowedIpService;
 
-    public IpMacSecurityFilter(SettingService settingService, AuthRestController authRestController, MenuService menuService) {
-        this.settingService = settingService;
-        this.authRestController = authRestController;
+    public IpMacSecurityFilter(ControlAllowedIpService allowedIpService) {
+        this.allowedIpService = allowedIpService;
     }
 
     @Override
@@ -50,8 +44,9 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 허용된 IP인지 검사
-        List<String> allowedIp = settingService.getIp();
+        // 허용 IP 테이블의 데이터로 허용된 IP인지 검사
+        List<String> allowedIp = allowedIpService.getIpListByUseFlag(1);
+
         String clientIp = getClientIp(request);
 //        if (!allowedIp.contains(clientIp)) {
 //            authRestController.logoutUser(request, response);

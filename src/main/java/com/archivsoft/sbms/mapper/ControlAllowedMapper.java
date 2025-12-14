@@ -23,5 +23,7 @@ public interface ControlAllowedMapper {
 //    허용 IP 삭제
     Integer deleteAllowedIp(ControlAllowedIpDTO controlAllowedIpDTO);
 
+//    UseFlag 조건으로 허용된 IP 전체 조회
+    List<ControlAllowedIpDTO> getAllAllowedIpListByUseFlag(Map<String, Object> paramMap);
 }
 

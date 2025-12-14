@@ -54,4 +54,15 @@
         WHERE       seq = #{seq}
     </delete>
 
+    <select id="getAllAllowedIpListByUseFlag" parameterType="map" resultType="ControlAllowedIpDTO">
+        SELECT seq ,
+               description,
+               ip,
+               use_flag
+        FROM
+            tb_allowed_ip tai
+        WHERE
+            tai.use_flag = #{useFlag}
+    </select>
+
 </mapper>

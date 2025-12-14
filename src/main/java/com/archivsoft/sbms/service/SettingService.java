@@ -89,7 +89,7 @@ public class SettingService {
         }
     }
 
-    // kyh서비스, 수정 필요, 리턴방식은 그대로 split 로직 제거
+    // kyh서비스, 미사용 됨으로써, 추후 삭제 필요
     // 접근가능 ip 가져오기
     public List<String> getIp() {
         String ipString = settingMapper.getIp();

@@ -13,9 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -106,5 +105,16 @@ public class ControlAllowedIpService {
         }
     }
 
+    // 허용 IP 만 담아 LIST 반환
+    public List<String> getIpListByUseFlag(int useFlag){
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("useFlag", useFlag);
+        List<ControlAllowedIpDTO> allowedIpDTOList = controlAllowedMapper.getAllAllowedIpListByUseFlag(paramMap);
+        if(allowedIpDTOList == null) {
+            return Collections.emptyList(); // GC 효율을 위한 싱글톤 빈 리스트 반환
+        }
+        List<String> ipList = allowedIpDTOList.stream().map(dto -> dto.getIp()).collect(Collectors.toList());
+        return ipList;
+    }
 
 }
