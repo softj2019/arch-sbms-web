@@ -3,7 +3,6 @@ package com.archivsoft.sbms.service;
 import com.archivsoft.sbms.common.ErrorCode;
 import com.archivsoft.sbms.dto.ControlAllowedIpDTO;
 import com.archivsoft.sbms.entity.SystemUserEntity;
-import com.archivsoft.sbms.exception.CustomException;
 import com.archivsoft.sbms.mapper.ControlAllowedMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,72 +39,85 @@ public class ControlAllowedIpService {
             return allowedIpPage;
         } catch (RuntimeException e) {
             log.error("허용 IP 리스트 로드 중 오류 발생 : {}", e.getMessage(), e);
-            throw new CustomException(ErrorCode.INTERNAL_ERROR.getMessage(), e.getCause(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("허용 IP 리스트 로드 실패", e);
         }
     }
 
     // 허용 IP 생성
     @Transactional(rollbackFor = Exception.class)
     public void createControlAllowedIp(ControlAllowedIpDTO allowedIpDTO) {
+        Integer affectedRow = 0;
         try {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setCreateUserId(systemUserEntity.getUserId());
             allowedIpDTO.setUseFlag(1);
 
-            Integer affectedRow = controlAllowedMapper.createAllowedIp(allowedIpDTO);
-            if(affectedRow != null && affectedRow == 1) {
-
-            }
-            else {
-
-            }
-        } catch (RuntimeException e) {
+            affectedRow = controlAllowedMapper.createAllowedIp(allowedIpDTO);
+        } catch (Exception e) {
             log.error("허용 IP 생성 중 오류 발생 : {}", e.getMessage(), e);
-            throw new CustomException(ErrorCode.INTERNAL_ERROR.getMessage(), e.getCause(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("허용 IP 생성 실패", e);
+        }
+
+        // 적용된 로우가 없을 경우
+        if(affectedRow == null || !affectedRow.equals(1)) {
+            String message = "허용 IP 생성 중 오류 발생 : " + "적용된 row수가 올바르지 않음. expected = 1, actual = " + affectedRow;
+
+            // 명시적으로 발생시키는 Exception 이므로 메세지를 임의로 생성
+            log.error(message);
+            throw new IllegalStateException(message);
         }
     }
 
     // 허용 IP 수정
     @Transactional(rollbackFor = Exception.class)
     public void updateControlAllowedIp(ControlAllowedIpDTO allowedIpDTO) {
+        Integer affectedRow = 0;
         try {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setUpdateUserId(systemUserEntity.getUserId());
 
-            Integer affectedRow = controlAllowedMapper.updateAllowedIp(allowedIpDTO);
-            if(affectedRow != null && affectedRow == 1) {
-
-            }
-            else {
-
-            }
-        } catch (RuntimeException e) {
+            affectedRow = controlAllowedMapper.updateAllowedIp(allowedIpDTO);
+        } catch (Exception e) {
             log.error("허용 IP 수정 중 오류 발생 : {}", e.getMessage(), e);
-            throw new CustomException(ErrorCode.INTERNAL_ERROR.getMessage(), e.getCause(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("허용 IP 수정 실패", e);
+        }
+
+        // 적용된 로우가 없을 경우, 화면 보는 중 삭제된 로우 발생
+        if(affectedRow == null || !affectedRow.equals(1)) {
+            String message = "허용 IP 수정 중 오류 발생 : " + "적용된 row수가 올바르지 않음. expected = 1, actual = " + affectedRow;
+
+            // 명시적으로 발생시키는 Exception 이므로 메세지를 임의로 생성
+            log.error(message);
+            throw new IllegalStateException(message);
         }
     }
 
     // 허용 IP 삭제
     @Transactional(rollbackFor = Exception.class)
     public void deleteControlAllowedIp(ControlAllowedIpDTO allowedIpDTO) {
+        Integer affectedRow = 0;
         try {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setUpdateUserId(systemUserEntity.getUserId());
 
-            Integer affectedRow = controlAllowedMapper.deleteAllowedIp(allowedIpDTO);
-            if(affectedRow != null && affectedRow == 1) {
-
-            }
-            else {
-
-            }
+            affectedRow = controlAllowedMapper.deleteAllowedIp(allowedIpDTO);
         } catch (RuntimeException e) {
             log.error("허용 IP 삭제 중 오류 발생 : {}", e.getMessage(), e);
-            throw new CustomException(ErrorCode.INTERNAL_ERROR.getMessage(), e.getCause(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("허용 IP 삭제 실패", e);
+        }
+
+        // 적용된 로우가 없을 경우, 화면 보는 중 삭제된 로우 발생
+        if(affectedRow == null || !affectedRow.equals(1)) {
+            String message = "허용 IP 삭제 중 오류 발생 : " + "적용된 row수가 올바르지 않음. expected = 1, actual = " + affectedRow;
+
+            // 명시적으로 발생시키는 Exception 이므로 메세지를 임의로 생성
+            log.error(message);
+            throw new IllegalStateException(message);
         }
     }
 
     // 허용 IP LIST 반환
+    @Transactional(readOnly = true) // 외부에서 호출되는 메소드이므로 트랜잭션 처리
     public List<String> getIpListByUseFlag(int useFlag){
         List<ControlAllowedIpDTO> allowedIpDTOList = getAllAllowedIpListByUseFlag(useFlag);
         if(allowedIpDTOList.isEmpty()) {
@@ -116,6 +128,7 @@ public class ControlAllowedIpService {
     }
 
     // 허용 IP STRING 반환
+    @Transactional(readOnly = true) // 외부에서 호출되는 메소드이므로 트랜잭션 처리
     public String getIpOneLineStringByUseFlag(int useFlag) {
         List<ControlAllowedIpDTO> allowedIpDTOList = getAllAllowedIpListByUseFlag(useFlag);
         if(allowedIpDTOList.isEmpty()) {
@@ -128,7 +141,6 @@ public class ControlAllowedIpService {
     }
 
     // useFlag 조건으로 모든 허용 IP 조회
-    @Transactional(readOnly = true)
     public List<ControlAllowedIpDTO> getAllAllowedIpListByUseFlag(int useFlag) {
         List<ControlAllowedIpDTO> result;
         Map<String, Object> paramMap = new HashMap<>();
@@ -142,7 +154,7 @@ public class ControlAllowedIpService {
         return result;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true) // 외부에서 호출되는 메소드이므로 트랜잭션 처리
     public boolean isDuplicatedIp(ControlAllowedIpDTO allowedIpDTO) {
         ControlAllowedIpDTO ipData = controlAllowedMapper.findIp(allowedIpDTO);
         return ipData != null;

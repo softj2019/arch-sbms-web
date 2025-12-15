@@ -30,22 +30,34 @@ public class ControlAllowedIpRestController {
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> create(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
-        controlAllowedIpService.createControlAllowedIp(controlAllowedIpDTO);
-        return responseHandler.generateResponse(true, null, null, response);
+        try{
+            controlAllowedIpService.createControlAllowedIp(controlAllowedIpDTO);
+            return responseHandler.generateResponse(true, null, null, response);
+        } catch (Exception e) {
+            return responseHandler.exceptionHandler(e, null, response);
+        }
     }
 
     @PutMapping("/update")
     public ResponseEntity<Map<String, Object>> update(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
-        controlAllowedIpService.updateControlAllowedIp(controlAllowedIpDTO);
-        return responseHandler.generateResponse(true, null, null, response);
+        try {
+            controlAllowedIpService.updateControlAllowedIp(controlAllowedIpDTO);
+            return responseHandler.generateResponse(true, null, null, response);
+        } catch (Exception e) {
+            return responseHandler.exceptionHandler(e, null, response);
+        }
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<Map<String, Object>> delete(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
-        controlAllowedIpService.deleteControlAllowedIp(controlAllowedIpDTO);
-        return responseHandler.generateResponse(true, null, null, response);
+        try {
+            controlAllowedIpService.deleteControlAllowedIp(controlAllowedIpDTO);
+            return responseHandler.generateResponse(true, null, null, response);
+        } catch (Exception e) {
+            return responseHandler.exceptionHandler(e, null, response);
+        }
     }
 
     @PostMapping("/isDuplicatedId")

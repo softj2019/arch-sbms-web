@@ -201,7 +201,7 @@ function createAllowedIp(){
             }
         },
         error : function (xhr, status, error){
-            popupOpenDialog('error', '허용 IP 등록중 에러 발생 '+error, 2000);
+            popupOpenDialog('error', '허용 IP 등록중 에러 발생', 2000);
             hideLoadingSpinner();
         },
         complete :  function (){
@@ -253,7 +253,6 @@ function getAllowedIpList(page = 0){
         },
         error : function(xhr, status, error){
             popupOpenDialog('error', "접근허용 IP 목록 조회에 실패하였습니다.", 2000);
-            console.warn(error);
             hideLoadingSpinner();
         },
         complete : function(){
@@ -378,7 +377,6 @@ function clearContents(){
 
 }
 
-// 추후 common으로 통합처리 필요
 class CustomToggleRenderer {
     constructor(props) {
         const el = document.createElement('label');
@@ -406,7 +404,6 @@ class CustomToggleRenderer {
     }
 }
 
-// 추후 common으로 통합처리 필요
 class CustomTextEditor {
     constructor(props) {
         const rowKey = props.rowKey;
