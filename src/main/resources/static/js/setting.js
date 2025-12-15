@@ -349,7 +349,17 @@ function updateSet(){
     }));
 
     /* if(id=2) 숫자 유효성 검사 */
-    const invalidNumberData = updateData.find(row => row.id === 2 && (!/^\d+$/.test(row.value) || Number(row.value) <= 10));
+    const invalidNumberData = updateData.find(row =>
+            row.id === 2 && (
+                !/^\d+$/.test(row.value) ||      // 숫자가 아님
+                Number(row.value) < 20 ||        // 20 미만
+                Number(row.value) > 50           // 50 초과
+            )
+    );
+
+    if (invalidNumberData) {
+        popupOpenDialog('error', "기온은 20~50 사이의 정수로 입력하세요.", 2000);
+    }
 
     if (invalidNumberData) {
         let rowIndex     = invalidNumberData.rowIndex;
