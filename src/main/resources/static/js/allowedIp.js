@@ -1,6 +1,8 @@
 /* 전역변수 */
-let grid1;               // 그리드
-let pagination1;         // 페이지네이션
+let grid1;                  // 그리드
+let pagination1;            // 페이지네이션
+let selectedIp = {};    // 현재 선택된 IP
+
 
 const colors = [
     { 번호: "00", 글자색: "흰색", 색상코드: "#FFFFFF", 테두리색상: "#FFFFFF",back: "#000000" },
@@ -21,15 +23,19 @@ $(document).ready(function(){
     $('#itemsPerPage').on('change', function () {
         getAllowedIpList(0);
     });
-});
 
-// esc 버튼과 닫기버튼으로 팝업닫기
-$(document).on('click keydown', function(event) {
-    if (
-        (event.type === "keydown" && (event.key === "Escape" || event.keyCode === 27))
-    ) {
-        $('.popup_frame.on').removeClass('on');
-    }
+
+    $(document).on("keydown", function (event) {
+        if (event.key === "Enter") {        // 엔터 발생시 현재 선택된 Row 데이터 update 진행
+            if(selectedIp.no !== null && selectedIp.no !== undefined) {
+                console.log("엔터");
+                confirmUpdateAllowedIp(selectedIp);
+            }
+        }
+        else if(event.key === "Escape") {   // ESC 발생시 현재 열린 모달 닫기
+            $('#deleteConfirmModal').remove();
+        }
+    });
 });
 
 /* 그리드 */
@@ -51,51 +57,13 @@ function initializeGrid() {
                 name: "description"	,
                 header: "설명"			,
                 sortable: true, align: 'center',
-                editor: {
-                    type: CustomTextEditor,
-                    options: {
-                        maxLength: 500
-                    }
-                },
-                formatter: function ({ row, value }) {
-                    const backgroundColor = "#FFF";
-                    return `<span class="cell-hover-effect" style="
-                            display: inline-block;
-                            width: 100%;
-                            height: 100%;
-                            line-height: 40px;
-                            text-align: center;
-                            background: ${backgroundColor};
-                            border-radius: 4px;
-                        ">
-                        ${value || ""}
-                    </span>`;
-                }
+                editor: 'text',
             },
             {
                 name: "ip"	, header: "접근허용IP"			,
                 sortable: true,
                 align: 'center',
-                editor: {
-                    type: CustomTextEditor,
-                    options: {
-                        maxLength: 500
-                    }
-                } ,
-                formatter: function ({ row, value }) {
-                    const backgroundColor = "#FFF";
-                    return `<span class="cell-hover-effect" style="
-                            display: inline-block;
-                            width: 100%;
-                            height: 100%;
-                            line-height: 40px;
-                            text-align: center;
-                            background: ${backgroundColor};
-                            border-radius: 4px;
-                        ">
-                        ${value || ""}
-                    </span>`;
-                }
+                editor: 'text'
             },
             {
                 name: "useFlag"		,
@@ -146,18 +114,28 @@ document.head.appendChild(style);
 
 // 그리드 한번 클릭 핸들러
 function handleOneClickBtn(e){
+
     // 수정, 삭제 필수 데이터
     const rowKey = e.rowKey;
+    const no = grid1.getValue(rowKey, 'no');
     const seq = grid1.getValue(rowKey, 'seq');
-    
+    const description = grid1.getValue(rowKey, 'description');
+    const ip = grid1.getValue(rowKey, 'ip');
+    const useFlag = grid1.getValue(rowKey, 'useFlag');
+
+    //현재 선택된 Row 기억
+    selectedIp.no = no;
+    selectedIp.seq = seq;
+    selectedIp.description = description;
+    selectedIp.ip = ip;
+    selectedIp.useFlag = useFlag;
+
     switch (e.columnName) {
         case "update_btn":
-            const description = grid1.getValue(rowKey, 'description');
-            const ip = grid1.getValue(rowKey, 'ip');
-            const useFlag = grid1.getValue(rowKey, 'useFlag');
 
             // 수정 데이터 취합
             const udtData = {
+                no : no,
                 seq : seq,
                 description : description,
                 ip : ip,
@@ -166,8 +144,10 @@ function handleOneClickBtn(e){
             confirmUpdateAllowedIp(udtData);
             break;
         case "delete_btn":
+
             // 삭제 데이터 취합
             const delData = {
+                no : no,
                 seq : seq
             }
             confirmDeleteAllowedIp(delData);
@@ -306,7 +286,7 @@ function initializePagination(totalItems, itemsPerPage, currentPage = 0){
 /* IP 정보 수정 */
 function confirmUpdateAllowedIp(udtData) {
     showConfirmModal(
-        "정말로 수정하시겠습니까?",
+        ` ${udtData.no} 번 IP를 정말로 수정하시겠습니까?`,
         function () {
             updateAllowedIp(udtData);
         }
@@ -390,6 +370,7 @@ function deleteAllowedIp(delData){
 function clearContents(){
     $('#ip_description').val('');
     $('#allowed_ip').val('');
+    selectedIp = {};
 }
 
 // 추후 common으로 통합처리 필요
@@ -438,115 +419,25 @@ class CustomTextEditor {
         wrapper.style.display = "flex";
         wrapper.style.height = "100%";
 
-        if (row.setting === '글자색상') {
-            const el = document.createElement('select');
-            el.style.textAlignLast = "center";
-            el.style.borderRadius = "4px";
-            el.style.lineHeight = "normal";
-            el.style.background = "#000";
-            el.style.appearance = "auto";
-            el.style.textAlign = "center";
-            el.style.padding = "5px";
-            el.style.display = "block";
-            el.style.height = "40px";
-            el.style.width = "90%";
+        const {maxLength} = props.columnInfo.editor.options;
+        const el = document.createElement('input');
 
-            const selectedColor = colors.find(color => color.번호 === String(props.value));
-            el.style.border = selectedColor
-                ? `2px solid ${selectedColor.테두리색상}`
-                : "2px solid #000";
-            el.style.color = selectedColor
-                ? `${selectedColor.색상코드}`
-                : "#000";
 
-            el.addEventListener("change", function() {
-                const newSelectedColor = colors.find(color => color.번호 === el.value);
 
-                if (newSelectedColor) {
-                    el.style.border = `2px solid ${newSelectedColor.테두리색상}`;
-                    el.style.color = newSelectedColor.색상코드;
-                    el.style.borderRadius = "4px";
-                } else {
-                    el.style.border = "2px solid #000";
-                    el.style.color = "#000"; // 기본값
-                    el.style.borderRadius = "4px";
-                }
-            });
+        el.style.textAlign = "center";
+        el.maxLength = maxLength;
+        el.value = String(props.value);
+        el.type = 'text';
 
-            // 옵션 추가
-            colors.forEach(color => {
-                const option = document.createElement('option');
-                option.style.background = color.back;
-                option.style.color = color.색상코드;
-                option.textContent = color.글자색;
-                option.value = color.번호;
+        // style 추가
+        el.style.display = 'inline-block';
+        el.style.width = '100%';
+        el.style.height = '100%';
+        el.style.lineHeight = '40px';
+        el.style.background = '#fff';
+        el.style.borderRadius = '4px';
 
-                el.appendChild(option);
-            });
-
-            // 현재 값 설정
-            el.value = String(props.value);
-            wrapper.appendChild(el);
-
-        } else if (row.id === 1){
-            const hourSelect = document.createElement('select');
-            hourSelect.style.height = "30px";
-            hourSelect.style.width = "100px";
-            hourSelect.style.textAlign = "center";
-            hourSelect.style.lineHeight = "normal";
-
-            for (let i = 0; i < 24; i++) {
-                const option = document.createElement('option');
-                option.value = String(i).padStart(2, '0');
-                option.textContent = String(i).padStart(2, '0');
-                hourSelect.appendChild(option);
-            }
-
-            // 콜론 (":")
-            const colon = document.createElement('span');
-            colon.textContent = " : ";
-            colon.style.fontSize = "16px";
-            colon.style.fontWeight = "bold";
-            colon.style.marginLeft = "5px";
-            colon.style.marginRight = "5px";
-
-            // 분 select 박스 (00, 15, 30, 45)
-            const minuteSelect = document.createElement('select');
-            minuteSelect.style.height = "30px";
-            minuteSelect.style.width = "100px";
-            minuteSelect.style.textAlign = "center";
-            minuteSelect.style.lineHeight = "normal";
-
-            [0, 15, 30, 45].forEach(min => {
-                const option = document.createElement('option');
-                option.value = String(min).padStart(2, '0');
-                option.textContent = String(min).padStart(2, '0');
-                minuteSelect.appendChild(option);
-            });
-
-            // 현재 값 설정
-            if (props.value) {
-                const [selectedHour, selectedMinute] = props.value.split(":");
-                hourSelect.value = selectedHour;
-                minuteSelect.value = selectedMinute;
-            }
-
-            wrapper.appendChild(hourSelect);
-            wrapper.appendChild(colon);
-            wrapper.appendChild(minuteSelect);
-
-        } else {
-            // Input box 생성
-            const {maxLength} = props.columnInfo.editor.options;
-            const el = document.createElement('input');
-
-            el.style.textAlign = "center";
-            el.maxLength = maxLength;
-            el.value = String(props.value);
-            el.type = 'text';
-
-            wrapper.appendChild(el);
-        }
+        wrapper.appendChild(el);
         this.el = wrapper;
     }
 

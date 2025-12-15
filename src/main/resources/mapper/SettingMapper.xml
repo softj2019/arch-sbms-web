@@ -69,7 +69,4 @@
         FROM    tb_general_setting
         WHERE   id = 4
     </select>
-
-<!-- kyh쿼리, insert 추가 필요   -->
-<!-- kyh쿼리, delete 추가 필요   -->
 </mapper>

@@ -51,7 +51,6 @@ public class ControlAllowedIpService {
             allowedIpDTO.setCreateUserId(systemUserEntity.getUserId());
             allowedIpDTO.setUseFlag(1);
 
-            //kyh, 적용 row 결과값 예외 필요
             Integer affectedRow = controlAllowedMapper.createAllowedIp(allowedIpDTO);
             if(affectedRow != null && affectedRow == 1) {
 
@@ -72,7 +71,6 @@ public class ControlAllowedIpService {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setUpdateUserId(systemUserEntity.getUserId());
 
-            //kyh, 적용 row 결과값 예외 필요
             Integer affectedRow = controlAllowedMapper.updateAllowedIp(allowedIpDTO);
             if(affectedRow != null && affectedRow == 1) {
 
@@ -93,7 +91,6 @@ public class ControlAllowedIpService {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setUpdateUserId(systemUserEntity.getUserId());
 
-            //kyh, 적용 row 결과값 예외 필요
             Integer affectedRow = controlAllowedMapper.deleteAllowedIp(allowedIpDTO);
             if(affectedRow != null && affectedRow == 1) {
 

@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,14 +21,12 @@ public class ControlAllowedIpRestController {
         this.controlAllowedIpService = controlAllowedIpService;
     }
 
-    //kyh, 예외처리 필요
     @GetMapping("/list")
     public ResponseEntity<Page<ControlAllowedIpDTO>> getAllowedIpList(Pageable pageable) {
         Page<ControlAllowedIpDTO> controlAllowedIps = controlAllowedIpService.getControlAllowedIpList((PageRequest) pageable);
         return ResponseEntity.ok(controlAllowedIps);
     }
 
-    //kyh, 예외처리 필요
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createAllowedIp(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -37,7 +34,6 @@ public class ControlAllowedIpRestController {
         return responseHandler.generateResponse(true, null, null, response);
     }
 
-    //kyh, 예외처리 필요
     @PutMapping("/update")
     public ResponseEntity<Map<String, Object>> updateAllowedIp(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -45,7 +41,6 @@ public class ControlAllowedIpRestController {
         return responseHandler.generateResponse(true, null, null, response);
     }
 
-    //kyh, 예외처리 필요
     @DeleteMapping("/delete")
     public ResponseEntity<Map<String, Object>> deleteAllowedIp(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
