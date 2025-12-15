@@ -3,7 +3,6 @@ let grid1;                  // 그리드
 let pagination1;            // 페이지네이션
 let selectedIp = {};    // 현재 선택된 IP
 
-
 const colors = [
     { 번호: "00", 글자색: "흰색", 색상코드: "#FFFFFF", 테두리색상: "#FFFFFF",back: "#000000" },
     { 번호: "01", 글자색: "파랑", 색상코드: "#0000ff", 테두리색상: "#0000ff" ,back: "#000000"},
@@ -24,11 +23,9 @@ $(document).ready(function(){
         getAllowedIpList(0);
     });
 
-
     $(document).on("keydown", function (event) {
         if (event.key === "Enter") {        // 엔터 발생시 현재 선택된 Row 데이터 update 진행
             if(selectedIp.no !== null && selectedIp.no !== undefined) {
-                console.log("엔터");
                 confirmUpdateAllowedIp(selectedIp);
             }
         }
