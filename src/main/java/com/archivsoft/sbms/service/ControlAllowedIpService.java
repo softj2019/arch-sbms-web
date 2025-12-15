@@ -1,6 +1,5 @@
 package com.archivsoft.sbms.service;
 
-import com.archivsoft.sbms.common.ErrorCode;
 import com.archivsoft.sbms.dto.ControlAllowedIpDTO;
 import com.archivsoft.sbms.entity.SystemUserEntity;
 import com.archivsoft.sbms.mapper.ControlAllowedMapper;
@@ -8,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

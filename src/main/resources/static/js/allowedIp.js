@@ -2,6 +2,7 @@
 let grid1;                  // 그리드
 let pagination1;            // 페이지네이션
 let selectedIp = {};    // 현재 선택된 IP
+let selectedRow;
 
 const colors = [
     { 번호: "00", 글자색: "흰색", 색상코드: "#FFFFFF", 테두리색상: "#FFFFFF",back: "#000000" },
@@ -25,8 +26,8 @@ $(document).ready(function(){
 
     $(document).on("keydown", function (event) {
         if (event.key === "Enter") {        // 엔터 발생시 현재 선택된 Row 데이터 update 진행
-            if(selectedIp.no !== null && selectedIp.no !== undefined) {
-                confirmUpdateAllowedIp(selectedIp);
+            if(selectedRow !== null && selectedRow !== undefined) {
+                confirmUpdateAllowedIp(selectedRow);
             }
         }
         else if(event.key === "Escape") {   // ESC 발생시 현재 열린 모달 닫기
@@ -54,13 +55,43 @@ function initializeGrid() {
                 name: "description"	,
                 header: "설명"			,
                 sortable: true, align: 'center',
-                editor: 'text',
+                editor: {
+                    type: CustomTextEditor,
+                    options: {
+                        maxLength: 500
+                    }
+                } ,
+                formatter: function ({ row, value }) {
+                    return  `<span class="cell-hover-effect" style="
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 100%;
+                        ">
+                        ${value || ""}
+                    </span>`;
+                }
             },
             {
                 name: "ip"	, header: "접근허용IP"			,
                 sortable: true,
                 align: 'center',
-                editor: 'text'
+                editor: {
+                    type: CustomTextEditor,
+                    options: {
+                        maxLength: 500
+                    }
+                } ,
+                formatter: function ({ row, value }) {
+                    return  `<span class="cell-hover-effect" style="
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 100%;
+                        ">
+                        ${value || ""}
+                    </span>`;
+                }
             },
             {
                 name: "useFlag"		,
@@ -112,44 +143,18 @@ document.head.appendChild(style);
 // 그리드 한번 클릭 핸들러
 function handleOneClickBtn(e){
 
-    // 수정, 삭제 필수 데이터
     const rowKey = e.rowKey;
-    const no = grid1.getValue(rowKey, 'no');
-    const seq = grid1.getValue(rowKey, 'seq');
-    const description = grid1.getValue(rowKey, 'description');
-    const ip = grid1.getValue(rowKey, 'ip');
-    const useFlag = grid1.getValue(rowKey, 'useFlag');
-
-    //현재 선택된 Row 기억
-    selectedIp.no = no;
-    selectedIp.seq = seq;
-    selectedIp.description = description;
-    selectedIp.ip = ip;
-    selectedIp.useFlag = useFlag;
 
     switch (e.columnName) {
         case "update_btn":
-
-            // 수정 데이터 취합
-            const udtData = {
-                no : no,
-                seq : seq,
-                description : description,
-                ip : ip,
-                useFlag: useFlag
-            }
-            confirmUpdateAllowedIp(udtData);
+            confirmUpdateAllowedIp(rowKey);
             break;
         case "delete_btn":
-
-            // 삭제 데이터 취합
-            const delData = {
-                no : no,
-                seq : seq
-            }
-            confirmDeleteAllowedIp(delData);
+            confirmDeleteAllowedIp(rowKey);
             break;
         default:
+            selectedRow = rowKey;
+            break;
     }
 }
 
@@ -285,18 +290,33 @@ function initializePagination(totalItems, itemsPerPage, currentPage = 0){
 }
 
 /* IP 정보 수정 */
-function confirmUpdateAllowedIp(udtData) {
+function confirmUpdateAllowedIp(selRow) {
+    const no = grid1.getValue(selRow, 'no');
     showConfirmModal(
-        ` ${udtData.no} 번 IP를 정말로 수정하시겠습니까?`,
+        ` ${no} 번 IP를 정말로 수정하시겠습니까?`,
         function () {
-            updateAllowedIp(udtData);
+            updateAllowedIp(selRow);
         }
     )
 }
 
-function updateAllowedIp(udtData){
+function updateAllowedIp(selRow){
     if (isLoading) return; // 중복 실행 방지
     isLoading = true;
+
+    const no = grid1.getValue(selRow, 'no');
+    const seq = grid1.getValue(selRow, 'seq');
+    const description = grid1.getValue(selRow, 'description');
+    const ip = grid1.getValue(selRow, 'ip');
+    const useFlag = grid1.getValue(selRow, 'useFlag');
+
+    const udtData = {
+        no : no,
+        seq : seq,
+        description : description,
+        ip : ip,
+        useFlag : useFlag
+    }
 
     $.ajax({
         url         : '/api/control/allowedIp/update',
@@ -327,18 +347,32 @@ function updateAllowedIp(udtData){
 }
 
 /* IP 정보 삭제 */
-function confirmDeleteAllowedIp(delData) {
+function confirmDeleteAllowedIp(selRow) {
     showConfirmModal(
         "정말로 삭제하시겠습니까?",
         function () {
-            deleteAllowedIp(delData);
+            deleteAllowedIp(selRow);
         }
     )
 }
 
-function deleteAllowedIp(delData){
+function deleteAllowedIp(selRow){
     if (isLoading) return; // 중복 실행 방지
     isLoading = true;
+
+    const no = grid1.getValue(selRow, 'no');
+    const seq = grid1.getValue(selRow, 'seq');
+    const description = grid1.getValue(selRow, 'description');
+    const ip = grid1.getValue(selRow, 'ip');
+    const useFlag = grid1.getValue(selRow, 'useFlag');
+
+    const delData = {
+        no : no,
+        seq : seq,
+        description : description,
+        ip : ip,
+        useFlag : useFlag
+    }
 
     $.ajax({
         url         : '/api/control/allowedIp/delete',
@@ -421,23 +455,14 @@ class CustomTextEditor {
         wrapper.style.display = "flex";
         wrapper.style.height = "100%";
 
+        // Input box 생성
         const {maxLength} = props.columnInfo.editor.options;
         const el = document.createElement('input');
-
-
 
         el.style.textAlign = "center";
         el.maxLength = maxLength;
         el.value = String(props.value);
         el.type = 'text';
-
-        // style 추가
-        el.style.display = 'inline-block';
-        el.style.width = '100%';
-        el.style.height = '100%';
-        el.style.lineHeight = '40px';
-        el.style.background = '#fff';
-        el.style.borderRadius = '4px';
 
         wrapper.appendChild(el);
         this.el = wrapper;
