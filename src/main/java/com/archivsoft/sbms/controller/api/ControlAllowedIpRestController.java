@@ -22,27 +22,27 @@ public class ControlAllowedIpRestController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Page<ControlAllowedIpDTO>> getAllowedIpList(Pageable pageable) {
+    public ResponseEntity<Page<ControlAllowedIpDTO>> list(Pageable pageable) {
         Page<ControlAllowedIpDTO> controlAllowedIps = controlAllowedIpService.getControlAllowedIpList((PageRequest) pageable);
         return ResponseEntity.ok(controlAllowedIps);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createAllowedIp(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
+    public ResponseEntity<Map<String, Object>> create(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
         controlAllowedIpService.createControlAllowedIp(controlAllowedIpDTO);
         return responseHandler.generateResponse(true, null, null, response);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Map<String, Object>> updateAllowedIp(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
+    public ResponseEntity<Map<String, Object>> update(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
         controlAllowedIpService.updateControlAllowedIp(controlAllowedIpDTO);
         return responseHandler.generateResponse(true, null, null, response);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Map<String, Object>> deleteAllowedIp(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
+    public ResponseEntity<Map<String, Object>> delete(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
         controlAllowedIpService.deleteControlAllowedIp(controlAllowedIpDTO);
         return responseHandler.generateResponse(true, null, null, response);
