@@ -105,21 +105,6 @@ public class ControlAllowedIpService {
         }
     }
 
-    // useFlag 조건으로 모든 허용 IP 조회
-    @Transactional(readOnly = true)
-    public List<ControlAllowedIpDTO> getAllAllowedIpListByUseFlag(int useFlag) {
-        List<ControlAllowedIpDTO> result;
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("useFlag", useFlag);
-
-        // NULL 반환 방지
-        result = controlAllowedMapper.getAllAllowedIpListByUseFlag(paramMap);
-        if(result == null || result.isEmpty()) {
-            result = Collections.emptyList();
-        }
-        return result;
-    }
-
     // 허용 IP LIST 반환
     public List<String> getIpListByUseFlag(int useFlag){
         List<ControlAllowedIpDTO> allowedIpDTOList = getAllAllowedIpListByUseFlag(useFlag);
@@ -139,6 +124,21 @@ public class ControlAllowedIpService {
         String result = allowedIpDTOList.stream()
                 .map(ControlAllowedIpDTO::getIp)
                 .collect(Collectors.joining(", "));
+        return result;
+    }
+
+    // useFlag 조건으로 모든 허용 IP 조회
+    @Transactional(readOnly = true)
+    public List<ControlAllowedIpDTO> getAllAllowedIpListByUseFlag(int useFlag) {
+        List<ControlAllowedIpDTO> result;
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("useFlag", useFlag);
+
+        // NULL 반환 방지
+        result = controlAllowedMapper.getAllAllowedIpListByUseFlag(paramMap);
+        if(result == null || result.isEmpty()) {
+            result = Collections.emptyList();
+        }
         return result;
     }
 
