@@ -26,6 +26,7 @@ public class ControlAllowedIpService {
     }
 
     // 허용 IP 리스트 조회 (페이지네이션)
+    @Transactional(readOnly = true)
     public Page<ControlAllowedIpDTO> getControlAllowedIpList(PageRequest pageable) {
         try {
             Map<String, Object> paramMap = new HashMap<>();
@@ -105,6 +106,7 @@ public class ControlAllowedIpService {
     }
 
     // useFlag 조건으로 모든 허용 IP 조회
+    @Transactional(readOnly = true)
     public List<ControlAllowedIpDTO> getAllAllowedIpListByUseFlag(int useFlag) {
         List<ControlAllowedIpDTO> result;
         Map<String, Object> paramMap = new HashMap<>();
@@ -140,6 +142,7 @@ public class ControlAllowedIpService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public boolean isDuplicatedIp(ControlAllowedIpDTO allowedIpDTO) {
         ControlAllowedIpDTO ipData = controlAllowedMapper.findIp(allowedIpDTO);
         return ipData != null;
