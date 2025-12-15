@@ -25,5 +25,8 @@ public interface ControlAllowedMapper {
 
 //    UseFlag 조건으로 허용된 IP 전체 조회
     List<ControlAllowedIpDTO> getAllAllowedIpListByUseFlag(Map<String, Object> paramMap);
+
+//    ip 중복 체크
+    ControlAllowedIpDTO findIp(ControlAllowedIpDTO controlAllowedIpDTO);
 }
 

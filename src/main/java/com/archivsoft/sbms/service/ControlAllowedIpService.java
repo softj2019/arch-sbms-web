@@ -139,4 +139,9 @@ public class ControlAllowedIpService {
                 .collect(Collectors.joining(", "));
         return result;
     }
+
+    public boolean isDuplicatedIp(ControlAllowedIpDTO allowedIpDTO) {
+        ControlAllowedIpDTO ipData = controlAllowedMapper.findIp(allowedIpDTO);
+        return ipData != null;
+    }
 }

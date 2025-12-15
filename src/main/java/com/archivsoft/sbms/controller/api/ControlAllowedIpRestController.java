@@ -47,4 +47,10 @@ public class ControlAllowedIpRestController {
         controlAllowedIpService.deleteControlAllowedIp(controlAllowedIpDTO);
         return responseHandler.generateResponse(true, null, null, response);
     }
+
+    @PostMapping("/isDuplicatedId")
+    public ResponseEntity<Boolean> isDuplicatedId(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
+        boolean isDuplicate = controlAllowedIpService.isDuplicatedIp(controlAllowedIpDTO);
+        return ResponseEntity.ok(isDuplicate);
+    }
 }

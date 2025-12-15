@@ -161,14 +161,19 @@ function createAllowedIp(){
     // 필수값 입력 확인
     if (!validateForm(description)) {
         popupOpenDialog('error', 'ip 설명 은 필수 입력항목입니다.', 2000);
-        $('#ipDescription').focus();
+        $('#ip_description').focus();
 
         return;
     }
     if (!validateForm(ip)){
         popupOpenDialog('error', 'ip 는 필수 입력항목입니다.', 2000);
-        $('#allowedIp').focus();
+        $('#allowed_ip').focus();
 
+        return;
+    }
+
+    if (!isDuplicatedId) {
+        popupOpenDialog('error', "IP 중복확인을 클릭해주세요.", 2000);
         return;
     }
 
@@ -368,6 +373,9 @@ function clearContents(){
     $('#ip_description').val('');
     $('#allowed_ip').val('');
     selectedIp = {};
+    isDuplicatedId = false;
+    clearBtn();
+
 }
 
 // 추후 common으로 통합처리 필요
@@ -456,4 +464,64 @@ class CustomTextEditor {
             inputEl.select();
         }
     }
+}
+
+// IP 중복확인
+let isDuplicatedId = false;
+function checkDuplicate(){
+    let ip = $('#allowed_ip').val();
+
+    // 중복일경우 실행중단
+    if (isDuplicatedId) return;
+
+    if (!ip){
+        popupOpenDialog('error', "IP 는 필수 입력항목입니다.", 2000)
+        $('#allowed_ip').focus();
+        return;
+    }
+
+    const data = {ip : ip};
+
+    $.ajax({
+        url         : '/api/control/allowedIp/isDuplicatedId',
+        method      : 'POST',
+        data        : JSON.stringify(data),
+        contentType : 'application/json; charset=utf-8',
+        dataType    : 'json',
+
+        success: function (response) {
+            const targetBtn = '#duplicateCheckBtn';
+            if (response) {
+                popupOpenDialog('error', "이미 등록된 IP 입니다.", 2000);
+                isDuplicatedId = false;
+                clearBtn();
+            } else {
+                popupOpenDialog('info', "등록 가능한 IP 입니다.", 2000);
+                isDuplicatedId = true;
+                $(targetBtn)
+                    .removeClass('btn_red_clr')
+                    .addClass('btn_gray')
+                    .prop('disabled', true);
+            }
+        },
+        error: function (xhr, status, error){
+            popupOpenDialog('error', "IP 중복확인중 에러 발생", 2000);
+            isDuplicatedId = false;
+        }
+    });
+}
+
+// IP 필드 변경 감지
+$('#allowed_ip').on('input', function () {
+    isDuplicatedId = false;
+    clearBtn();
+});
+
+// 유동적 변경 버튼 초기화
+function clearBtn() {
+    const targetBtn = '#duplicateCheckBtn';
+    $(targetBtn)
+        .removeClass('btn_gray')
+        .addClass('btn_red_clr')
+        .prop('disabled', false);
 }

@@ -65,4 +65,14 @@
             tai.use_flag = #{useFlag}
     </select>
 
+    <!--    ip 중복확인-->
+    <select id="findIp" parameterType="ControlAllowedIpDTO" resultType="ControlAllowedIpDTO">
+        SELECT  seq ,
+                ip
+        FROM
+            tb_allowed_ip tai
+        WHERE
+            tai.ip = #{ip}
+    </select>
+
 </mapper>
