@@ -180,15 +180,15 @@ public class WebSocketController {
                             response.put("ledFontColor", value); // 글자색상
                         }
                         break;
-//                    case 4:
-//                        response.put("allowIpList", value); // 허용 IP
-//                        break;
+                    case 4:
+                        response.put("allowIpList", value); // 허용 IP
+                        break;
                 }
             }
 
-            // 허용 IP 데이터 별도로 세팅
-            String allowedIpString = allowedIpService.getIpOneLineStringByUseFlag(1);
-            response.put("allowIpList", allowedIpString);
+            // 허용 IP 데이터 별도로 세팅, 추후 사용 예정
+//            String allowedIpString = allowedIpService.getIpOneLineStringByUseFlag(1);
+//            response.put("allowIpList", allowedIpString);
 
             return response;
         } catch (Exception e){
