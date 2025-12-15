@@ -2,7 +2,6 @@
 let grid1;               // 그리드
 let pagination1;         // 페이지네이션
 
-// kyh, 추후 통합 필요
 const colors = [
     { 번호: "00", 글자색: "흰색", 색상코드: "#FFFFFF", 테두리색상: "#FFFFFF",back: "#000000" },
     { 번호: "01", 글자색: "파랑", 색상코드: "#0000ff", 테두리색상: "#0000ff" ,back: "#000000"},
@@ -144,6 +143,7 @@ style.innerHTML = `
     }
 `;
 document.head.appendChild(style);
+
 // 그리드 한번 클릭 핸들러
 function handleOneClickBtn(e){
     // 수정, 삭제 필수 데이터
@@ -175,7 +175,6 @@ function handleOneClickBtn(e){
         default:
     }
 }
-
 
 /* 허용 IP 등록 */
 function createAllowedIp(){
@@ -281,8 +280,6 @@ function getAllowedIpList(page = 0){
     });
 }
 
-
-
 /* 페이지네이션 초기화 */
 function initializePagination(totalItems, itemsPerPage, currentPage = 0){
     // 페이지네이션 객체가 존재하면 삭제 후 재설정
@@ -316,7 +313,6 @@ function confirmUpdateAllowedIp(udtData) {
     )
 }
 
-
 function updateAllowedIp(udtData){
     if (isLoading) return; // 중복 실행 방지
     isLoading = true;
@@ -344,7 +340,6 @@ function updateAllowedIp(udtData){
         },
         complete : function (){
             clearContents();
-            //kyh, 변동 체크 변수 초기화 필요할 듯
             isLoading = false;
         }
     });
@@ -359,7 +354,6 @@ function confirmDeleteAllowedIp(delData) {
         }
     )
 }
-
 
 function deleteAllowedIp(delData){
     if (isLoading) return; // 중복 실행 방지
@@ -387,7 +381,6 @@ function deleteAllowedIp(delData){
             hideLoadingSpinner();
         },
         complete : function (){
-            //kyh, 변동 체크 변수 초기화 필요할 듯
             isLoading = false;
         }
     });
@@ -414,8 +407,6 @@ class CustomToggleRenderer {
         // 이벤트 리스너 추가
         this.el.querySelector('input').addEventListener('change', (e) => {
             const newValue = e.target.checked ? 1 : 0;
-
-            console.log(newValue);
             props.grid.setValue(props.rowKey, props.columnInfo.name, newValue);
         });
     }
