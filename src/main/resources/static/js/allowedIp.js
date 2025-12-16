@@ -193,7 +193,7 @@ function createAllowedIp(){
         ip     : ip
     }
 
-    showLoadingSpinner()
+    showLoadingSpinner();
     $.ajax({
         url              : '/api/control/allowedIp/create',
         method           : 'POST',
@@ -238,7 +238,7 @@ function getAllowedIpList(page = 0){
     // 조회건수
     const size = $('#itemsPerPage').val() || 10;
 
-    showLoadingSpinner()
+    showLoadingSpinner();
 
     $.ajax({
         url     : `/api/control/allowedIp/list?page=${page}&size=${size}`,
@@ -330,7 +330,7 @@ function updateAllowedIp(selRow){
         useFlag : useFlag
     }
 
-    showLoadingSpinner()
+    showLoadingSpinner();
     $.ajax({
         url         : '/api/control/allowedIp/update',
         method      : 'PUT',
@@ -391,7 +391,7 @@ function deleteAllowedIp(selRow){
         useFlag : useFlag
     }
 
-    showLoadingSpinner()
+    showLoadingSpinner();
     $.ajax({
         url         : '/api/control/allowedIp/delete',
         method      : 'DELETE',
