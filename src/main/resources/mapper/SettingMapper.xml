@@ -43,14 +43,6 @@
               , 'option2' AS optionKey
         FROM    tb_general_setting
         WHERE   id = 3
-        UNION ALL
-        SELECT  id
-             , description
-             , option_1 AS setting
-             , value_1 AS value
-              , 'option1' AS optionKey
-        FROM    tb_general_setting
-        WHERE   id = 4
     </select>
     <update id="updateSetting" parameterType="com.archivsoft.sbms.dto.SettingDTO">
         UPDATE tb_general_setting
