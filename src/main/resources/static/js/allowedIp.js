@@ -188,11 +188,12 @@ function createAllowedIp(){
         return;
     }
 
-    showLoadingSpinner()
     const data = {
         description       : description,
         ip     : ip
     }
+
+    showLoadingSpinner()
     $.ajax({
         url              : '/api/control/allowedIp/create',
         method           : 'POST',
@@ -329,6 +330,7 @@ function updateAllowedIp(selRow){
         useFlag : useFlag
     }
 
+    showLoadingSpinner()
     $.ajax({
         url         : '/api/control/allowedIp/update',
         method      : 'PUT',
@@ -389,6 +391,7 @@ function deleteAllowedIp(selRow){
         useFlag : useFlag
     }
 
+    showLoadingSpinner()
     $.ajax({
         url         : '/api/control/allowedIp/delete',
         method      : 'DELETE',
