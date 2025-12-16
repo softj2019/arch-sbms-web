@@ -59,10 +59,4 @@ public class ControlAllowedIpRestController {
             return responseHandler.commonExceptionHandler(e, null, response);
         }
     }
-
-    @PostMapping("/isDuplicatedId")
-    public ResponseEntity<Boolean> isDuplicatedId(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
-        boolean isDuplicate = controlAllowedIpService.isDuplicatedIp(controlAllowedIpDTO);
-        return ResponseEntity.ok(isDuplicate);
-    }
 }
