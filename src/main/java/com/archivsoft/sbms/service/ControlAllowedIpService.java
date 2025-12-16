@@ -4,6 +4,7 @@ import com.archivsoft.sbms.dto.ControlAllowedIpDTO;
 import com.archivsoft.sbms.entity.SystemUserEntity;
 import com.archivsoft.sbms.mapper.ControlAllowedMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -45,24 +46,30 @@ public class ControlAllowedIpService {
     @Transactional(rollbackFor = Exception.class)
     public void createControlAllowedIp(ControlAllowedIpDTO allowedIpDTO) {
         Integer affectedRow = 0;
+        String defaultMessage = "허용 IP 생성 중 오류 발생";
         try {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setCreateUserId(systemUserEntity.getUserId());
             allowedIpDTO.setUseFlag(1);
 
             affectedRow = controlAllowedMapper.createAllowedIp(allowedIpDTO);
-        } catch (Exception e) {
-            log.error("허용 IP 생성 중 오류 발생 : {}", e.getMessage(), e);
-            throw new RuntimeException("허용 IP 생성 실패", e);
+        }
+        catch (DuplicateKeyException e) {
+            defaultMessage = "중복 IP 에러 발생";
+            log.error(defaultMessage + " : {}", e.getMessage(), e);
+            throw new RuntimeException(defaultMessage, e);
+        }
+        catch (Exception e) {
+            log.error(defaultMessage + " : {}", e.getMessage(), e);
+            throw new RuntimeException(defaultMessage, e);
         }
 
         // 적용된 로우가 없을 경우
         if(affectedRow == null || !affectedRow.equals(1)) {
-            String message = "허용 IP 생성 중 오류 발생 : " + "적용된 row수가 올바르지 않음. expected = 1, actual = " + affectedRow;
-
+            String detailMessage = "적용된 row수가 올바르지 않음. expected = 1, actual = " + affectedRow;
             // 명시적으로 발생시키는 Exception 이므로 메세지를 임의로 생성
-            log.error(message);
-            throw new IllegalStateException(message);
+            log.error(defaultMessage + " : {}", detailMessage);
+            throw new IllegalStateException(defaultMessage);
         }
     }
 
@@ -70,23 +77,29 @@ public class ControlAllowedIpService {
     @Transactional(rollbackFor = Exception.class)
     public void updateControlAllowedIp(ControlAllowedIpDTO allowedIpDTO) {
         Integer affectedRow = 0;
+        String defaultMessage = "허용 IP 수정 중 오류 발생";
         try {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setUpdateUserId(systemUserEntity.getUserId());
 
             affectedRow = controlAllowedMapper.updateAllowedIp(allowedIpDTO);
-        } catch (Exception e) {
-            log.error("허용 IP 수정 중 오류 발생 : {}", e.getMessage(), e);
-            throw new RuntimeException("허용 IP 수정 실패", e);
+        }
+        catch (DuplicateKeyException e) {
+            defaultMessage = "중복 IP 에러 발생";
+            log.error(defaultMessage + " : {}", e.getMessage(), e);
+            throw new RuntimeException(defaultMessage, e);
+        }
+        catch (Exception e) {
+            log.error(defaultMessage + " : {}", e.getMessage(), e);
+            throw new RuntimeException(defaultMessage, e);
         }
 
         // 적용된 로우가 없을 경우, 화면 보는 중 삭제된 로우 발생
         if(affectedRow == null || !affectedRow.equals(1)) {
-            String message = "허용 IP 수정 중 오류 발생 : " + "적용된 row수가 올바르지 않음. expected = 1, actual = " + affectedRow;
-
+            String detailMessage = "적용된 row수가 올바르지 않음. expected = 1, actual = " + affectedRow;
             // 명시적으로 발생시키는 Exception 이므로 메세지를 임의로 생성
-            log.error(message);
-            throw new IllegalStateException(message);
+            log.error(defaultMessage + " : {}", detailMessage);
+            throw new IllegalStateException(defaultMessage);
         }
     }
 
@@ -94,23 +107,23 @@ public class ControlAllowedIpService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteControlAllowedIp(ControlAllowedIpDTO allowedIpDTO) {
         Integer affectedRow = 0;
+        String defaultMessage = "허용 IP 삭제 중 오류 발생";
         try {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setUpdateUserId(systemUserEntity.getUserId());
 
             affectedRow = controlAllowedMapper.deleteAllowedIp(allowedIpDTO);
         } catch (RuntimeException e) {
-            log.error("허용 IP 삭제 중 오류 발생 : {}", e.getMessage(), e);
-            throw new RuntimeException("허용 IP 삭제 실패", e);
+            log.error(defaultMessage + " : {}", e.getMessage(), e);
+            throw new RuntimeException(defaultMessage, e);
         }
 
         // 적용된 로우가 없을 경우, 화면 보는 중 삭제된 로우 발생
         if(affectedRow == null || !affectedRow.equals(1)) {
-            String message = "허용 IP 삭제 중 오류 발생 : " + "적용된 row수가 올바르지 않음. expected = 1, actual = " + affectedRow;
-
+            String detailMessage = "적용된 row수가 올바르지 않음. expected = 1, actual = " + affectedRow;
             // 명시적으로 발생시키는 Exception 이므로 메세지를 임의로 생성
-            log.error(message);
-            throw new IllegalStateException(message);
+            log.error(defaultMessage + " : {}", detailMessage);
+            throw new IllegalStateException(defaultMessage);
         }
     }
 

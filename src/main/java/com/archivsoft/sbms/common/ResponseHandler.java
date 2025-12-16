@@ -56,4 +56,15 @@ public class ResponseHandler {
         response.put("message", "사용자 수정 에러: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+
+    // exception 에러 메세지를 수정 이외 공통으로 적용하기 위한 핸들러, 서버측 에러 메세지를 뷰에서 그대로 출력용
+    public ResponseEntity<Map<String, Object>> commonExceptionHandler
+            (Exception e,
+             String errorMsg,
+             Map<String, Object> response)
+    {
+        response.put("status", "error");
+        response.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
 }

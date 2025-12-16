@@ -34,7 +34,7 @@ public class ControlAllowedIpRestController {
             controlAllowedIpService.createControlAllowedIp(controlAllowedIpDTO);
             return responseHandler.generateResponse(true, null, null, response);
         } catch (Exception e) {
-            return responseHandler.exceptionHandler(e, null, response);
+            return responseHandler.commonExceptionHandler(e, null, response);
         }
     }
 
@@ -45,7 +45,7 @@ public class ControlAllowedIpRestController {
             controlAllowedIpService.updateControlAllowedIp(controlAllowedIpDTO);
             return responseHandler.generateResponse(true, null, null, response);
         } catch (Exception e) {
-            return responseHandler.exceptionHandler(e, null, response);
+            return responseHandler.commonExceptionHandler(e, null, response);
         }
     }
 
@@ -56,7 +56,7 @@ public class ControlAllowedIpRestController {
             controlAllowedIpService.deleteControlAllowedIp(controlAllowedIpDTO);
             return responseHandler.generateResponse(true, null, null, response);
         } catch (Exception e) {
-            return responseHandler.exceptionHandler(e, null, response);
+            return responseHandler.commonExceptionHandler(e, null, response);
         }
     }
 

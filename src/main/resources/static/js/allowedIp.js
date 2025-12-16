@@ -212,7 +212,11 @@ function createAllowedIp(){
             }
         },
         error : function (xhr, status, error){
-            popupOpenDialog('error', '허용 IP 등록중 에러 발생', 2000);
+            const res = JSON.parse(xhr.responseText);
+            const message = res.message || "";
+
+            // 서버측의 에러 메세지 그대로 팝업처리
+            popupOpenDialog('error', message, 2000);
             hideLoadingSpinner();
         },
         complete :  function (){
@@ -342,8 +346,12 @@ function updateAllowedIp(selRow){
             }
             hideLoadingSpinner();
         },
-        error : function(){
-            popupOpenDialog('error', "IP 정보 수정 에러", 2000);
+        error : function(xhr, status, error){
+            const res = JSON.parse(xhr.responseText);
+            const message = res.message || "";
+
+            // 서버측의 에러 메세지 그대로 팝업처리
+            popupOpenDialog('error', message, 2000);
             hideLoadingSpinner();
         },
         complete : function (){
@@ -398,8 +406,13 @@ function deleteAllowedIp(selRow){
             }
             hideLoadingSpinner();
         },
-        error : function(){
-            popupOpenDialog('error', "IP 정보 삭제 에러", 2000);
+        error : function(xhr, status, error){
+            const res = JSON.parse(xhr.responseText);
+            const message = res.message || "";
+
+            console.log(message);
+            // 서버측의 에러 메세지 그대로 팝업처리
+            popupOpenDialog('error', message, 2000);
             hideLoadingSpinner();
         },
         complete : function (){
