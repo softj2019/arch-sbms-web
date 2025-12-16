@@ -1,8 +1,7 @@
 /* 전역변수 */
 let grid1;                  // 그리드
 let pagination1;            // 페이지네이션
-let selectedIp = {};    // 현재 선택된 IP
-let selectedRow;
+let selectedRow;            // 선택된 로우 저장
 
 const colors = [
     { 번호: "00", 글자색: "흰색", 색상코드: "#FFFFFF", 테두리색상: "#FFFFFF",back: "#000000" },
@@ -24,14 +23,26 @@ $(document).ready(function(){
         getAllowedIpList(0);
     });
 
-    $(document).on("keydown", function (event) {
-        if (event.key === "Enter") {        // 엔터 발생시 현재 선택된 Row 데이터 update 진행
+    // 키업 액션 발생시
+    $(document).on("keyup", function (event) {
+        if (event.key === "Enter" || event.keyCode === 13) {
+
+            // 현재 선택어진 컬럼이 존재하다면 해당 로우 update
             if(selectedRow !== null && selectedRow !== undefined) {
                 confirmUpdateAllowedIp(selectedRow);
             }
         }
-        else if(event.key === "Escape") {   // ESC 발생시 현재 열린 모달 닫기
-            $('#deleteConfirmModal').remove();
+    });
+
+    // 키다운 액션 발생시
+    $(document).on("keydown", function (event) {
+        if (event.key === "Escape" || event.keyCode === 27) {
+            const delModal = $('#deleteConfirmModal');
+
+            // 현재 띄워진 모달이 존재하는 경우
+            if(delModal.length > 0) {
+                delModal.remove();
+            }
         }
     });
 });
@@ -261,6 +272,7 @@ function getAllowedIpList(page = 0){
             hideLoadingSpinner();
         },
         complete : function(){
+            clearContents();
             isLoading = false; // 요청 완료 후 플래그 초기화
         }
     });
@@ -396,19 +408,19 @@ function deleteAllowedIp(selRow){
             hideLoadingSpinner();
         },
         complete : function (){
+            clearContents();
             isLoading = false;
         }
     });
 }
 
-/* IP 등록 인풋 초기화 */
+/* 초기화 */
 function clearContents(){
     $('#ip_description').val('');
     $('#allowed_ip').val('');
-    selectedIp = {};
     isDuplicatedId = false;
+    selectedRow = undefined;
     clearBtn();
-
 }
 
 class CustomToggleRenderer {
