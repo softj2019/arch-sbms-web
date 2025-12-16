@@ -15,4 +15,9 @@ public class ControlAllowedIpDTO {
     private String createdAt;           // 등록 일자
     private String updateUserId;        // 수정자    
     private String updatedAt;           // 수정 일자
+
+    public void normalize() {
+        if (this.description != null) this.description = this.description.trim();
+        if( this.ip != null) this.ip = this.ip.trim();
+    }
 }

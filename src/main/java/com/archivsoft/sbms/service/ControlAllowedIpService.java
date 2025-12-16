@@ -50,7 +50,11 @@ public class ControlAllowedIpService {
         try {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setCreateUserId(systemUserEntity.getUserId());
+            allowedIpDTO.setUpdateUserId(systemUserEntity.getUserId());
             allowedIpDTO.setUseFlag(1);
+
+            // 공백 존재 가능성 있는 데이터 trim 처리
+            allowedIpDTO.normalize();
 
             affectedRow = controlAllowedMapper.createAllowedIp(allowedIpDTO);
         }
@@ -81,6 +85,9 @@ public class ControlAllowedIpService {
         try {
             SystemUserEntity systemUserEntity = (SystemUserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             allowedIpDTO.setUpdateUserId(systemUserEntity.getUserId());
+
+            // 공백 존재 가능성 있는 데이터 trim 처리
+            allowedIpDTO.normalize();
 
             affectedRow = controlAllowedMapper.updateAllowedIp(allowedIpDTO);
         }
