@@ -432,6 +432,13 @@ function clearContents(){
     selectedRow = undefined;
 }
 
+function clearSearchContents(){
+    $('#s_ip_description').val('');
+    $('#s_allowed_ip').val('');
+    $('#s_create_user_id').val('');
+    $('#s_update_user_id').val('');
+}
+
 class CustomToggleRenderer {
     constructor(props) {
         const el = document.createElement('label');
