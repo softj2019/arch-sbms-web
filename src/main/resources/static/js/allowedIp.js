@@ -154,8 +154,12 @@ document.head.appendChild(style);
 // 그리드 한번 클릭 핸들러
 function handleOneClickBtn(e){
 
+    // 그리드 헤더 클릭시 버튼 처리 제외
+    if(e.targetType !== "cell") return;
+    if(e.rowKey == null) return;
+    
     const rowKey = e.rowKey;
-
+    console.log(e);
     switch (e.columnName) {
         case "update_btn":
             confirmUpdateAllowedIp(rowKey);
