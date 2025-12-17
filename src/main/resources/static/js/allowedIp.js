@@ -15,12 +15,12 @@ const colors = [
 
 /* 페이지 온로드 */
 $(document).ready(function(){
-    getAllowedIpList();
+    getAllowedIpList(true, 0);
     initializeGrid();
 
     // 조회건수 이벤트
     $('#itemsPerPage').on('change', function () {
-        getAllowedIpList(0);
+        getAllowedIpList(true, 0);
     });
 
     // 키업 액션 발생시
@@ -204,7 +204,7 @@ function createAllowedIp(){
         success : function(result){
             if (result.status==="success"){
                 popupOpenDialog('info', result.message, 2000);
-                getAllowedIpList();
+                getAllowedIpList(false ,0);
                 $('#create_popup_frame').removeClass("on");
                 hideLoadingSpinner();
             } else {
@@ -234,14 +234,30 @@ function validateForm(v1){
 let isLoading = false;
 
 /* 허용 IP 리스트 조회 */
-function getAllowedIpList(page = 0){
+function getAllowedIpList(search = true, page = 0){
+
     // 조회건수
     const size = $('#itemsPerPage').val() || 10;
 
     showLoadingSpinner();
 
+    // 조회조건
+    const s_ip_description = search ? $('#s_ip_description').val().trim() : null;
+    const s_allowed_ip = search ? $('#s_allowed_ip').val().trim() : null;
+    const s_create_user_id = search ? $('#s_create_user_id').val().trim() : null;
+    const s_update_user_id = search ? $('#s_update_user_id').val().trim() : null;
+
+    const s_data = {
+        sIpDescription    : s_ip_description,
+        sAllowedIp    : s_allowed_ip,
+        sCreateUserId : s_create_user_id,
+        sUpdateUserId : s_update_user_id
+    }
+
+    const qryString = $.param(s_data);
+
     $.ajax({
-        url     : `/api/control/allowedIp/list?page=${page}&size=${size}`,
+        url     : `/api/control/allowedIp/list?page=${page}&size=${size}&${qryString}`,
         method  : 'GET',
 
         success : function(response){
@@ -297,7 +313,7 @@ function initializePagination(totalItems, itemsPerPage, currentPage = 0){
     // 페이지 이동 이벤트 핸들러
     pagination1.on('afterMove', function (eventData) {
         const newPage = eventData.page - 1; // 현재 페이지
-        getAllowedIpList(newPage);           // 새 페이지 데이터 요청
+        getAllowedIpList(true , newPage);           // 새 페이지 데이터 요청
     });
 }
 
@@ -341,7 +357,7 @@ function updateAllowedIp(selRow){
         success : function (response){
             if (response.status === 'success'){
                 popupOpenDialog('info', response.message, 2000);
-                getAllowedIpList();
+                getAllowedIpList(false, 0);
                 $('#popup_frame').removeClass('on');
             } else {
                 popupOpenDialog('error', response.message, 2000);
@@ -402,7 +418,7 @@ function deleteAllowedIp(selRow){
         success : function (response){
             if (response.status === 'success'){
                 popupOpenDialog('info', response.message, 2000);
-                getAllowedIpList();
+                getAllowedIpList(false, 0);
                 $('#popup_frame').removeClass('on');
             } else {
                 popupOpenDialog('error', response.message, 2000);

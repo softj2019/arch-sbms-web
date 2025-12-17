@@ -3,6 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.archivsoft.sbms.mapper.ControlAllowedMapper">
 
+    <!-- 허용 IP 조회 -->
     <select id="getAllowedIpList" parameterType="map" resultType="ControlAllowedIpDTO">
         SELECT seq ,
                description,
@@ -14,17 +15,56 @@
                updated_at
        FROM
                tb_allowed_ip tai
+       WHERE   1=1
+        <if test="description != null and description != ''">
+            AND tai.description LIKE CONCAT('%', #{description}, '%')
+       </if>
+        <if test="ip != null and ip != ''">
+            AND tai.ip LIKE CONCAT('%', #{ip}, '%')
+        </if>
+        <if test="createUserId != null and createUserId != ''">
+            AND tai.create_user_id LIKE CONCAT('%', #{createUserId} , '%')
+        </if>
+        <if test="updateUserId != null and updateUserId != ''">
+            AND tai.update_user_id LIKE CONCAT('%', #{updateUserId} , '%')
+        </if>
        ORDER BY
                created_at ASC
        LIMIT   #{pageSize}
        OFFSET  #{offset}
     </select>
 
+    <!-- 허용 IP 총 갯수 조회 -->
     <select id="getAllowedIpCount" parameterType="map" resultType="int">
         SELECT COUNT(*)
-        FROM   tb_allowed_ip tai;
+        FROM   (
+            SELECT seq ,
+                   description,
+                   ip,
+                   use_flag,
+                   create_user_id,
+                   created_at,
+                   update_user_id,
+                   updated_at
+            FROM
+                   tb_allowed_ip tai
+            WHERE  1=1
+            <if test="description != null and description != ''">
+                AND tai.description LIKE CONCAT('%', #{description}, '%')
+            </if>
+            <if test="ip != null and ip != ''">
+                AND tai.ip LIKE CONCAT('%', #{ip}, '%')
+            </if>
+            <if test="createUserId != null and createUserId != ''">
+                AND tai.create_user_id LIKE CONCAT('%', #{createUserId} , '%')
+            </if>
+            <if test="updateUserId != null and updateUserId != ''">
+                AND tai.update_user_id LIKE CONCAT('%', #{updateUserId} , '%')
+            </if>
+            ) tai;
     </select>
 
+    <!-- 허용 IP 등록 -->
     <insert id="createAllowedIp" parameterType="ControlAllowedIpDTO">
         INSERT INTO tb_allowed_ip (
            description,
@@ -42,6 +82,7 @@
         )
     </insert>
 
+    <!-- 허용 IP 수정 -->
     <update id="updateAllowedIp" parameterType="ControlAllowedIpDTO">
         UPDATE tb_allowed_ip
         SET    description    =    #{description},
@@ -51,11 +92,13 @@
         WHERE  seq            =    #{seq}
     </update>
 
+    <!-- 허용 IP 삭제 -->
     <delete id="deleteAllowedIp" parameterType="ControlAllowedIpDTO">
         DELETE FROM tb_allowed_ip
         WHERE       seq = #{seq}
     </delete>
 
+    <!-- 사용중인 허용 IP 조회 -->
     <select id="getAllAllowedIpListByUseFlag" parameterType="map" resultType="ControlAllowedIpDTO">
         SELECT seq ,
                description,
@@ -67,7 +110,7 @@
             tai.use_flag = #{useFlag}
     </select>
 
-    <!--    ip 중복확인-->
+    <!-- ip 중복확인 (현재 미사용) -->
     <select id="findIp" parameterType="ControlAllowedIpDTO" resultType="ControlAllowedIpDTO">
         SELECT  seq ,
                 ip

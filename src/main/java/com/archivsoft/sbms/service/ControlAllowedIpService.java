@@ -25,11 +25,11 @@ public class ControlAllowedIpService {
 
     // 허용 IP 리스트 조회 (페이지네이션)
     @Transactional(readOnly = true)
-    public Page<ControlAllowedIpDTO> getControlAllowedIpList(PageRequest pageable) {
+    public Page<ControlAllowedIpDTO> getControlAllowedIpList(ControlAllowedIpDTO allowedIpDTO, PageRequest pageable) {
         try {
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("pageSize", pageable.getPageSize());
-            paramMap.put("offset", (int) pageable.getOffset());
+
+            // 검색 조건 추출
+            Map<String, Object> paramMap = buildSearchParams(allowedIpDTO, pageable);
 
             List<ControlAllowedIpDTO> controlAllowedList = controlAllowedMapper.getAllowedIpList(paramMap);
             Integer totalCount = controlAllowedMapper.getAllowedIpCount(paramMap);
@@ -176,5 +176,18 @@ public class ControlAllowedIpService {
     public boolean isDuplicatedIp(ControlAllowedIpDTO allowedIpDTO) {
         ControlAllowedIpDTO ipData = controlAllowedMapper.findIp(allowedIpDTO);
         return ipData != null;
+    }
+
+    // 파라미터 생성
+    private Map<String, Object> buildSearchParams(ControlAllowedIpDTO allowedIpDTO, PageRequest pageable) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("description" ,allowedIpDTO.getDescription());
+        paramMap.put("ip" ,allowedIpDTO.getIp());
+        paramMap.put("createUserId" ,allowedIpDTO.getCreateUserId());
+        paramMap.put("updateUserId" ,allowedIpDTO.getUpdateUserId());
+        paramMap.put("offset" ,pageable.getOffset());
+        paramMap.put("pageSize" ,pageable.getPageSize());
+
+        return paramMap;
     }
 }

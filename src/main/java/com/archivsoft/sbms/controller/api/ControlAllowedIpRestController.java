@@ -21,12 +21,26 @@ public class ControlAllowedIpRestController {
         this.controlAllowedIpService = controlAllowedIpService;
     }
 
+    // 허용 IP 조회
     @GetMapping("/list")
-    public ResponseEntity<Page<ControlAllowedIpDTO>> list(Pageable pageable) {
-        Page<ControlAllowedIpDTO> controlAllowedIps = controlAllowedIpService.getControlAllowedIpList((PageRequest) pageable);
+    public ResponseEntity<Page<ControlAllowedIpDTO>> list(
+            @RequestParam(required = false) String sIpDescription,
+            @RequestParam(required = false) String sAllowedIp,
+            @RequestParam(required = false) String sCreateUserId,
+            @RequestParam(required = false) String sUpdateUserId,
+            Pageable pageable) {
+
+        ControlAllowedIpDTO allowedIpDTO = new ControlAllowedIpDTO();
+        allowedIpDTO.setDescription(sIpDescription);
+        allowedIpDTO.setIp(sAllowedIp);
+        allowedIpDTO.setCreateUserId(sCreateUserId);
+        allowedIpDTO.setUpdateUserId(sUpdateUserId);
+
+        Page<ControlAllowedIpDTO> controlAllowedIps = controlAllowedIpService.getControlAllowedIpList(allowedIpDTO, (PageRequest) pageable);
         return ResponseEntity.ok(controlAllowedIps);
     }
 
+    // 허용 IP 등록
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> create(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -38,6 +52,7 @@ public class ControlAllowedIpRestController {
         }
     }
 
+    // 허용 IP 수정
     @PutMapping("/update")
     public ResponseEntity<Map<String, Object>> update(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -49,6 +64,7 @@ public class ControlAllowedIpRestController {
         }
     }
 
+    // 허용 IP 삭제
     @DeleteMapping("/delete")
     public ResponseEntity<Map<String, Object>> delete(@RequestBody ControlAllowedIpDTO controlAllowedIpDTO) {
         Map<String, Object> response = new HashMap<>();
