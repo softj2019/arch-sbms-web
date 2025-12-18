@@ -1,15 +1,11 @@
 package com.archivsoft.sbms.config;
 
-import com.archivsoft.sbms.controller.api.AuthRestController;
 import com.archivsoft.sbms.entity.SystemUserEntity;
-import com.archivsoft.sbms.service.MenuService;
-import com.archivsoft.sbms.service.SettingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.archivsoft.sbms.service.ControlAllowedIpService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,12 +19,10 @@ import java.util.List;
  * */
 @Component
 public class IpMacSecurityFilter extends OncePerRequestFilter {
-    private SettingService settingService;
-    private AuthRestController authRestController;
+    private final ControlAllowedIpService allowedIpService;
 
-    public IpMacSecurityFilter(SettingService settingService, AuthRestController authRestController, MenuService menuService) {
-        this.settingService = settingService;
-        this.authRestController = authRestController;
+    public IpMacSecurityFilter(ControlAllowedIpService allowedIpService) {
+        this.allowedIpService = allowedIpService;
     }
 
     @Override
@@ -50,8 +44,9 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 허용된 IP인지 검사
-        List<String> allowedIp = settingService.getIp();
+        // 허용 IP 테이블의 데이터로 허용된 IP인지 검사
+        List<String> allowedIp = allowedIpService.getIpListByUseFlag(1);
+
         String clientIp = getClientIp(request);
 //        if (!allowedIp.contains(clientIp)) {
 //            authRestController.logoutUser(request, response);
@@ -106,18 +101,19 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
                 uri.equals("/favicon.ico") ||
                 uri.equals("/websocket") ||
                 uri.startsWith("/api/auth/login") ||
-                uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|woff2|ttf|map)$");
+                uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|woff2|ttf|map)$") ||
+                uri.startsWith("/login");
     }
 
     // 사용자 IP 가져오기
     private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
+        String ip = request.getHeader("X-Forwarded-For"); // 공인 IP 부터 중개되어 온 IP들을 ,(쉼표)구분으로 한줄 반환
         if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            ip = ip.split(",")[0].trim();
+            ip = ip.split(",")[0].trim(); // 공인 IP 반환
             return convertToIPv4IfNeeded(ip);
         }
 
-        String[] headers = {
+        String[] headers = { // 중개 되어 올 경우 존재할 수 있는 헤더들
                 "Proxy-Client-IP", "WL-Proxy-Client-IP",
                 "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"
         };

@@ -43,22 +43,14 @@
               , 'option2' AS optionKey
         FROM    tb_general_setting
         WHERE   id = 3
-        UNION ALL
-        SELECT  id
-              , description
-              , option_1 AS setting
-              , value_1 AS value
-              , 'option1' AS optionKey
-        FROM    tb_general_setting
-        WHERE   id = 4
     </select>
-
     <update id="updateSetting" parameterType="com.archivsoft.sbms.dto.SettingDTO">
         UPDATE tb_general_setting
         <set>
-            <trim suffixOverrides=",">  <if test="setting.value1 != null and setting.value1 != ''">
-                value_1 = #{setting.value1},
-            </if>
+            <trim suffixOverrides=",">
+                <if test="setting.value1 != null and setting.value1 != ''">
+                    value_1 = #{setting.value1},
+                </if>
                 <if test="setting.value2 != null and setting.value2 != ''">
                     value_2 = #{setting.value2},
                 </if>
@@ -70,6 +62,7 @@
         WHERE id = #{setting.id}
     </update>
 
+<!-- 허용 ip 테이블 생성으로 인해 현재 미사용  -->
     <!-- 접근가능 ip 조회 -->
     <select id="getIp" resultType="String">
         SELECT  value_1

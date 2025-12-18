@@ -25,4 +25,7 @@ public class ControlController {
     public String setting(Model model) {
         return "control/setting";
     }
+
+    @GetMapping("allowedIp")
+    public String allowedIp(Model model) { return "control/allowedIp";}
 }

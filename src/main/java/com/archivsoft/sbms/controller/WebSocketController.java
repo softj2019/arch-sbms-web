@@ -1,20 +1,12 @@
 package com.archivsoft.sbms.controller;
 
 import com.archivsoft.sbms.dto.SettingDTO;
-import com.archivsoft.sbms.service.HidLogService;
-import com.archivsoft.sbms.service.MonitoringService;
-import com.archivsoft.sbms.service.SettingService;
-import com.archivsoft.sbms.service.WeatherService;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+import com.archivsoft.sbms.service.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.reactive.socket.server.WebSocketService;
 import lombok.extern.slf4j.Slf4j;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,16 +17,19 @@ public class WebSocketController {
     private final HidLogService hidLogService;
     private final SettingService settingService;
     private final WeatherService weatherService;
+    private final ControlAllowedIpService allowedIpService;
     public WebSocketController(
             MonitoringService monitoringService,
             HidLogService hidLogService,
             SettingService settingService,
-            WeatherService weatherService
+            WeatherService weatherService,
+            ControlAllowedIpService allowedIpService
     ) {
         this.monitoringService = monitoringService;
         this.hidLogService = hidLogService;
         this.settingService = settingService;
         this.weatherService = weatherService;
+        this.allowedIpService = allowedIpService;
     }
 
     @MessageMapping("/iot/overview")
@@ -142,6 +137,7 @@ public class WebSocketController {
             return response;
         }
     }
+
     @MessageMapping("/iot/config")
     @SendTo("/topic/config")
     public Map<String, String>  config(Map<String, String> payload) {
@@ -184,11 +180,15 @@ public class WebSocketController {
                             response.put("ledFontColor", value); // 글자색상
                         }
                         break;
-                    case 4:
-                        response.put("allowIpList", value); // 허용 IP
-                        break;
+                    default:
+                        // 예외로 발생하는 id 분기에 대한 방어코드
+                        log.error("/iot/config 예외 id : {}", id);
                 }
             }
+
+            // 허용 IP 데이터 별도로 세팅
+            String allowedIpString = allowedIpService.getIpOneLineStringByUseFlag(1);
+            response.put("allowIpList", allowedIpString);
 
             return response;
         } catch (Exception e){

@@ -35,5 +35,6 @@ public interface SystemUserRepository extends JpaRepository<SystemUserEntity, St
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
     SystemUserEntity findUserByUserId(String userId);
 }

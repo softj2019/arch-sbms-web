@@ -22,6 +22,7 @@
 		<typeAlias type="com.archivsoft.sbms.dto.MonitoringDTO"			alias="MonitoringDTO"/>
 		<typeAlias type="com.archivsoft.sbms.dto.ControlLogDTO"			alias="ControlLogDTO"/>
 		<typeAlias type="com.archivsoft.sbms.dto.ControlMessageDTO"		alias="ControlMessageDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.ControlAllowedIpDTO"	alias="ControlAllowedIpDTO"/>
 		<package   name="com.archivsoft.sbms.dto" />
 	</typeAliases>
 

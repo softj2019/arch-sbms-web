@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<script src="../../static/js/facility.js"></script>
+<th:block layout:fragment="content">
+    <div class="content_title">
+        <h3 class="page_title">
+            접근허용IP
+            <span style="font-weight: normal; font-size:14px; color:#666; margin-left: 15px;">
+                <i class="fa fa-info-circle" style="color:#666; margin-right: 5px;"></i>설명, 접근허용IP 클릭시 수정모드로 전환 됩니다.
+            </span>
+        </h3>
+        <ol class="page_breadcrumb">
+            <li>HOME</li>
+            <li><a href="#">제어</a></li>
+            <li><a href="#">접근허용IP</a></li>
+        </ol>
+    </div>
+
+    <div class="content_area">
+
+        <div class="area_title">
+            <h4 class="left_grp">
+                <span class="sub_title">IP 등록</span>
+            </h4>
+        </div>
+
+        <!-- s: 등록 영역 -->
+        <div class="search_wrap">
+            <ul>
+                <li>
+                    <p>설명</p>
+                    <div class="rowbox">
+                        <input type="text" id="ip_description" placeholder="설명을 입력해주세요">
+                    </div>
+                </li>
+                <li>
+                    <p>IP</p>
+                    <div class="rowbox">
+                        <input type="text" id="allowed_ip" placeholder="IP를 입력해주세요">
+                    </div>
+                </li>
+            </ul>
+
+            <div class="srch_btn">
+                <div class="type_grp type_single">
+                    <button type="button" class="btn_def btn_point_clr" onclick="createAllowedIp()">등록</button>
+                    <button type="button" class="btn_def btn_red_clr" onclick="clearContents()">초기화</button>
+                </div>
+            </div>
+        </div>
+        <!-- e: 등록 영역 -->
+
+        <!-- s: 조회(검색) 영역 -->
+        <div class="area_title">
+            <h4 class="left_grp">
+                <span class="sub_title">IP 조회</span>
+            </h4>
+        </div>
+
+        <div class="search_wrap">
+            <ul>
+                <li>
+                    <p>설명</p>
+                    <div class="rowbox">
+                        <input type="text" id="s_ip_description" placeholder="설명을 입력해주세요.">
+                    </div>
+                </li>
+                <li>
+                    <p>IP</p>
+                    <div class="rowbox">
+                        <input type="text" id="s_allowed_ip" placeholder="IP를 입력해주세요.">
+                    </div>
+                </li>
+                <li>
+                    <p>등록자</p>
+                    <div class="rowbox">
+                        <input type="text" id="s_create_user_id" placeholder="등록자를 입력해주세요.">
+                    </div>
+                </li>
+                <li>
+                    <p>수정자</p>
+                    <div class="rowbox">
+                        <input type="text" id="s_update_user_id" placeholder="수정자를 입력해주세요.">
+                    </div>
+                </li>
+            </ul>
+
+            <div class="srch_btn">
+                <div class="type_grp type_single">
+                    <button type="button" class="btn_def btn_point_clr" onclick="getAllowedIpList()">조회</button>
+                    <button type="button" class="btn_def btn_red_clr" onclick="clearSearchContents()">초기화</button>
+                </div>
+            </div>
+        </div>
+        <!-- e: 조회(검색) 영역 -->
+
+        <!-- s: 조회 영역 -->
+        <div class="area_title">
+            <h4 class="left_grp">
+                <span class="sub_title">조회결과</span>
+                <span class="sub_script">
+                  총 건수: <span class="num">10</span>건
+                </span>
+            </h4>
+            <div class="right_grp btn_grp">
+                <div class="type_grp">
+                    <label class="hide">적용건수 선택</label>
+                    <select id="itemsPerPage" class="select_round" onchange="getAllowedIpList(0)">
+                        <option value="10">10건</option>
+                        <option value="100">100건</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- e: 조회 영역 -->
+
+        <!--        s: 그리드-->
+        <div class="grid_board">
+            <div id="grid_table"></div>
+            <div id="grid_pagination" class="tui-pagination"></div>
+        </div>
+        <!--        e: 그리드-->
+
+    </div>
+    <script type="text/javascript" th:src="@{/js/allowedIp.js}"></script>
+</th:block>
+</html>

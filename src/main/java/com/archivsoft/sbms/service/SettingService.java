@@ -19,6 +19,7 @@ public class SettingService {
     private final SettingMapper settingMapper;
     @Autowired
     private SqlSessionFactory sqlSessionFactory;
+
     /**
      * 기본 설정값 조회
      * */
@@ -83,6 +84,7 @@ public class SettingService {
         }
     }
 
+    // 미사용 됨으로써 추후 삭제 필요
     // 접근가능 ip 가져오기
     public List<String> getIp() {
         String ipString = settingMapper.getIp();
