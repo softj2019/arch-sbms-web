@@ -176,6 +176,7 @@ function handleOneClickBtn(e){
 
 /* 허용 IP 등록 */
 function createAllowedIp(){
+
     const description    = $('#ip_description').val()?.trim() || "";
     const ip  = $('#allowed_ip').val()?.trim() || "";
 
@@ -183,13 +184,23 @@ function createAllowedIp(){
     if (!validateForm(description)) {
         popupOpenDialog('error', 'ip 설명 은 필수 입력항목입니다.', 2000);
         $('#ip_description').focus();
-
+        isLoading = false;
         return;
     }
+
+    // 필수값 입력 확인
     if (!validateForm(ip)){
         popupOpenDialog('error', 'ip 는 필수 입력항목입니다.', 2000);
         $('#allowed_ip').focus();
+        isLoading = false;
+        return;
+    }
 
+    // IPv4 형식 검증
+    if(!validateIpv4(ip)) {
+        popupOpenDialog('error', '옳바르지 않은 IP 형식입니다.', 2000);
+        $('#allowed_ip').focus();
+        isLoading = false;
         return;
     }
 
@@ -227,6 +238,7 @@ function createAllowedIp(){
         },
         complete :  function (){
             clearContents();
+            clearSearchContents();
         },
     });
 }
@@ -390,6 +402,30 @@ function updateAllowedIp(selRow){
         return;
     }
 
+    // 필수값 입력 확인
+    if (!validateForm(description)) {
+        popupOpenDialog('error', 'ip 설명 은 필수 입력항목입니다.', 2000);
+        $('#ip_description').focus();
+        isLoading = false;
+        return;
+    }
+
+    // 필수값 입력 확인
+    if (!validateForm(ip)){
+        popupOpenDialog('error', 'ip 는 필수 입력항목입니다.', 2000);
+        $('#allowed_ip').focus();
+        isLoading = false;
+        return;
+    }
+
+    // IPv4 형식 검증
+    if(!validateIpv4(ip)) {
+        popupOpenDialog('error', '옳바르지 않은 IP 형식입니다.', 2000);
+        $('#allowed_ip').focus();
+        isLoading = false;
+        return;
+    }
+
     const udtData = {
         no : no,
         seq : seq,
@@ -426,6 +462,7 @@ function updateAllowedIp(selRow){
         },
         complete : function (){
             clearContents();
+            clearSearchContents();
             isLoading = false;
         }
     });
@@ -488,6 +525,7 @@ function deleteAllowedIp(selRow){
         },
         complete : function (){
             clearContents();
+            clearSearchContents();
             isLoading = false;
         }
     });
@@ -591,4 +629,10 @@ class CustomTextEditor {
 function exitGridFocus() {
     grid1.finishEditing();  // 에디터 모드 종료
     grid1.blur();           // 포커스까지 제거
+}
+
+/* IP ipv4 형식인지 유효성 검증 */
+function validateIpv4(ip) {
+    const SIMPLE_IP_REGEX = /^\d+(\.\d+){3}$/;
+    return SIMPLE_IP_REGEX.test(String(ip).trim());
 }
