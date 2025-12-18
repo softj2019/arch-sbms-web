@@ -2,6 +2,7 @@
 let grid1;                  // 그리드
 let pagination1;            // 페이지네이션
 let selectedRow;            // 선택된 로우 저장
+let ORIGINAL_IP_MAP = []; // 허용 IP list 원본
 
 const colors = [
     { 번호: "00", 글자색: "흰색", 색상코드: "#FFFFFF", 테두리색상: "#FFFFFF",back: "#000000" },
@@ -159,7 +160,7 @@ function handleOneClickBtn(e){
     if(e.rowKey == null) return;
     
     const rowKey = e.rowKey;
-    console.log(e);
+
     switch (e.columnName) {
         case "update_btn":
             confirmUpdateAllowedIp(rowKey);
@@ -237,6 +238,19 @@ function validateForm(v1){
 
 let isLoading = false;
 
+function saveOriginData(item) {
+    ORIGINAL_IP_MAP.push({
+        seq  : item.seq,
+        description  : item.description,
+        ip    : item.ip,
+        useFlag    : item.useFlag,
+        createUserId : item.createUserId,
+        createdAt : item.createdAt,
+        updateUserId : item.updateUserId,
+        updatedAt : item.updatedAt
+    });
+}
+
 /* 허용 IP 리스트 조회 */
 function getAllowedIpList(search = true, page = 0){
 
@@ -265,18 +279,29 @@ function getAllowedIpList(search = true, page = 0){
         method  : 'GET',
 
         success : function(response){
-            const gridData = response.content.map((ipInfo, index) => ({
-                no          : index + 1 + page * size,
-                seq  : ipInfo.seq,
-                description  : ipInfo.description,
-                ip    : ipInfo.ip,
-                useFlag    : ipInfo.useFlag,
-                createUserId : ipInfo.createUserId,
-                createdAt : ipInfo.createdAt,
-                updateUserId : ipInfo.updateUserId,
-                updatedAt : ipInfo.updatedAt
-                // smartscreen : formatDeviceStatus(facility.smartscreen)
-            }));
+            const content = Array.isArray(response.content) ? response.content : [];
+
+            // 초기 데이터 초기화
+            ORIGINAL_IP_MAP = [];
+            
+            const gridData = content.map(function (ipInfo, index) {
+
+                // ORIGINAL_PLA
+                saveOriginData(ipInfo);
+
+                return {
+                    no          : index + 1 + page * size,
+                    seq  : ipInfo.seq,
+                    description  : ipInfo.description,
+                    ip    : ipInfo.ip,
+                    useFlag    : ipInfo.useFlag,
+                    createUserId : ipInfo.createUserId,
+                    createdAt : ipInfo.createdAt,
+                    updateUserId : ipInfo.updateUserId,
+                    updatedAt : ipInfo.updatedAt
+                }
+            });
+
             // TOAST UI Grid 데이터 초기화
             grid1.resetData(gridData);
 
@@ -341,6 +366,22 @@ function updateAllowedIp(selRow){
     const description = grid1.getValue(selRow, 'description');
     const ip = grid1.getValue(selRow, 'ip');
     const useFlag = grid1.getValue(selRow, 'useFlag');
+
+    // 초기 데이터 변경 감지
+    const beforeData = ORIGINAL_IP_MAP.find(function (item, index) {
+        return item.seq === seq;
+    });
+
+    // 변경값과 이전값 체크
+    if(
+        `${beforeData.description}`     ===     description &&
+        `${beforeData.ip}`              ===     ip  &&
+        `${beforeData.useFlag}`         ===     String(useFlag)
+    ) {
+        popupOpenDialog('error', '변동사항이 없습니다.', 2000);
+        isLoading = false;
+        return;
+    }
 
     const udtData = {
         no : no,
@@ -433,7 +474,6 @@ function deleteAllowedIp(selRow){
             const res = JSON.parse(xhr.responseText);
             const message = res.message || "";
 
-            console.log(message);
             // 서버측의 에러 메세지 그대로 팝업처리
             popupOpenDialog('error', message, 2000);
             hideLoadingSpinner();
