@@ -152,7 +152,7 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
-// 그리드 한번 클릭 핸들러
+/* 그리드 한번 클릭 핸들러 */
 function handleOneClickBtn(e){
 
     // 그리드 헤더 클릭시 버튼 처리 제외
@@ -238,6 +238,7 @@ function validateForm(v1){
 
 let isLoading = false;
 
+/* 기존 IP 정보 저장 */
 function saveOriginData(item) {
     ORIGINAL_IP_MAP.push({
         seq  : item.seq,
@@ -346,9 +347,13 @@ function initializePagination(totalItems, itemsPerPage, currentPage = 0){
     });
 }
 
-/* IP 정보 수정 */
+/* IP 정보 수정 팝업 */
 function confirmUpdateAllowedIp(selRow) {
     const no = grid1.getValue(selRow, 'no');
+
+    // 그리드 편집 모드 강제 종료
+    exitGridFocus();
+
     showConfirmModal(
         ` ${no} 번 IP를 정말로 수정하시겠습니까?`,
         function () {
@@ -357,6 +362,7 @@ function confirmUpdateAllowedIp(selRow) {
     )
 }
 
+/* IP 정보 수정 */
 function updateAllowedIp(selRow){
     if (isLoading) return; // 중복 실행 방지
     isLoading = true;
@@ -424,7 +430,7 @@ function updateAllowedIp(selRow){
     });
 }
 
-/* IP 정보 삭제 */
+/* IP 정보 삭제 팝업 */
 function confirmDeleteAllowedIp(selRow) {
     showConfirmModal(
         "정말로 삭제하시겠습니까?",
@@ -434,6 +440,7 @@ function confirmDeleteAllowedIp(selRow) {
     )
 }
 
+/* IP 정보 삭제 */
 function deleteAllowedIp(selRow){
     if (isLoading) return; // 중복 실행 방지
     isLoading = true;
@@ -492,6 +499,7 @@ function clearContents(){
     selectedRow = undefined;
 }
 
+/* 검색 관련 초기화 */
 function clearSearchContents(){
     $('#s_ip_description').val('');
     $('#s_allowed_ip').val('');
@@ -499,6 +507,7 @@ function clearSearchContents(){
     $('#s_update_user_id').val('');
 }
 
+/* 사용자 토글 렌더 */
 class CustomToggleRenderer {
     constructor(props) {
         const el = document.createElement('label');
@@ -526,6 +535,7 @@ class CustomToggleRenderer {
     }
 }
 
+/* 사용자 정의 에디터박스 */
 class CustomTextEditor {
     constructor(props) {
         const rowKey = props.rowKey;
@@ -574,4 +584,10 @@ class CustomTextEditor {
             inputEl.select();
         }
     }
+}
+
+/* 그리드 편집 모드 강제 종료 */
+function exitGridFocus() {
+    grid1.finishEditing();  // 에디터 모드 종료
+    grid1.blur();           // 포커스까지 제거
 }
