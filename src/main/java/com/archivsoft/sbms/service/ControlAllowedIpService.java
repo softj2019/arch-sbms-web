@@ -28,6 +28,9 @@ public class ControlAllowedIpService {
     public Page<ControlAllowedIpDTO> getControlAllowedIpList(ControlAllowedIpDTO allowedIpDTO, PageRequest pageable) {
         try {
 
+            // 검색조건 프로퍼티 null 예방 처리
+            allowedIpDTO = nullToEmptyGetListProperties(allowedIpDTO);
+            
             // 검색 조건 추출
             Map<String, Object> paramMap = buildSearchParams(allowedIpDTO, pageable);
 
@@ -189,5 +192,25 @@ public class ControlAllowedIpService {
         paramMap.put("pageSize" ,pageable.getPageSize());
 
         return paramMap;
+    }
+
+    private ControlAllowedIpDTO nullToEmptyGetListProperties(ControlAllowedIpDTO dto) {
+
+        if(dto != null) {
+            dto.setDescription(dto.getDescription() == null ? "" : dto.getDescription());
+            dto.setIp(dto.getIp() == null ? "" : dto.getIp());
+            dto.setCreateUserId(dto.getCreateUserId() == null ? "" : dto.getCreateUserId());
+            dto.setUpdateUserId(dto.getUpdateUserId() == null ? "" : dto.getUpdateUserId());
+        }
+        else{
+            ControlAllowedIpDTO defaultDTO = new ControlAllowedIpDTO();
+            defaultDTO.setDescription("");
+            defaultDTO.setIp("");
+            defaultDTO.setCreateUserId("");
+            defaultDTO.setUpdateUserId("");
+            dto = defaultDTO;
+        }
+
+        return dto;
     }
 }

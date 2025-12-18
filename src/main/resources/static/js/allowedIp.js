@@ -273,6 +273,7 @@ function getAllowedIpList(search = true, page = 0){
         sUpdateUserId : s_update_user_id
     }
 
+    // 쿼리파라미터 값들을 직렬화 (null값은 ""값으로 치환)
     const qryString = $.param(s_data);
 
     $.ajax({
