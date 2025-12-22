@@ -341,11 +341,13 @@
   font-weight: 500;
   color: #666;
 }
+
+/* 체크박스 크기 수정 13px -> 20px */
 .check_def + label::before {
   display: inline-flex;
   align-self: center;
-  width: 13px;
-  height: 13px;
+  width: 20px;
+  height: 20px;
   margin-right: 8px;
   border: 1px solid #b8b8c3;
   background-color: #fff;
