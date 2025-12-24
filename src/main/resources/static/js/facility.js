@@ -28,6 +28,7 @@ $(document).on('click keydown', function(event) {
         (event.type === "keydown" && (event.key === "Escape" || event.keyCode === 27))
     ) {
         $('.popup_frame.on').removeClass('on');
+        clearContentsForPopup();
     }
 });
 
@@ -48,15 +49,51 @@ function initializeGrid() {
             { name: "no"			, header: "NO"				, sortable: true, align: 'center', width: 80},
             { name: "terminalId"	, header: "정류장ID"			, sortable: true, align: 'center' },
             { name: "terminalNm"	, header: "정류장명"			, sortable: true, align: 'center' },
-            { name: "ctlBoard"		, header: "통합제어보드"		, sortable: true, align: 'center' },
-            { name: "smartscreen"	, header: "스마트스크린"		, sortable: true, align: 'center' },
-            { name: "cv"			, header: "재실감지카메라"	    , sortable: true, align: 'center' },
-            { name: "ledPanel"      , header: "승하차알림시스템"	, sortable: true, align: 'center' },
-            { name: "lcdDisplay"	, header: "공기질표출장치"	    , sortable: true, align: 'center' },
-            { name: "lteRouter"		, header: "LTE라우터"		, sortable: true, align: 'center' },
-            { name: "lteRouter2"	, header: "공공WI-FI"		, sortable: true, align: 'center' },
-            { name: "ledLight"		, header: "LED전등"			, sortable: true, align: 'center' },
-            { name: "fan"			, header: "냉각FAN"			, sortable: true, align: 'center' }
+            { name: "ctlBoard"		, header: "통합제어보드"		, sortable: true, align: 'center',
+                renderer    : {
+                    type    : CustomToggleRenderer
+                }
+            },
+            { name: "smartscreen"	, header: "스마트스크린"		, sortable: true, align: 'center',
+                renderer    : {
+                    type    : CustomToggleRenderer
+                }
+            },
+            { name: "cv"			, header: "재실감지카메라"	    , sortable: true, align: 'center',
+                renderer    : {
+                    type    : CustomToggleRenderer
+                }
+            },
+            { name: "ledPanel"      , header: "승하차알림시스템"	, sortable: true, align: 'center',
+                renderer    : {
+                    type    : CustomToggleRenderer
+                }
+            },
+            { name: "lcdDisplay"	, header: "공기질표출장치"	    , sortable: true, align: 'center',
+                renderer    : {
+                    type    : CustomToggleRenderer
+                }
+            },
+            { name: "lteRouter"		, header: "LTE라우터"		, sortable: true, align: 'center',
+                renderer    : {
+                    type    : CustomToggleRenderer
+                }
+            },
+            { name: "lteRouter2"	, header: "공공WI-FI"		, sortable: true, align: 'center',
+                renderer    : {
+                    type    : CustomToggleRenderer
+                }
+            },
+            { name: "ledLight"		, header: "LED전등"			, sortable: true, align: 'center',
+                renderer    : {
+                    type    : CustomToggleRenderer
+                }
+            },
+            { name: "fan"			, header: "냉각FAN"			, sortable: true, align: 'center',
+                renderer    : {
+                    type    : CustomToggleRenderer
+                }
+            }
         ],
         columnOptions : {
             resizable   : true,
@@ -74,6 +111,38 @@ function initializeGrid() {
     grid1.on('uncheckAll' , handleUncheckAll);      // 전체해제
 }
 
+// TUI Grid 커스텀 토글 버튼 렌더러
+class CustomToggleRenderer {
+    constructor(props) {
+
+        const el = document.createElement("div");
+        el.className = "rowbox check_box";
+        el.style = "display: initial";
+
+        // input id와 label for 의 값을 맞추고, 각 체크박스 셀마다 고유하게 가져야 addEventListener 에서 선택된 각 셀을 인지가능
+        el.innerHTML = `
+                    <input type="checkbox" id='c_ctlBoard_${props.rowKey}_${props.columnInfo["name"]}' class="check_def" ${props.value ? "checked" : ""} style="pointer-events: none;">
+                    <label for="c_ctlBoard_${props.rowKey}_${props.columnInfo["name"]}" style="pointer-events: none;"></label>
+        `;
+
+        this.el = el;
+
+        // 이벤트 리스너 추가
+        this.el.querySelector('input').addEventListener('change', (e) => {
+            const newValue = e.target.checked ? 1 : 0;
+            props.grid.setValue(props.rowKey, props.columnInfo.name, newValue);
+        });
+    }
+
+    getElement() {
+        return this.el;
+    }
+
+    render(props) {
+        this.el.querySelector('input').checked = props.value;
+    }
+}
+
 // row data 클릭으로 userId 처리 (클릭)
 function handleGridClick(e) {
     if (e.columnName === '_checked') return; // 체크박스 열 제외
@@ -89,28 +158,48 @@ function handleGridClick(e) {
 
 // 상세보기 팝업 오픈 (더블클릭)
 function handleGridDoubleClick(e) {
+    //선택 정보 관련 전역 변수 초기화
     resetSelection();
     if (e.columnName === '_checked') return; // 체크박스 열 제외
 
     const row = grid1.getRow(e.rowKey);
     if (!row) return;
 
+    // 로우 데이터로 상세페이지 각 필드값 직접 넣어 세팅
     $('#no'            ).text(row.no);
     $('#u_tmnId'       ).text(row.terminalId);
     $('#u_tmnNm'       ).val(row.terminalNm);
-    $('#u_ctlBoard'    ).val(row.ctlBoard);
-    $('#u_smartscreen' ).val(row.smartscreen);
-    $('#u_cv'          ).val(row.cv);
-    $('#u_ledPanel'    ).val(row.ledPanel);
-    $('#u_lcdDisplay'  ).val(row.lcdDisplay);
-    $('#u_lteRouter'   ).val(row.lteRouter);
-    $('#u_lteRouter2'  ).val(row.lteRouter2);
-    $('#u_ledLight'    ).val(row.ledLight);
-    $('#u_fan'         ).val(row.fan);
+    $('#u_ctlBoard').prop('checked', row.ctlBoard === 1);
+    $('#u_smartscreen' ).prop('checked', row.smartscreen === 1);
+    $('#u_cv'          ).prop('checked',row.cv === 1);
+    $('#u_ledPanel'    ).prop('checked',row.ledPanel === 1);
+    $('#u_lcdDisplay'  ).prop('checked',row.lcdDisplay === 1);
+    $('#u_lteRouter'   ).prop('checked',row.lteRouter === 1);
+    $('#u_lteRouter2'  ).prop('checked',row.lteRouter2 === 1);
+    $('#u_ledLight'    ).prop('checked',row.ledLight === 1);
+    $('#u_fan'         ).prop('checked',row.fan === 1);
+
+    // 임시 변수에 모든값 세팅
+    const tempHasDeviceList = {
+        1 : row.ctlBoard,
+        2 : row.smartscreen,
+        3 : row.cv,
+        4 : row.ledPanel,
+        5 : row.lcdDisplay,
+        6 : row.lteRouter,
+        7 : row.lteRouter2,
+        8 : row.ledLight,
+        9 : row.fan
+    }
+    // 상세페이지 정류장이 가진 기기 정보 전역변수에 저장
+    hasDeviceList = Object.entries(tempHasDeviceList)
+        .filter(([_, value]) => value !== 0)
+        .map(([key]) => Number(key));
 
     // 선택된 정류장 ID 전역변수에 할당
     selectedTerminalId = row.terminalId;
 
+    // 수정을 위한 상세 팝업 ON
     const target = $('#popup_frame');
     target.toggleClass('on');
 
@@ -157,9 +246,8 @@ function handleUncheckAll() {
 }
 
 /* 시설물 현황 등록 팝업 체크리스트 컨트롤 */
-$('table.align_center .check_def').each(function (index) {
+$('#create_popup_frame .check_def').each(function (index) {
     const value = index + 1;
-
     $(this).on('change', function () {
         if ($(this).is(':checked')) {
             if (!hasDeviceList.includes(value)) {
@@ -170,6 +258,21 @@ $('table.align_center .check_def').each(function (index) {
         }
     });
 });
+
+/* 시설물 현황 수정 팝업 체크리스트 컨트롤 */
+$('#popup_frame .check_def').each(function (index) {
+    const value = index + 1;
+    $(this).on('change', function () {
+        if ($(this).is(':checked')) {
+            if (!hasDeviceList.includes(value)) {
+                hasDeviceList.push(value);
+            }
+        } else {
+            hasDeviceList = hasDeviceList.filter(item => item !== value);
+        }
+    });
+});
+
 
 // 검색조건 엔터키 감지
 $('#s_terminalId, #s_terminalNm').on('keydown', function (event) {
@@ -231,15 +334,14 @@ $('#c_tmnId, #u_tmnId').on('input', function () {
     isDuplicatedId = false;
 
     const targetBtn = $(this).attr('id') === 'c_tmnId'
-                                           ? '#duplicateCheckBtn'
-                                           : '#duplicateCheckBtn2';
+        ? '#duplicateCheckBtn'
+        : '#duplicateCheckBtn2';
 
     $(targetBtn)
         .removeClass('btn_gray')
         .addClass('btn_red_clr')
         .prop('disabled', false);
 });
-
 
 /* 시설물 현황 등록 */
 function createTerminal(){
@@ -306,13 +408,15 @@ function validateForm(v1){
 
 /* 입력값 초기화 */
 function clearContents(){
+
+    // 정류장이 가진 기기 리스트 전역 변수 초기화
     hasDeviceList = [];
-    
+
     // 시설물 등록
     $('#c_tmnId').val('');
     $('#c_tmnNm').val('');
     $('table.align_center .check_def').prop('checked', false);
-    
+
     // 시설물 조회
     $('#s_terminalId').val('');
     $('#s_terminalNm').val('');
@@ -346,15 +450,15 @@ function getTerminalList(page = 0){
                 no          : index + 1 + page * size,
                 terminalId  : facility.terminal_id,
                 terminalNm  : facility.terminal_name,
-                ctlBoard    : formatDeviceStatus(facility.ctlBoard),
-                smartscreen : formatDeviceStatus(facility.smartscreen),
-                cv          : formatDeviceStatus(facility.cv),
-                ledPanel    : formatDeviceStatus(facility.ledPanel),
-                lcdDisplay  : formatDeviceStatus(facility.lcdDisplay),
-                lteRouter   : formatDeviceStatus(facility.lteRouter),
-                lteRouter2  : formatDeviceStatus(facility.lteRouter2),
-                ledLight    : formatDeviceStatus(facility.ledLight),
-                fan         : formatDeviceStatus(facility.fan),
+                ctlBoard    : facility.ctlBoard,
+                smartscreen : facility.smartscreen,
+                cv          : facility.cv,
+                ledPanel    : facility.ledPanel,
+                lcdDisplay  : facility.lcdDisplay,
+                lteRouter   : facility.lteRouter,
+                lteRouter2  : facility.lteRouter2,
+                ledLight    : facility.ledLight,
+                fan         : facility.fan
             }));
 
             // TOAST UI Grid 데이터 초기화
@@ -380,11 +484,11 @@ function getTerminalList(page = 0){
     });
 }
 
-// 디바이스 보유값 전처리
+// 디바이스 보유값 전처리 (미사용됨)
 function formatDeviceStatus(value) {
     return  value === 1 ? "O"
-          : value === 0 ? "X"
-          : "?";
+        : value === 0 ? "X"
+            : "?";
 }
 
 /* 페이지네이션 초기화 */
@@ -418,6 +522,7 @@ function deleteFacility(){
     );
 }
 
+/* 시설물 삭제 요청 */
 function deleteFacilites(){
     // 선택한 정류장 ID값과 시설물리스트 값이 다르면서 시설물리스트가 비어있을경우 정류장 ID 할당
     if (!facilityList.includes(selectedTerminalId) && facilityList.length === 0 && selectedTerminalId != null){
@@ -482,42 +587,18 @@ function updateFacility() {
     )
 }
 
+/* 시설물 수정 요청 */
 function updateFacilities(){
     let u_terminalNm  = $('#u_tmnNm').val().trim();
-    let u_ctlBoard    = $('#u_ctlBoard  ').val();
-    let u_smartscreen = $('#u_smartscreen').val();
-    let u_cv          = $('#u_cv  ').val();
-    let u_ledPanel    = $('#u_ledPanel').val();
-    let u_lcdDisplay  = $('#u_lcdDisplay').val();
-    let u_lteRouter   = $('#u_lteRouter').val();
-    let u_lteRouter2  = $('#u_lteRouter2').val();
-    let u_ledLight    = $('#u_ledLight').val();
-    let u_fan         = $('#u_fan').val();
 
-    // 시설물 구비여부 리스트
-    const deviceMap = {
-        1: u_ctlBoard,
-        2: u_smartscreen,
-        3: u_cv,
-        4: u_ledPanel,
-        5: u_lcdDisplay,
-        6: u_lteRouter,
-        7: u_lteRouter2,
-        8: u_ledLight,
-        9: u_fan
-    };
-
+    // 변동 유무 체크
     if (!isTerminalChange && !isDeviceChange) {
         popupOpenDialog('info', '변동사항이 없습니다.', 2000)
         $('#popup_frame').removeClass('on');
         return;
     }
 
-    // 시설물 구비여부 리스트화
-    hasDeviceList = Object.entries(deviceMap)
-        .filter(([_, value]) => value === 'O')
-        .map(([key, _]) => Number(key));
-
+    // 업데이트 데이터 세팅
     const udtData = {
         terminalId       : selectedTerminalId,
         isTerminalChange : isTerminalChange,
@@ -554,4 +635,51 @@ function updateFacilities(){
             isDeviceChange   = false;
         }
     });
+}
+
+/* 팝업을 위한 전용 초기화 함수, 기존 clearContents는 팝업을 닫을때 사용하기엔 기존 페이지에 영향이 미치므로 별도 생성 */
+function clearContentsForPopup() {
+
+    // 등록과 수정시 필요한 정류장 관련 기기 전역 변수 초기화
+    hasDeviceList = [];
+
+    // 시설물 등록 팝업에 사용되는 ID, 이름 필드 초기화, 수정 팝업 클로즈시 초기화 되도 상관 없음
+    $('#c_tmnId').val('');
+    $('#c_tmnNm').val('');
+
+    // 체크된 체크박스들 모두 초기화
+    $('table.align_center .check_def').prop('checked', false);
+
+    // 변경 감지를 위한 전역 변수 초기화
+    isTerminalChange = false;
+    isDeviceChange   = false;
+
+    // 기존 clearContent에 있는 시설물 조회 관련 필드 초기화 제외
+}
+
+/* 등록 팝업 발생시 기기관련 기본값 세팅 */
+function onClickRegisterBtn() {
+
+    //화면상 체크박스 체크
+    $('#c_ctlBoard').prop('checked', true);
+    $('#c_smartscreen' ).prop('checked', true);
+    $('#c_cv'          ).prop('checked', true);
+    $('#c_ledPanel'    ).prop('checked', true);
+    $('#c_lcdDisplay'  ).prop('checked', true);
+    $('#c_lteRouter'   ).prop('checked', true);
+    $('#c_lteRouter2'  ).prop('checked', true);
+    $('#c_ledLight'    ).prop('checked', true);
+    $('#c_fan'         ).prop('checked', true);
+
+    // 기기 관련 전역변수 세팅
+    // 1 : 통합제어보드
+    // 2 : 스마트스크린
+    // 3 : 재실감지카메라
+    // 4 : 승하차알림시스템
+    // 5 : 공기질표출장치
+    // 6 : LTE라우터
+    // 7 : 공공WIFI
+    // 8 : LED전등
+    // 9 : 냉각 팬
+    hasDeviceList = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 }

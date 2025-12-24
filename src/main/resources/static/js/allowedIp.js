@@ -16,8 +16,8 @@ const colors = [
 
 /* 페이지 온로드 */
 $(document).ready(function(){
-    getAllowedIpList(true, 0);
     initializeGrid();
+    getAllowedIpList(true, 0);
 
     // 조회건수 이벤트
     $('#itemsPerPage').on('change', function () {
@@ -111,7 +111,8 @@ function initializeGrid() {
                 sortable: true, align: 'center',
                 renderer    : {
                     type    : CustomToggleRenderer
-                }},
+                },
+            },
             { name: "createUserId"	, header: "등록자 ID"		, sortable: true, align: 'center' },
             { name: "createdAt"			, header: "등록 일자"	    , sortable: true, align: 'center' },
             { name: "updateUserId"      , header: "수정자 ID"	, sortable: true, align: 'center' },
@@ -549,11 +550,15 @@ function clearSearchContents(){
 /* 사용자 토글 렌더 */
 class CustomToggleRenderer {
     constructor(props) {
-        const el = document.createElement('label');
-        el.className = "switch";
+
+        const el = document.createElement("div");
+        el.className = "rowbox check_box";
+        el.style = "display: initial";
+
+        // input id와 label for 의 값을 맞추고, 각 체크박스 셀마다 고유하게 가져야 addEventListener 에서 선택된 각 셀을 인지가능
         el.innerHTML = `
-            <input type="checkbox" ${props.value ? 'checked' : ''}>
-            <span class="slider round"></span>
+                    <input type="checkbox" id='c_ctlBoard_${props.rowKey}' class="check_def" ${props.value ? "checked" : ""}>
+                    <label for="c_ctlBoard_${props.rowKey}"></label>
         `;
 
         this.el = el;
