@@ -656,3 +656,30 @@ function clearContentsForPopup() {
 
     // 기존 clearContent에 있는 시설물 조회 관련 필드 초기화 제외
 }
+
+/* 등록 팝업 발생시 기기관련 기본값 세팅 */
+function onClickRegisterBtn() {
+
+    //화면상 체크박스 체크
+    $('#c_ctlBoard').prop('checked', true);
+    $('#c_smartscreen' ).prop('checked', true);
+    $('#c_cv'          ).prop('checked', true);
+    $('#c_ledPanel'    ).prop('checked', true);
+    $('#c_lcdDisplay'  ).prop('checked', true);
+    $('#c_lteRouter'   ).prop('checked', true);
+    $('#c_lteRouter2'  ).prop('checked', true);
+    $('#c_ledLight'    ).prop('checked', true);
+    $('#c_fan'         ).prop('checked', true);
+
+    // 기기 관련 전역변수 세팅
+    // 1 : 통합제어보드
+    // 2 : 스마트스크린
+    // 3 : 재실감지카메라
+    // 4 : 승하차알림시스템
+    // 5 : 공기질표출장치
+    // 6 : LTE라우터
+    // 7 : 공공WIFI
+    // 8 : LED전등
+    // 9 : 냉각 팬
+    hasDeviceList = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+}
