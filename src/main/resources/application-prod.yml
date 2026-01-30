@@ -8,16 +8,16 @@ logging:
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   level:
     root: INFO
-    com.archivsoft: WARN
-    org.springframework: WARN
-    org.mybatis: WARN
-    org.apache.ibatis: WARN
+    com.archivsoft: INFO
+    org.springframework: INFO
+    org.mybatis: INFO
+    org.apache.ibatis: INFO
     jdbc.audit: OFF
     jdbc.connection: OFF
     jdbc.resultset: OFF
     jdbc.resultsettable: OFF
-    jdbc.sqlonly: WARN
-    jdbc.sqltiming: ERROR
+    jdbc.sqlonly: INFO
+    jdbc.sqltiming: INFO
 
 spring:
   websocket:
