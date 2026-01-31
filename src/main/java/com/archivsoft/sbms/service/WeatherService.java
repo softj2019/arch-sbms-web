@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -30,6 +29,9 @@ import org.springframework.http.HttpEntity;
 @RequiredArgsConstructor
 public class WeatherService {
     private static final Logger logger = LoggerFactory.getLogger(WeatherService.class);
+
+    private final WeatherInsertDataService weatherInsertDataService;
+
     private final WeatherAirQualityMapper weatherMapper;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -148,15 +150,13 @@ public class WeatherService {
         return weatherMapper.getRecentWeatherData();
     }
 
+    // 어차피 내부 메소드인 fetchAndSaveWeatherData 에서 호출되는 메소이드이므로, @Transactional을 붙여도 실제 작동하지 않음.
+    // 실제 @Transactional을 적용하고 싶다면, fetchAndSaveWeatherData 적용해야 하지만, 단일건에 대한 insert이므로 한번의 insert가 되지 않아도
+    // 큰 문제 없으므로, 구태여 붙이지 않음
     /**
      * 기상 데이터 insert, 기존 캐싱 무효화
      */
-    @Transactional
-    @CacheEvict(
-            value = "latestWeatherCache",   // 캐시 이름
-            allEntries = true               // 캐시 내 모든 엔트리
-    )
     public void insertWeatherData(WeatherAirQuality weatherAirQuality) {
-        weatherMapper.insertWeatherData(weatherAirQuality);
+        weatherInsertDataService.insertWeatherData(weatherAirQuality);
     }
 }
