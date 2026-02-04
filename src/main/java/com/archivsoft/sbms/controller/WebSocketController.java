@@ -36,6 +36,8 @@ public class WebSocketController {
     @SendTo("/topic/dashboard")
     public String handleData(String message) {
         try{
+            log.info("/iot/overview");
+            log.info(message);
             // 소켓 데이터 db 저장
             monitoringService.processMessage(message);
         } catch (Exception ignored){
