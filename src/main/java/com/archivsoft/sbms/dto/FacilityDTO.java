@@ -68,4 +68,5 @@ public class FacilityDTO {
     private Integer networkRebootThreshold;
     private String networkFailureReason;
     private List<NetworkEventLogDTO> networkEventLogs;
+    private List<NetworkOutageLogDTO> networkOutageLogs;
 }

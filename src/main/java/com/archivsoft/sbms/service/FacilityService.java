@@ -2,6 +2,7 @@ package com.archivsoft.sbms.service;
 
 import com.archivsoft.sbms.dto.FacilityDTO;
 import com.archivsoft.sbms.dto.NetworkEventLogDTO;
+import com.archivsoft.sbms.dto.NetworkOutageLogDTO;
 import com.archivsoft.sbms.dto.TerminalNetworkStatusDTO;
 import com.archivsoft.sbms.mapper.FacilityMapper;
 import com.archivsoft.sbms.mapper.TerminalNetworkMapper;
@@ -105,6 +106,10 @@ public class FacilityService {
 
     public List<NetworkEventLogDTO> getRecentNetworkEvents(String terminalId) {
         return terminalNetworkMapper.getNetworkEventsByTerminalId(terminalId);
+    }
+
+    public List<NetworkOutageLogDTO> getRecentNetworkOutageLogs(String terminalId) {
+        return terminalNetworkMapper.getNetworkOutageLogsByTerminalId(terminalId);
     }
 
     public Map<String, Integer> getDevicesCnt() {

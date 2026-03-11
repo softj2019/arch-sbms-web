@@ -15,6 +15,7 @@
             network_reboot_threshold,
             network_failure_reason,
             network_event_logs_raw,
+            network_outage_logs_raw,
             last_overview_received_at
         ) VALUES (
             #{terminalId},
@@ -27,6 +28,7 @@
             #{networkRebootThreshold},
             #{networkFailureReason},
             #{networkEventLogsRaw},
+            #{networkOutageLogsRaw},
             NOW()
         )
         ON DUPLICATE KEY UPDATE
@@ -39,6 +41,7 @@
             network_reboot_threshold = VALUES(network_reboot_threshold),
             network_failure_reason = VALUES(network_failure_reason),
             network_event_logs_raw = VALUES(network_event_logs_raw),
+            network_outage_logs_raw = VALUES(network_outage_logs_raw),
             last_overview_received_at = NOW()
     </insert>
 
@@ -76,6 +79,43 @@
         )
     </insert>
 
+    <insert id="insertNetworkOutageLog" parameterType="NetworkOutageLogDTO">
+        INSERT IGNORE INTO tb_terminal_network_outage_log (
+            terminal_id,
+            log_hash,
+            occurred_at,
+            occurred_at_iso,
+            level,
+            logger,
+            message,
+            raw_json
+        ) VALUES (
+            #{terminalId},
+            #{logHash},
+            #{occurredAt},
+            #{occurredAtIso},
+            #{level},
+            #{logger},
+            #{message},
+            #{rawJson}
+        )
+    </insert>
+
+    <delete id="deleteOldNetworkOutageLogs">
+        DELETE FROM tb_terminal_network_outage_log
+        WHERE terminal_id = #{terminalId}
+          AND id NOT IN (
+            SELECT id
+            FROM (
+                SELECT id
+                FROM tb_terminal_network_outage_log
+                WHERE terminal_id = #{terminalId}
+                ORDER BY occurred_at_iso DESC, id DESC
+                LIMIT #{retainCount}
+            ) retained
+        )
+    </delete>
+
     <select id="getNetworkStatusesByTerminalIds" resultType="TerminalNetworkStatusDTO">
         SELECT      terminal_id,
                     network_retry_count,
@@ -87,6 +127,7 @@
                     network_reboot_threshold,
                     network_failure_reason,
                     network_event_logs_raw,
+                    network_outage_logs_raw,
                     last_overview_received_at,
                     created_at,
                     updated_at
@@ -146,5 +187,23 @@
         ORDER BY    created_at DESC,
                     id DESC
         LIMIT       20
+    </select>
+
+    <select id="getNetworkOutageLogsByTerminalId" resultType="NetworkOutageLogDTO">
+        SELECT      id,
+                    terminal_id,
+                    log_hash,
+                    occurred_at,
+                    occurred_at_iso,
+                    level,
+                    logger,
+                    message,
+                    raw_json,
+                    created_at
+        FROM        tb_terminal_network_outage_log
+        WHERE       terminal_id = #{terminalId}
+        ORDER BY    occurred_at_iso DESC,
+                    id DESC
+        LIMIT       200
     </select>
 </mapper>

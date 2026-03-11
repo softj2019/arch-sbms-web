@@ -30,7 +30,8 @@
             network_retry_interval_sec,
             network_reboot_threshold,
             network_failure_reason,
-            network_event_logs_raw
+            network_event_logs_raw,
+            network_outage_logs_raw
         ) VALUES (
              #{cpu_temperature},
              #{ctl_board_power},
@@ -58,7 +59,8 @@
              #{network_retry_interval_sec},
              #{network_reboot_threshold},
              #{network_failure_reason},
-             #{network_event_logs_raw}
+             #{network_event_logs_raw},
+             #{network_outage_logs_raw}
          );
     </insert>
 

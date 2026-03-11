@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -51,8 +52,10 @@ class MonitoringServiceTest {
         MonitoringDTO saved = monitoringCaptor.getValue();
         assertThat(saved.getTerminal_id()).isEqualTo(26019);
         assertThat(saved.getNetwork_event_logs_raw()).isNull();
+        assertThat(saved.getNetwork_outage_logs_raw()).isNull();
         verify(terminalNetworkMapper).upsertNetworkStatus(any());
         verify(terminalNetworkMapper, times(0)).insertNetworkEvent(any());
+        verify(terminalNetworkMapper, times(0)).insertNetworkOutageLog(any());
     }
 
     @Test
@@ -77,6 +80,13 @@ class MonitoringServiceTest {
                 + "\"router_wan_ip\":\"1.1.1.1\","
                 + "\"public_ip\":\"2.2.2.2\","
                 + "\"outbound_ok\":false"
+                + "}],"
+                + "\"network_outage_logs\":[{"
+                + "\"occurred_at\":\"2026-03-11 10:01:00\","
+                + "\"occurred_at_iso\":\"2026-03-11T10:01:00+09:00\","
+                + "\"level\":\"WARN\","
+                + "\"logger\":\"wan.monitor\","
+                + "\"message\":\"wan retry timeout\""
                 + "}]"
                 + "}";
 
@@ -84,8 +94,11 @@ class MonitoringServiceTest {
 
         verify(monitoringMapper).saveData(monitoringCaptor.capture());
         assertThat(monitoringCaptor.getValue().getNetwork_event_logs_raw()).contains("occurred_at_iso");
+        assertThat(monitoringCaptor.getValue().getNetwork_outage_logs_raw()).contains("wan.monitor");
         verify(terminalNetworkMapper).upsertNetworkStatus(any());
         verify(terminalNetworkMapper).insertNetworkEvent(any());
+        verify(terminalNetworkMapper).insertNetworkOutageLog(any());
+        verify(terminalNetworkMapper).deleteOldNetworkOutageLogs(eq("26019"), eq(200));
     }
 
     @Test
@@ -116,5 +129,37 @@ class MonitoringServiceTest {
         assertThat(monitoringCaptor.getValue().getNetwork_event_logs_raw()).isEqualTo("{not-json}");
         verify(terminalNetworkMapper).upsertNetworkStatus(any());
         verify(terminalNetworkMapper, times(0)).insertNetworkEvent(any());
+    }
+
+    @Test
+    void processMessage_parsesTextualNetworkOutageLogsJson() {
+        String payload = "{"
+                + "\"terminal_id\":26019,"
+                + "\"network_outage_logs\":\"[{\\\"occurred_at\\\":\\\"2026-03-11 10:01:00\\\",\\\"occurred_at_iso\\\":\\\"2026-03-11T10:01:00+09:00\\\",\\\"level\\\":\\\"ERROR\\\",\\\"logger\\\":\\\"wan.monitor\\\",\\\"message\\\":\\\"router disconnected\\\"}]\""
+                + "}";
+
+        monitoringService.processMessage(payload);
+
+        verify(monitoringMapper).saveData(monitoringCaptor.capture());
+        assertThat(monitoringCaptor.getValue().getNetwork_outage_logs_raw()).contains("wan.monitor");
+        verify(terminalNetworkMapper).upsertNetworkStatus(any());
+        verify(terminalNetworkMapper).insertNetworkOutageLog(any());
+        verify(terminalNetworkMapper).deleteOldNetworkOutageLogs(eq("26019"), eq(200));
+    }
+
+    @Test
+    void processMessage_ignoresInvalidNetworkOutageLogsJson() {
+        String payload = "{"
+                + "\"terminal_id\":26019,"
+                + "\"network_outage_logs\":\"{not-json}\""
+                + "}";
+
+        assertDoesNotThrow(() -> monitoringService.processMessage(payload));
+
+        verify(monitoringMapper).saveData(monitoringCaptor.capture());
+        assertThat(monitoringCaptor.getValue().getNetwork_outage_logs_raw()).isEqualTo("{not-json}");
+        verify(terminalNetworkMapper).upsertNetworkStatus(any());
+        verify(terminalNetworkMapper, times(0)).insertNetworkOutageLog(any());
+        verify(terminalNetworkMapper, times(0)).deleteOldNetworkOutageLogs(any(), any(Integer.class));
     }
 }

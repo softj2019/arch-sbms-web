@@ -2,6 +2,7 @@ package com.archivsoft.sbms.service;
 
 import com.archivsoft.sbms.dto.MonitoringDTO;
 import com.archivsoft.sbms.dto.NetworkEventLogDTO;
+import com.archivsoft.sbms.dto.NetworkOutageLogDTO;
 import com.archivsoft.sbms.dto.TerminalNetworkStatusDTO;
 import com.archivsoft.sbms.mapper.MonitoringMapper;
 import com.archivsoft.sbms.mapper.TerminalNetworkMapper;
@@ -47,7 +48,8 @@ public class MonitoringService {
 
     public void processMessage(String message) {
         MonitoringDTO monitoringDTO = convertJsonToDto(message);
-        monitoringDTO.setNetwork_event_logs_raw(extractRawNetworkEventLogs(monitoringDTO.getNetwork_event_logs()));
+        monitoringDTO.setNetwork_event_logs_raw(extractRawNetworkLogs(monitoringDTO.getNetwork_event_logs()));
+        monitoringDTO.setNetwork_outage_logs_raw(extractRawNetworkLogs(monitoringDTO.getNetwork_outage_logs()));
         saveData(monitoringDTO);
         saveNetworkDataSafely(monitoringDTO);
     }
@@ -78,6 +80,18 @@ public class MonitoringService {
         } catch (Exception e) {
             log.warn("네트워크 이벤트 저장 실패. terminalId={}", monitoringDTO.getTerminal_id(), e);
         }
+
+        try {
+            List<NetworkOutageLogDTO> outageLogs = parseNetworkOutageLogs(monitoringDTO);
+            if (!outageLogs.isEmpty()) {
+                for (NetworkOutageLogDTO outageLogDTO : outageLogs) {
+                    terminalNetworkMapper.insertNetworkOutageLog(outageLogDTO);
+                }
+                terminalNetworkMapper.deleteOldNetworkOutageLogs(String.valueOf(monitoringDTO.getTerminal_id()), 200);
+            }
+        } catch (Exception e) {
+            log.warn("네트워크 장애 로그 저장 실패. terminalId={}", monitoringDTO.getTerminal_id(), e);
+        }
     }
 
     private TerminalNetworkStatusDTO toTerminalNetworkStatus(MonitoringDTO monitoringDTO) {
@@ -92,60 +106,41 @@ public class MonitoringService {
                 .networkRebootThreshold(monitoringDTO.getNetwork_reboot_threshold())
                 .networkFailureReason(monitoringDTO.getNetwork_failure_reason())
                 .networkEventLogsRaw(monitoringDTO.getNetwork_event_logs_raw())
+                .networkOutageLogsRaw(monitoringDTO.getNetwork_outage_logs_raw())
                 .build();
     }
 
-    private String extractRawNetworkEventLogs(JsonNode networkEventLogsNode) {
-        if (networkEventLogsNode == null || networkEventLogsNode.isNull()) {
+    private String extractRawNetworkLogs(JsonNode networkLogsNode) {
+        if (networkLogsNode == null || networkLogsNode.isNull()) {
             return null;
         }
 
-        if (networkEventLogsNode.isTextual()) {
-            return networkEventLogsNode.asText();
+        if (networkLogsNode.isTextual()) {
+            return networkLogsNode.asText();
         }
 
         try {
-            return objectMapper.writeValueAsString(networkEventLogsNode);
+            return objectMapper.writeValueAsString(networkLogsNode);
         } catch (JsonProcessingException e) {
-            log.warn("network_event_logs raw 직렬화 실패", e);
+            log.warn("network logs raw 직렬화 실패", e);
             return null;
         }
     }
 
     private List<NetworkEventLogDTO> parseNetworkEventLogs(MonitoringDTO monitoringDTO) {
-        JsonNode sourceNode = monitoringDTO.getNetwork_event_logs();
-        if (sourceNode == null || sourceNode.isNull()) {
+        JsonNode parsedNode = parseFlexibleLogNode(
+                monitoringDTO.getNetwork_event_logs(),
+                "network_event_logs",
+                monitoringDTO.getTerminal_id()
+        );
+        if (parsedNode == null) {
             return Collections.emptyList();
         }
 
-        JsonNode parsedNode = sourceNode;
-        if (sourceNode.isTextual()) {
-            String rawValue = sourceNode.asText();
-            if (rawValue == null || rawValue.trim().isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            try {
-                parsedNode = objectMapper.readTree(rawValue);
-            } catch (JsonProcessingException e) {
-                log.warn("network_event_logs 파싱 실패. terminalId={}", monitoringDTO.getTerminal_id(), e);
-                return Collections.emptyList();
-            }
-        }
-
-        List<JsonNode> eventNodes = new ArrayList<>();
-        if (parsedNode.isArray()) {
-            parsedNode.forEach(eventNodes::add);
-        } else if (parsedNode.isObject()) {
-            eventNodes.add(parsedNode);
-        } else {
-            log.warn("network_event_logs 형식 이상. terminalId={}, nodeType={}",
-                    monitoringDTO.getTerminal_id(), parsedNode.getNodeType());
-            return Collections.emptyList();
-        }
-
+        List<JsonNode> eventNodes = collectLogNodes(parsedNode);
         List<NetworkEventLogDTO> eventLogDTOList = new ArrayList<>();
         String terminalId = String.valueOf(monitoringDTO.getTerminal_id());
+
         for (JsonNode eventNode : eventNodes) {
             try {
                 NetworkEventLogDTO eventLogDTO = objectMapper.treeToValue(eventNode, NetworkEventLogDTO.class);
@@ -159,6 +154,73 @@ public class MonitoringService {
         }
 
         return eventLogDTOList;
+    }
+
+    private List<NetworkOutageLogDTO> parseNetworkOutageLogs(MonitoringDTO monitoringDTO) {
+        JsonNode parsedNode = parseFlexibleLogNode(
+                monitoringDTO.getNetwork_outage_logs(),
+                "network_outage_logs",
+                monitoringDTO.getTerminal_id()
+        );
+        if (parsedNode == null) {
+            return Collections.emptyList();
+        }
+
+        List<JsonNode> logNodes = collectLogNodes(parsedNode);
+        List<NetworkOutageLogDTO> outageLogDTOList = new ArrayList<>();
+        String terminalId = String.valueOf(monitoringDTO.getTerminal_id());
+
+        for (JsonNode logNode : logNodes) {
+            try {
+                NetworkOutageLogDTO outageLogDTO = objectMapper.treeToValue(logNode, NetworkOutageLogDTO.class);
+                outageLogDTO.setTerminalId(terminalId);
+                outageLogDTO.setRawJson(objectMapper.writeValueAsString(logNode));
+                outageLogDTO.setLogHash(generateOutageLogHash(terminalId, outageLogDTO));
+                outageLogDTOList.add(outageLogDTO);
+            } catch (JsonProcessingException | IllegalArgumentException e) {
+                log.warn("network_outage_logs 항목 파싱 실패. terminalId={}", monitoringDTO.getTerminal_id(), e);
+            }
+        }
+
+        return outageLogDTOList;
+    }
+
+    private JsonNode parseFlexibleLogNode(JsonNode sourceNode, String fieldName, Integer terminalId) {
+        if (sourceNode == null || sourceNode.isNull()) {
+            return null;
+        }
+
+        JsonNode parsedNode = sourceNode;
+        if (sourceNode.isTextual()) {
+            String rawValue = sourceNode.asText();
+            if (rawValue == null || rawValue.trim().isEmpty()) {
+                return null;
+            }
+
+            try {
+                parsedNode = objectMapper.readTree(rawValue);
+            } catch (JsonProcessingException e) {
+                log.warn("{} 파싱 실패. terminalId={}", fieldName, terminalId, e);
+                return null;
+            }
+        }
+
+        if (!parsedNode.isArray() && !parsedNode.isObject()) {
+            log.warn("{} 형식 이상. terminalId={}, nodeType={}", fieldName, terminalId, parsedNode.getNodeType());
+            return null;
+        }
+
+        return parsedNode;
+    }
+
+    private List<JsonNode> collectLogNodes(JsonNode parsedNode) {
+        List<JsonNode> logNodes = new ArrayList<>();
+        if (parsedNode.isArray()) {
+            parsedNode.forEach(logNodes::add);
+        } else if (parsedNode.isObject()) {
+            logNodes.add(parsedNode);
+        }
+        return logNodes;
     }
 
     private String generateEventHash(String terminalId, NetworkEventLogDTO eventLogDTO) {
@@ -175,6 +237,23 @@ public class MonitoringService {
                 safeValue(eventLogDTO.getOutboundOk())
         );
 
+        return sha256(source);
+    }
+
+    private String generateOutageLogHash(String terminalId, NetworkOutageLogDTO outageLogDTO) {
+        String source = String.join("|",
+                safeValue(terminalId),
+                safeValue(outageLogDTO.getOccurredAt()),
+                safeValue(outageLogDTO.getOccurredAtIso()),
+                safeValue(outageLogDTO.getLevel()),
+                safeValue(outageLogDTO.getLogger()),
+                safeValue(outageLogDTO.getMessage())
+        );
+
+        return sha256(source);
+    }
+
+    private String sha256(String source) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(source.getBytes(StandardCharsets.UTF_8));

@@ -59,6 +59,7 @@ spring:
       algorithm: rms
   thymeleaf:
     cache: false
+    encoding: UTF-8
     prefix: file:src/main/resources/templates/
   messages:
     basename: messages/common
@@ -74,6 +75,10 @@ server:
   compression:
     enabled: true
   servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
     session:
       timeout: 86400
 ---

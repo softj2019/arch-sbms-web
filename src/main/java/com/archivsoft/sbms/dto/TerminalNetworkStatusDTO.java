@@ -20,6 +20,7 @@ public class TerminalNetworkStatusDTO {
     private Integer networkRebootThreshold;
     private String networkFailureReason;
     private String networkEventLogsRaw;
+    private String networkOutageLogsRaw;
     private String lastOverviewReceivedAt;
     private String createdAt;
     private String updatedAt;

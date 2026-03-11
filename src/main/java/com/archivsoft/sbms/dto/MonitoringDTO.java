@@ -41,4 +41,6 @@ public class MonitoringDTO {
     private String network_failure_reason;
     private JsonNode network_event_logs;
     private String network_event_logs_raw;
+    private JsonNode network_outage_logs;
+    private String network_outage_logs_raw;
 }

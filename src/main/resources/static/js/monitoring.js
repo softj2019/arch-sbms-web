@@ -16,41 +16,41 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollX: true,
         scrollY: false,
         columns: [
-            { name: "terminal_id", header: "Terminal ID", sortable: true, align: 'center' },
-            { name: "terminal_nm", header: "Terminal Name", sortable: true, align: 'center' },
+            { name: "terminal_id", header: "Terminal ID", sortable: true, align: "center" },
+            { name: "terminal_nm", header: "Terminal Name", sortable: true, align: "center" },
             {
                 name: "rfc_cpu",
                 header: "CPU",
                 sortable: true,
-                align: 'center',
+                align: "center",
                 formatter: ({ row }) => row.rfc_cpu ?? "-"
             },
             {
                 name: "cpu_temperature",
                 header: "CPU Temp",
                 sortable: true,
-                align: 'center',
+                align: "center",
                 formatter: ({ row }) => row.cpu_temperature ?? "-"
             },
             {
                 name: "memory",
                 header: "Memory",
                 sortable: true,
-                align: 'center',
+                align: "center",
                 formatter: ({ row }) => row.memory ?? "-"
             },
             {
                 name: "storage",
                 header: "Storage",
                 sortable: true,
-                align: 'center',
+                align: "center",
                 formatter: ({ row }) => row.storage ?? "-"
             },
             {
                 name: "ipaddress",
                 header: "IP",
                 sortable: true,
-                align: 'center',
+                align: "center",
                 formatter: ({ row }) => {
                     if (!row.ipaddress) {
                         return "-";
@@ -63,47 +63,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: "network_retry_count",
                 header: "Retry Count",
                 sortable: true,
-                align: 'center',
-                hidden: true,
+                align: "center",
                 formatter: ({ row }) => row.network_retry_count ?? "-"
             },
             {
                 name: "network_outage_started_at",
                 header: "Outage Started",
                 sortable: true,
-                align: 'center',
-                hidden: true,
+                align: "center",
                 formatter: ({ row }) => row.network_outage_started_at ?? "-"
             },
             {
                 name: "network_last_recovered_at",
                 header: "Last Recovered",
                 sortable: true,
-                align: 'center',
+                align: "center",
                 formatter: ({ row }) => row.network_last_recovered_at ?? "-"
             },
             {
                 name: "network_last_reboot_requested_at",
                 header: "Last Reboot Req",
                 sortable: true,
-                align: 'center',
-                hidden: true,
+                align: "center",
                 formatter: ({ row }) => row.network_last_reboot_requested_at ?? "-"
             },
             {
                 name: "network_failure_reason",
                 header: "Failure Reason",
                 sortable: true,
-                align: 'center',
-                hidden: true,
+                align: "center",
                 formatter: ({ row }) => row.network_failure_reason ?? "-"
             },
             {
                 name: "recent_network_events",
                 header: "Recent Events",
                 sortable: false,
-                align: 'left',
-                hidden: true,
+                align: "left",
                 formatter: ({ row }) => row.recent_network_events ?? "-"
             }
         ],
@@ -125,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     grid1.on("click", (ev) => {
         const { columnName, rowKey, targetType } = ev;
-        if (targetType !== 'cell' || rowKey === null || rowKey === undefined) {
+        if (targetType !== "cell" || rowKey === null || rowKey === undefined) {
             return;
         }
 
@@ -144,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     stompClient.connect({}, () => {
-        stompClient.subscribe('/topic/dashboard', (message) => {
+        stompClient.subscribe("/topic/dashboard", (message) => {
             try {
                 let receivedData = JSON.parse(message.body);
                 if (!Array.isArray(receivedData)) {
@@ -178,23 +173,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     grid1.setValue(rowIndex, "recent_network_events", formatRecentNetworkEvents(newRow.network_event_logs));
                 });
             } catch (error) {
-                console.error('Invalid JSON format or unexpected data structure:', error);
+                console.error("Invalid JSON format or unexpected data structure:", error);
             }
         });
     });
 
-    $(document).on('click', '#network_detail_popup .btn_close', function () {
+    $(document).on("click", "#network_detail_popup .btn_close", function () {
         closeNetworkDetailPopup();
     });
 
-    $(document).on('click', '#network_detail_popup', function (event) {
-        if (!$(event.target).closest('.popup_wrap').length) {
+    $(document).on("click", "#network_detail_popup", function (event) {
+        if (!$(event.target).closest(".popup_wrap").length) {
             closeNetworkDetailPopup();
         }
     });
 
-    $(document).on('keydown', function (event) {
-        if (event.key === 'Escape' && $('#network_detail_popup').hasClass('on')) {
+    $(document).on("keydown", function (event) {
+        if (event.key === "Escape" && $("#network_detail_popup").hasClass("on")) {
             closeNetworkDetailPopup();
         }
     });
@@ -219,12 +214,12 @@ function loginAndRedirect(wanip) {
 }
 
 function clearContents() {
-    $('#s_terminalId').val('');
-    $('#s_terminalNm').val('');
+    $("#s_terminalId").val("");
+    $("#s_terminalNm").val("");
 }
 
-$('#s_terminalId, #s_terminalNm').on('keydown', function (event) {
-    if (event.key === 'Enter') {
+$("#s_terminalId, #s_terminalNm").on("keydown", function (event) {
+    if (event.key === "Enter") {
         getStationName();
     }
 });
@@ -237,22 +232,22 @@ function getStationName() {
     isLoading = true;
 
     const dataList = {
-        terminalId: $('#s_terminalId').val(),
-        terminalNm: $('#s_terminalNm').val()
+        terminalId: $("#s_terminalId").val(),
+        terminalNm: $("#s_terminalNm").val()
     };
     const qryString = $.param(dataList);
 
     showLoadingSpinner();
     $.ajax({
         url: `/api/monitoring/list?${qryString}`,
-        method: 'GET',
-        dataType: 'json',
+        method: "GET",
+        dataType: "json",
         success: function (response) {
             if (!Array.isArray(response)) {
                 return;
             }
 
-            stationList = response.map(station => ({
+            stationList = response.map((station) => ({
                 terminal_id: String(station.terminal_id ?? station.terminalId),
                 terminal_nm: station.terminal_name ?? station.terminalName,
                 network_retry_count: station.network_retry_count ?? station.networkRetryCount ?? "-",
@@ -264,10 +259,10 @@ function getStationName() {
             }));
 
             grid1.resetData(stationList);
-            $('.sub_script .num').text(stationList.length);
+            $(".sub_script .num").text(stationList.length);
         },
         error: function (xhr, status, error) {
-            popupOpenDialog('error', 'System monitoring query failed: ' + error, 2000);
+            popupOpenDialog("error", "System monitoring query failed: " + error, 2000);
             hideLoadingSpinner();
         },
         complete: function () {
@@ -279,25 +274,26 @@ function getStationName() {
 
 function getRowIndexByTerminalId(terminalId) {
     const data = grid1.getData();
-    return data.findIndex(row => row.terminal_id === terminalId);
+    return data.findIndex((row) => row.terminal_id === terminalId);
 }
 
 function openNetworkDetailPopup(rowData) {
-    $('#network_popup_title').text(`네트워크 상세 정보 - ${rowData.terminal_nm} (${rowData.terminal_id})`);
-    $('#network_popup_terminal_id').text(rowData.terminal_id ?? "-");
-    $('#network_popup_terminal_name').text(rowData.terminal_nm ?? "-");
-    $('#network_popup_retry_count').text(rowData.network_retry_count ?? "-");
-    $('#network_popup_outage_started_at').text(rowData.network_outage_started_at ?? "-");
-    $('#network_popup_last_recovered_at').text(rowData.network_last_recovered_at ?? "-");
-    $('#network_popup_last_reboot_requested_at').text(rowData.network_last_reboot_requested_at ?? "-");
-    $('#network_popup_failure_reason').text(rowData.network_failure_reason ?? "-");
+    $("#network_popup_title").text(`네트워크 상세 정보 - ${rowData.terminal_nm} (${rowData.terminal_id})`);
+    $("#network_popup_terminal_id").text(rowData.terminal_id ?? "-");
+    $("#network_popup_terminal_name").text(rowData.terminal_nm ?? "-");
+    $("#network_popup_retry_count").text(rowData.network_retry_count ?? "-");
+    $("#network_popup_outage_started_at").text(rowData.network_outage_started_at ?? "-");
+    $("#network_popup_last_recovered_at").text(rowData.network_last_recovered_at ?? "-");
+    $("#network_popup_last_reboot_requested_at").text(rowData.network_last_reboot_requested_at ?? "-");
+    $("#network_popup_failure_reason").text(rowData.network_failure_reason ?? "-");
     renderNetworkPopupEvents([]);
-    $('#network_detail_popup').addClass('on');
+    renderNetworkOutageLogs([]);
+    $("#network_detail_popup").addClass("on");
 
     $.ajax({
         url: `/api/monitoring/network/${encodeURIComponent(rowData.terminal_id)}/events`,
-        method: 'GET',
-        dataType: 'json',
+        method: "GET",
+        dataType: "json",
         success: function (response) {
             if (Array.isArray(response)) {
                 renderNetworkPopupEvents(response);
@@ -309,18 +305,34 @@ function openNetworkDetailPopup(rowData) {
             renderNetworkPopupEvents([]);
         }
     });
+
+    $.ajax({
+        url: `/api/iot/network-outage-logs?terminal_id=${encodeURIComponent(rowData.terminal_id)}`,
+        method: "GET",
+        dataType: "json",
+        success: function (response) {
+            if (Array.isArray(response)) {
+                renderNetworkOutageLogs(response);
+            } else {
+                renderNetworkOutageLogs([]);
+            }
+        },
+        error: function () {
+            renderNetworkOutageLogs([]);
+        }
+    });
 }
 
 function closeNetworkDetailPopup() {
-    $('#network_detail_popup').removeClass('on');
+    $("#network_detail_popup").removeClass("on");
 }
 
 function renderNetworkPopupEvents(events) {
-    const $rows = $('#network_popup_event_rows');
+    const $rows = $("#network_popup_event_rows");
     $rows.empty();
 
     if (!Array.isArray(events) || !events.length) {
-        $rows.append('<tr><td colspan="7">네트워크 장애 이력이 없습니다.</td></tr>');
+        $rows.append("<tr><td colspan=\"7\">네트워크 장애 이력이 없습니다.</td></tr>");
         return;
     }
 
@@ -348,13 +360,39 @@ function renderNetworkPopupEvents(events) {
     });
 }
 
+function renderNetworkOutageLogs(logs) {
+    const $rows = $("#network_popup_outage_rows");
+    $rows.empty();
+
+    if (!Array.isArray(logs) || !logs.length) {
+        $rows.append("<tr><td colspan=\"4\">네트워크 장애 로그가 없습니다.</td></tr>");
+        return;
+    }
+
+    logs.forEach((logItem) => {
+        const occurredAt = logItem.occurredAtIso ?? logItem.occurred_at_iso ?? logItem.occurredAt ?? logItem.occurred_at ?? "-";
+        const level = logItem.level ?? "-";
+        const logger = logItem.logger ?? "-";
+        const message = logItem.message ?? "-";
+
+        $rows.append(`
+            <tr>
+                <td>${escapeHtml(occurredAt)}</td>
+                <td>${escapeHtml(level)}</td>
+                <td>${escapeHtml(logger)}</td>
+                <td style="text-align:left;">${escapeHtml(message)}</td>
+            </tr>
+        `);
+    });
+}
+
 function formatRecentNetworkEvents(eventLogs) {
     if (!eventLogs) {
         return "-";
     }
 
     let parsedEvents = eventLogs;
-    if (typeof eventLogs === 'string') {
+    if (typeof eventLogs === "string") {
         try {
             parsedEvents = JSON.parse(eventLogs);
         } catch (error) {
@@ -376,14 +414,14 @@ function formatRecentNetworkEvents(eventLogs) {
         const reason = event.failure_reason ?? event.failureReason ?? "-";
         const retryCount = event.retry_count ?? event.retryCount ?? "-";
         return `${startedAt} / ${recoveredAt} / ${reason} / retry ${retryCount}`;
-    }).join('<br>');
+    }).join("<br>");
 }
 
 function escapeHtml(value) {
     return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
