@@ -79,7 +79,7 @@ server:
 ---
 # 데이터베이스 설정
 server:
-  port: 8099
+  port: 8080
 spring:
   websocket:
     max-text-message-size: 50MB
