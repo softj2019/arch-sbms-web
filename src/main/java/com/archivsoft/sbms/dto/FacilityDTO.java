@@ -59,4 +59,13 @@ public class FacilityDTO {
     private Integer fan;            // 냉각FAN
 
     private List<String> terminalIdList; // 체크된 시설물 ID 리스트
+    private Integer networkRetryCount;
+    private String networkOutageStartedAt;
+    private String networkLastRecoveredAt;
+    private String networkLastRebootRequestedAt;
+    private Integer networkPendingEventCount;
+    private Integer networkRetryIntervalSec;
+    private Integer networkRebootThreshold;
+    private String networkFailureReason;
+    private List<NetworkEventLogDTO> networkEventLogs;
 }

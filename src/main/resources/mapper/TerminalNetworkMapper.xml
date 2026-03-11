@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.TerminalNetworkMapper">
+
+    <insert id="upsertNetworkStatus" parameterType="TerminalNetworkStatusDTO">
+        INSERT INTO tb_terminal_network_status (
+            terminal_id,
+            network_retry_count,
+            network_outage_started_at,
+            network_last_recovered_at,
+            network_last_reboot_requested_at,
+            network_pending_event_count,
+            network_retry_interval_sec,
+            network_reboot_threshold,
+            network_failure_reason,
+            network_event_logs_raw,
+            last_overview_received_at
+        ) VALUES (
+            #{terminalId},
+            #{networkRetryCount},
+            #{networkOutageStartedAt},
+            #{networkLastRecoveredAt},
+            #{networkLastRebootRequestedAt},
+            #{networkPendingEventCount},
+            #{networkRetryIntervalSec},
+            #{networkRebootThreshold},
+            #{networkFailureReason},
+            #{networkEventLogsRaw},
+            NOW()
+        )
+        ON DUPLICATE KEY UPDATE
+            network_retry_count = VALUES(network_retry_count),
+            network_outage_started_at = VALUES(network_outage_started_at),
+            network_last_recovered_at = VALUES(network_last_recovered_at),
+            network_last_reboot_requested_at = VALUES(network_last_reboot_requested_at),
+            network_pending_event_count = VALUES(network_pending_event_count),
+            network_retry_interval_sec = VALUES(network_retry_interval_sec),
+            network_reboot_threshold = VALUES(network_reboot_threshold),
+            network_failure_reason = VALUES(network_failure_reason),
+            network_event_logs_raw = VALUES(network_event_logs_raw),
+            last_overview_received_at = NOW()
+    </insert>
+
+    <insert id="insertNetworkEvent" parameterType="NetworkEventLogDTO">
+        INSERT IGNORE INTO tb_terminal_network_event (
+            terminal_id,
+            event_hash,
+            occurred_at_iso,
+            failure_reason,
+            retry_count,
+            failure_started_at,
+            failure_started_at_iso,
+            recovered_at,
+            recovered_at_iso,
+            duration_sec,
+            router_wan_ip,
+            public_ip,
+            outbound_ok,
+            raw_json
+        ) VALUES (
+            #{terminalId},
+            #{eventHash},
+            #{occurredAtIso},
+            #{failureReason},
+            #{retryCount},
+            #{failureStartedAt},
+            #{failureStartedAtIso},
+            #{recoveredAt},
+            #{recoveredAtIso},
+            #{durationSec},
+            #{routerWanIp},
+            #{publicIp},
+            #{outboundOk},
+            #{rawJson}
+        )
+    </insert>
+
+    <select id="getNetworkStatusesByTerminalIds" resultType="TerminalNetworkStatusDTO">
+        SELECT      terminal_id,
+                    network_retry_count,
+                    network_outage_started_at,
+                    network_last_recovered_at,
+                    network_last_reboot_requested_at,
+                    network_pending_event_count,
+                    network_retry_interval_sec,
+                    network_reboot_threshold,
+                    network_failure_reason,
+                    network_event_logs_raw,
+                    last_overview_received_at,
+                    created_at,
+                    updated_at
+        FROM        tb_terminal_network_status
+        WHERE       terminal_id IN
+        <foreach collection="terminalIds" item="terminalId" open="(" separator="," close=")">
+            #{terminalId}
+        </foreach>
+    </select>
+
+    <select id="getNetworkEventsByTerminalIds" resultType="NetworkEventLogDTO">
+        SELECT      id,
+                    terminal_id,
+                    event_hash,
+                    occurred_at_iso,
+                    failure_reason,
+                    retry_count,
+                    failure_started_at,
+                    failure_started_at_iso,
+                    recovered_at,
+                    recovered_at_iso,
+                    duration_sec,
+                    router_wan_ip,
+                    public_ip,
+                    outbound_ok,
+                    raw_json,
+                    created_at
+        FROM        tb_terminal_network_event
+        WHERE       terminal_id IN
+        <foreach collection="terminalIds" item="terminalId" open="(" separator="," close=")">
+            #{terminalId}
+        </foreach>
+        ORDER BY    terminal_id ASC,
+                    created_at DESC,
+                    id DESC
+    </select>
+
+    <select id="getNetworkEventsByTerminalId" resultType="NetworkEventLogDTO">
+        SELECT      id,
+                    terminal_id,
+                    event_hash,
+                    occurred_at_iso,
+                    failure_reason,
+                    retry_count,
+                    failure_started_at,
+                    failure_started_at_iso,
+                    recovered_at,
+                    recovered_at_iso,
+                    duration_sec,
+                    router_wan_ip,
+                    public_ip,
+                    outbound_ok,
+                    raw_json,
+                    created_at
+        FROM        tb_terminal_network_event
+        WHERE       terminal_id = #{terminalId}
+        ORDER BY    created_at DESC,
+                    id DESC
+        LIMIT       20
+    </select>
+</mapper>

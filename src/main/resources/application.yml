@@ -91,16 +91,21 @@ spring:
         queue-capacity: 1000
   devtools:
     restart:
-      enabled: false
+      enabled: true
+      additional-paths: src/main/resources/static,src/main/resources/templates
+      exclude: static/**,public/**,templates/**,META-INF/resources/**,resources/**
     livereload:
-      enabled: false
+      enabled: true
   config:
     activate:
       on-profile: dev
   web:
     resources:
+      static-locations: file:src/main/resources/static/,classpath:/static/,classpath:/public/,classpath:/resources/,classpath:/META-INF/resources/
       cache:
         period: 0
+      chain:
+        cache: false
   logging:
     level:
       root: ERROR
@@ -132,10 +137,6 @@ spring:
   messages:
     basename: messages/common
     encoding: UTF-8
-  spring:
-    resources:
-      static-locations: classpath:/static/,classpath:/public/,classpath:/resources/,classpath:/META-INF/resources/
-
 upload:
   path: D:\\download\\uploads\\
 
