@@ -9,6 +9,7 @@ RELEASE_VERSION="${RELEASE_CHANNEL:-prod}-$(date +%Y%m%d)-${RELEASE_SHORT_SHA}"
 RELEASE_ROOT="${PACKAGE_DIR}/${RELEASE_VERSION}"
 ARCHIVE_PATH="${PACKAGE_DIR}/${PACKAGE_NAME}-${RELEASE_VERSION}.tar.gz"
 MANIFEST_PATH="${PACKAGE_DIR}/manifest.json"
+REPO_ROOT="${CI_PROJECT_DIR:-$PWD}"
 
 mkdir -p "$RELEASE_ROOT"
 
@@ -26,6 +27,7 @@ manifest = {
     "version": "${RELEASE_VERSION}",
     "git_sha": "${RELEASE_SHA}",
     "generated_at": "$(date -Iseconds)",
+    "repo_root": "${REPO_ROOT}",
     "services": ["main_ctl.service", "wayvnc.service", "gunpo-network-watchdog.service"],
     "files": [
         "docker/main_ctl.py",
@@ -33,6 +35,7 @@ manifest = {
         "docker/network_probe.py",
         "docker/websocket_endpoint.py",
         "install/git_pull.sh",
+        ".gitlab-ci.yml",
     ],
 }
 

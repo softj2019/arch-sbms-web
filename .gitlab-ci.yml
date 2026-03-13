@@ -40,6 +40,7 @@ package:prod:
     - validate:python
   rules:
     - if: $CI_COMMIT_BRANCH == "prod"
+    - if: $CI_MERGE_REQUEST_IID
   script:
     - bash ops/package_release.sh
   artifacts:
@@ -47,18 +48,16 @@ package:prod:
     paths:
       - dist/
 
-deploy:single:
+deploy:26037:
   stage: deploy
   needs:
     - package:prod
   rules:
-    - if: $CI_COMMIT_BRANCH == "prod"
-      when: manual
+    - if: $CI_COMMIT_BRANCH == "prod" && $CI_PIPELINE_SOURCE == "push"
   environment:
-    name: production/single
+    name: production/26037
   script:
-    - test -n "$TARGET_TERMINAL_ID"
-    - bash ops/deploy.sh single "$TARGET_TERMINAL_ID"
+    - bash ops/deploy.sh single 26037
 
 deploy:group-a:
   stage: deploy
@@ -98,6 +97,8 @@ deploy:all:
 
 verify:single:
   stage: verify
+  needs:
+    - deploy:26037
   rules:
     - if: $CI_COMMIT_BRANCH == "prod"
       when: manual
@@ -106,6 +107,18 @@ verify:single:
   script:
     - test -n "$TARGET_TERMINAL_ID"
     - bash ops/verify_device.sh single "$TARGET_TERMINAL_ID"
+
+verify:26037:
+  stage: verify
+  needs:
+    - deploy:26037
+  rules:
+    - if: $CI_COMMIT_BRANCH == "prod"
+      when: manual
+  environment:
+    name: production/26037
+  script:
+    - bash ops/verify_device.sh single 26037
 
 verify:group-a:
   stage: verify
@@ -137,6 +150,16 @@ rollback:single:
   script:
     - test -n "$TARGET_TERMINAL_ID"
     - bash ops/rollback.sh single "$TARGET_TERMINAL_ID"
+
+rollback:26037:
+  stage: rollback
+  rules:
+    - if: $CI_COMMIT_BRANCH == "prod"
+      when: manual
+  environment:
+    name: production/26037
+  script:
+    - bash ops/rollback.sh single 26037
 
 rollback:group-a:
   stage: rollback
