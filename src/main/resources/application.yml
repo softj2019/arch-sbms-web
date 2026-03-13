@@ -59,6 +59,7 @@ spring:
       algorithm: rms
   thymeleaf:
     cache: false
+    encoding: UTF-8
     prefix: file:src/main/resources/templates/
   messages:
     basename: messages/common
@@ -74,12 +75,16 @@ server:
   compression:
     enabled: true
   servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
     session:
       timeout: 86400
 ---
 # 데이터베이스 설정
 server:
-  port: 8099
+  port: 8080
 spring:
   websocket:
     max-text-message-size: 50MB
@@ -91,16 +96,21 @@ spring:
         queue-capacity: 1000
   devtools:
     restart:
-      enabled: false
+      enabled: true
+      additional-paths: src/main/resources/static,src/main/resources/templates
+      exclude: static/**,public/**,templates/**,META-INF/resources/**,resources/**
     livereload:
-      enabled: false
+      enabled: true
   config:
     activate:
       on-profile: dev
   web:
     resources:
+      static-locations: file:src/main/resources/static/,classpath:/static/,classpath:/public/,classpath:/resources/,classpath:/META-INF/resources/
       cache:
         period: 0
+      chain:
+        cache: false
   logging:
     level:
       root: ERROR
@@ -132,10 +142,6 @@ spring:
   messages:
     basename: messages/common
     encoding: UTF-8
-  spring:
-    resources:
-      static-locations: classpath:/static/,classpath:/public/,classpath:/resources/,classpath:/META-INF/resources/
-
 upload:
   path: D:\\download\\uploads\\
 

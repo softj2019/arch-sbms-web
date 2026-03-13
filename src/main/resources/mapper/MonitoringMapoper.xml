@@ -21,7 +21,17 @@
             rfc_storage_used,
             smartscreen_power,
             terminal_id,
-            vc_power
+            vc_power,
+            network_retry_count,
+            network_outage_started_at,
+            network_last_recovered_at,
+            network_last_reboot_requested_at,
+            network_pending_event_count,
+            network_retry_interval_sec,
+            network_reboot_threshold,
+            network_failure_reason,
+            network_event_logs_raw,
+            network_outage_logs_raw
         ) VALUES (
              #{cpu_temperature},
              #{ctl_board_power},
@@ -40,7 +50,17 @@
              #{rfc_storage_used},
              #{smartscreen_power},
              #{terminal_id},
-             #{vc_power}
+             #{vc_power},
+             #{network_retry_count},
+             #{network_outage_started_at},
+             #{network_last_recovered_at},
+             #{network_last_reboot_requested_at},
+             #{network_pending_event_count},
+             #{network_retry_interval_sec},
+             #{network_reboot_threshold},
+             #{network_failure_reason},
+             #{network_event_logs_raw},
+             #{network_outage_logs_raw}
          );
     </insert>
 

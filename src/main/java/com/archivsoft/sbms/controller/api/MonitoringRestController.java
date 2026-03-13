@@ -3,6 +3,8 @@ package com.archivsoft.sbms.controller.api;
 import com.archivsoft.sbms.dto.CommandDTO;
 import com.archivsoft.sbms.dto.FacilityDTO;
 import com.archivsoft.sbms.dto.HidLogDTO;
+import com.archivsoft.sbms.dto.NetworkEventLogDTO;
+import com.archivsoft.sbms.dto.NetworkOutageLogDTO;
 import com.archivsoft.sbms.service.FacilityService;
 import com.archivsoft.sbms.service.HidLogService;
 import lombok.RequiredArgsConstructor;
@@ -107,5 +109,15 @@ public class MonitoringRestController {
         Page<HidLogDTO> hidLogDTOList = hidLogService.getAllLogs(hidLogDTO, (PageRequest) pageable);
 
         return ResponseEntity.ok(hidLogDTOList);
+    }
+
+    @GetMapping("/network/{terminalId}/events")
+    public ResponseEntity<List<NetworkEventLogDTO>> getRecentNetworkEvents(@PathVariable String terminalId) {
+        return ResponseEntity.ok(facilityService.getRecentNetworkEvents(terminalId));
+    }
+
+    @GetMapping("/network/{terminalId}/outage-logs")
+    public ResponseEntity<List<NetworkOutageLogDTO>> getRecentNetworkOutageLogs(@PathVariable String terminalId) {
+        return ResponseEntity.ok(facilityService.getRecentNetworkOutageLogs(terminalId));
     }
 }

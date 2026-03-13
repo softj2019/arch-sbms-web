@@ -146,7 +146,7 @@
     </select>
 
     <!-- 정류장 정보 단순 조회(대시보드, 모니터링, 통합제어, 커맨드 등 사용) -->
-    <select id="getTerminalList" parameterType="FacilityDTO" resultType="map">
+    <select id="getTerminalList" parameterType="FacilityDTO" resultType="FacilityDTO">
         SELECT      t.terminal_id
                   , t.terminal_name
         FROM        tb_terminal t

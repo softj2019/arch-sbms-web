@@ -2,6 +2,8 @@ package com.archivsoft.sbms.config;
 
 import com.archivsoft.sbms.entity.SystemUserEntity;
 import com.archivsoft.sbms.service.ControlAllowedIpService;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -20,9 +22,11 @@ import java.util.List;
 @Component
 public class IpMacSecurityFilter extends OncePerRequestFilter {
     private final ControlAllowedIpService allowedIpService;
+    private final Environment environment;
 
-    public IpMacSecurityFilter(ControlAllowedIpService allowedIpService) {
+    public IpMacSecurityFilter(ControlAllowedIpService allowedIpService, Environment environment) {
         this.allowedIpService = allowedIpService;
+        this.environment = environment;
     }
 
     @Override
@@ -48,6 +52,13 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
         List<String> allowedIp = allowedIpService.getIpListByUseFlag(1);
 
         String clientIp = getClientIp(request);
+
+        if (isDevLocalRequest(clientIp, request.getServerName())) {
+            logger.info("LoginIP [DEV LOCAL BYPASS] 접속IP : " + clientIp + ", serverName : " + request.getServerName());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
 //        if (!allowedIp.contains(clientIp)) {
 //            authRestController.logoutUser(request, response);
 //            response.sendRedirect("/login");
@@ -66,6 +77,17 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isDevLocalRequest(String clientIp, String serverName) {
+        if (!environment.acceptsProfiles(Profiles.of("dev"))) {
+            return false;
+        }
+
+        return "127.0.0.1".equals(clientIp)
+                || "::1".equals(clientIp)
+                || "0:0:0:0:0:0:0:1".equals(clientIp)
+                || "localhost".equalsIgnoreCase(serverName);
     }
 
     private int getRoleIdFromAuthentication() {

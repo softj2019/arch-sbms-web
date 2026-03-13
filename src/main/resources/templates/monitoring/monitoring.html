@@ -2,6 +2,23 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
 <th:block layout:fragment="content">
+  <style>
+    #network_detail_popup .pop_title .btn_x {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      outline: none;
+    }
+
+    #network_detail_popup .pop_title .btn_x .icon_x,
+    #network_detail_popup .pop_title .btn_x .icon_x::before,
+    #network_detail_popup .pop_title .btn_x .icon_x::after {
+      color: #fff !important;
+      background-color: #fff !important;
+    }
+  </style>
+
   <div class="content_title">
     <h3 class="page_title">시스템 모니터링</h3>
     <ol class="page_breadcrumb">
@@ -12,19 +29,18 @@
   </div>
 
   <div class="content_area">
-
     <div class="search_wrap">
       <ul>
         <li>
-          <p>정류장 ID</p>
+          <p>터미널 ID</p>
           <div class="rowbox">
-            <input type="text" id="s_terminalId" placeholder="정류장 ID 를 입력해주세요">
+            <input type="text" id="s_terminalId" placeholder="터미널 ID를 입력해주세요">
           </div>
         </li>
         <li>
-          <p>정류장 명</p>
+          <p>터미널명</p>
           <div class="rowbox">
-            <input type="text" id="s_terminalNm" placeholder="정류장 명 을 입력해주세요">
+            <input type="text" id="s_terminalNm" placeholder="터미널명을 입력해주세요">
           </div>
         </li>
       </ul>
@@ -40,9 +56,7 @@
     <div class="area_title">
       <h4 class="left_grp">
         <span class="sub_title">조회결과</span>
-        <span class="sub_script">총 건수:
-          <span class="num"></span>건
-        </span>
+        <span class="sub_script">총 건수: <span class="num"></span>건</span>
       </h4>
     </div>
 
@@ -53,8 +67,112 @@
   </div>
 
   <div id="datepicker_wrapper" style="margin-top: -1px;"></div>
+  <div id="network_detail_popup" class="popup_frame">
+    <div class="popup_wrap">
+      <div class="pop_title">
+        <h5 id="network_popup_title">네트워크 상세 정보</h5>
+        <button type="button" class="btn_x btn_close">
+          <span class="hide">닫기</span>
+          <i class="icon_x"></i>
+        </button>
+      </div>
+
+      <div class="pop_content">
+        <div class="area_title">
+          <h4 class="left_grp">
+            <span class="sub_title">현재 네트워크 상태</span>
+          </h4>
+        </div>
+        <div class="table_wrap">
+          <table class="align_center">
+            <caption class="hide">현재 네트워크 상태</caption>
+            <colgroup>
+              <col style="width: 30%;">
+              <col style="width: 70%;">
+            </colgroup>
+            <tbody>
+            <tr><th>터미널 ID</th><td id="network_popup_terminal_id">-</td></tr>
+            <tr><th>터미널명</th><td id="network_popup_terminal_name">-</td></tr>
+            <tr><th>현재 재시도 횟수</th><td id="network_popup_retry_count">-</td></tr>
+            <tr><th>장애 시작 시각</th><td id="network_popup_outage_started_at">-</td></tr>
+            <tr><th>마지막 복구 시각</th><td id="network_popup_last_recovered_at">-</td></tr>
+            <tr><th>마지막 재부팅 요청 시각</th><td id="network_popup_last_reboot_requested_at">-</td></tr>
+            <tr><th>최근 장애 사유</th><td id="network_popup_failure_reason">-</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="area_title mt_40">
+          <h4 class="left_grp">
+            <span class="sub_title">최근 네트워크 장애 이력</span>
+          </h4>
+        </div>
+        <div class="table_wrap">
+          <table class="align_center">
+            <caption class="hide">최근 네트워크 장애 이력</caption>
+            <colgroup>
+              <col style="width: 15%;">
+              <col style="width: 18%;">
+              <col style="width: 18%;">
+              <col style="width: 15%;">
+              <col style="width: 10%;">
+              <col style="width: 12%;">
+              <col style="width: 12%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th>발생 시각</th>
+              <th>장애 시작</th>
+              <th>복구 시각</th>
+              <th>장애 사유</th>
+              <th>재시도</th>
+              <th>지속 시간(초)</th>
+              <th>외부 통신</th>
+            </tr>
+            </thead>
+            <tbody id="network_popup_event_rows">
+            <tr>
+              <td colspan="7">네트워크 장애 이력이 없습니다.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="area_title mt_40">
+          <h4 class="left_grp">
+            <span class="sub_title">최근 네트워크 장애 로그</span>
+          </h4>
+        </div>
+        <div class="table_wrap">
+          <table class="align_center">
+            <caption class="hide">최근 네트워크 장애 로그</caption>
+            <colgroup>
+              <col style="width: 18%;">
+              <col style="width: 12%;">
+              <col style="width: 20%;">
+              <col style="width: 50%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th>시간</th>
+              <th>등급</th>
+              <th>로거</th>
+              <th>메시지</th>
+            </tr>
+            </thead>
+            <tbody id="network_popup_outage_rows">
+            <tr>
+              <td colspan="4">네트워크 장애 로그가 없습니다.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="/webjars/sockjs-client/sockjs.min.js"></script>
   <script src="/webjars/stomp-websocket/stomp.min.js"></script>
-  <script type="text/javascript" th:src="@{/js/monitoring.js}"></script>
+  <script type="text/javascript" th:src="@{/js/monitoring.js(v=${#dates.format(#dates.createNow(), 'yyyyMMddHHmmss')})}"></script>
 </th:block>
 </html>

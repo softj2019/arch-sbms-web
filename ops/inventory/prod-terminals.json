@@ -1,0 +1,23 @@
+[
+  {
+    "terminalId": "26023",
+    "host": "10.248.121.141",
+    "group": "prod-a",
+    "appDir": "/home/admin/gunpo",
+    "releaseRoot": "/home/admin/releases"
+  },
+  {
+    "terminalId": "26030",
+    "host": "10.43.20.171",
+    "group": "prod-a",
+    "appDir": "/home/admin/gunpo",
+    "releaseRoot": "/home/admin/releases"
+  },
+  {
+    "terminalId": "26037",
+    "host": "10.135.235.129",
+    "group": "prod-b",
+    "appDir": "/home/admin/gunpo",
+    "releaseRoot": "/home/admin/releases"
+  }
+]
