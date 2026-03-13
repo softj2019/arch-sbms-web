@@ -47,7 +47,7 @@ spring:
       algorithm: rms
   thymeleaf:
     cache: false
-    prefix: file:src/main/resources/templates/
+    prefix: classpath:/templates/
   spring:
     resources:
       static-locations: classpath:/static/,classpath:/public/,classpath:/resources/,classpath:/META-INF/resources/

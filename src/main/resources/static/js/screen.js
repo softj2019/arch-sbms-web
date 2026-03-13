@@ -1,5 +1,12 @@
-﻿/* ?꾩뿭蹂??*/
-let terminalList = []; // ?뺣쪟???곗씠??諛곗뿴
+/* 전역변수 */
+let terminalList = []; // 정류장 데이터 배열
+
+function normalizeTerminal(terminal) {
+    return {
+        terminal_id: terminal?.terminal_id ?? terminal?.terminalId,
+        terminal_name: terminal?.terminal_name ?? terminal?.terminalName
+    };
+}
 
 /* ?섏씠吏 ?⑤줈??*/
 $(document).ready(function(){
@@ -55,7 +62,7 @@ function ctlScreen(terminalId,action){
 
 function validatePowerControl(terminalId, device, el) {
     if(device==="lte_router" ){
-        popupOpenDialog("error","LTE ?쇱슦???꾩썝 ? ?쒖뼱媛 遺덇??ν빀?덈떎.",4000)
+        popupOpenDialog("error","LTE 라우터 전원 제어가 불가능합니다.",4000)
         return;
         // const proceed  = confirm("LTE ?쇱슦???꾩썝 OFF ???대떦 ?뺣쪟?μ쓽 紐⑤뱺 ?쒖뼱 諛??곹깭 ?뺤씤??遺덇??ν빀?덈떎. 吏꾪뻾?섏떆寃좎뒿?덇퉴?")
         // if (!proceed) {
@@ -214,7 +221,7 @@ function createCard(){
         <h3>${list.terminal_name} (${list.terminal_id})</h3>
         <div class="flex-space-between control-screen">
           <p>
-            ?ㅻ쭏???ㅽ겕由?
+            스마트스크린
           </p>
           <div class="row-flex">
             <div class="icon-wrapper "><i class="ic-up"   onclick="ctlScreen('${list.terminal_id}','UP')"></i><div class="loading-spinner"></div></div>
@@ -225,27 +232,27 @@ function createCard(){
 
         <div class="row-flex-power">
           <div class="flex-space-between-power">
-            <p>LTE ?쇱슦??/p><div class="icon-wrapper "><i class="ic-power-on lte_router" onclick="ctlPower('${list.terminal_id}','lte_router',$(this))"></i><div class="loading-spinner"></div></div>
+            <p>LTE 라우터</p><div class="icon-wrapper "><i class="ic-power-on lte_router" onclick="ctlPower('${list.terminal_id}','lte_router',$(this))"></i><div class="loading-spinner"></div></div>
           </div>
           <div class="flex-space-between-power">
-           <p>怨듦린吏덊몴異쒖옣移?/p><div class="icon-wrapper "><i class="ic-power-on lcd_display" onclick="ctlPower('${list.terminal_id}','lcd_display',$(this))"></i></div>
+           <p>공기질표출장치</p><div class="icon-wrapper "><i class="ic-power-on lcd_display" onclick="ctlPower('${list.terminal_id}','lcd_display',$(this))"></i></div>
           </div>
         </div>
         <div class="row-flex-power">
           <div class="flex-space-between-power">
-           <p>?뱁븯李⑥븣由?/p><div class="icon-wrapper "><i class="ic-power-on led_panel" onclick="ctlPower('${list.terminal_id}','led_panel',$(this))"></i></div>
+           <p>승하차알림</p><div class="icon-wrapper "><i class="ic-power-on led_panel" onclick="ctlPower('${list.terminal_id}','led_panel',$(this))"></i></div>
           </div>
           <div class="flex-space-between-power">
-            <p>?ъ떎媛먯?移대찓??/p><div class="icon-wrapper "><i class="ic-power-on cv" onclick="ctlPower('${list.terminal_id}','cv',$(this))"></i></div>
+            <p>재실감지카메라</p><div class="icon-wrapper "><i class="ic-power-on cv" onclick="ctlPower('${list.terminal_id}','cv',$(this))"></i></div>
           </div>
         </div>
 
         <div class="row-flex-power">
           <div class="flex-space-between-power">
-             <p>怨듦났 WI-FI</p><div class="icon-wrapper "><i class="ic-power-on lte_router" onclick="ctlPower('${list.terminal_id}','lte_router',$(this))"></i></div>
+            <p>공공 WI-FI</p><div class="icon-wrapper "><i class="ic-power-on lte_router" onclick="ctlPower('${list.terminal_id}','lte_router',$(this))"></i></div>
           </div>
           <div class="flex-space-between-power">
-            <p>LED ?꾨벑</p><div class="icon-wrapper "><i class="ic-power-on led_light" onclick="ctlPower('${list.terminal_id}','led_light',$(this))"></i></div>
+            <p>LED 전등</p><div class="icon-wrapper "><i class="ic-power-on led_light" onclick="ctlPower('${list.terminal_id}','led_light',$(this))"></i></div>
           </div>
 
         </div>
@@ -254,7 +261,7 @@ function createCard(){
               <p>FAN</p><div class="icon-wrapper "><i class="ic-power-on fan" onclick="ctlPower('${list.terminal_id}','fan',$(this))"></i></div>
             </div>
             <div class="flex-space-between-power">
-              <p>移대찓?쇱옱??/p><div class="icon-wrapper "><i class="ic-media cv" onclick="open_stream('${list.terminal_id}','cv',$(this))"></i></div>
+              <p>카메라 재생</p><div class="icon-wrapper "><i class="ic-media cv" onclick="open_stream('${list.terminal_id}','cv',$(this))"></i></div>
             </div>
         </div>
       `;
@@ -279,15 +286,14 @@ function getTerminalList(){
         method  : 'GET',
 
         success : function (response){
-            terminalList  = response.map(terminal => ({
-                terminal_id  : terminal.terminal_id,
-                terminal_name: terminal.terminal_name
-            }));
+            terminalList = response
+                .map(normalizeTerminal)
+                .filter(terminal => terminal.terminal_id && terminal.terminal_name);
 
             hideLoadingSpinner();
         },
         error   : function (error){
-            popupOpenDialog('error', '?뺣쪟??議고쉶以??먮윭 諛쒖깮: ' + error, 2000);
+            popupOpenDialog('error', '정류장 조회중 에러 발생: ' + error, 2000);
             hideLoadingSpinner();
         },
         complete:function(){
@@ -321,7 +327,7 @@ function open_stream(terminalId){
         connectWebSocket(terminalId);
         addLog(terminalId, "cv", "ON");
     }else{
-        popupOpenDialog("error", "?듯빀?쒖뼱蹂대뱶 ?곌껐?곹깭瑜??뺤씤?섏꽭??",4000);
+        popupOpenDialog("error", "통합제어보드 연결상태를 확인하세요.",4000);
         hideLoadingSpinner();
         addLog(terminalId, "cv", "FAIL");
     }
@@ -337,7 +343,7 @@ function connectWebSocket(terminalId) {
 
     cvConnectTimer = setTimeout(() => {
         hideLoadingSpinner();
-        popupOpenDialog("error", "移대찓???곌껐?쒓컙??珥덇낵?섏뿀?듬땲??", 4000);
+        popupOpenDialog("error", "카메라 연결 시간이 초과되었습니다.", 4000);
         closePopup();
     }, 1000 * 15); // 15珥?
 
@@ -351,7 +357,7 @@ function connectWebSocket(terminalId) {
             if (data.status === "fail") {  // RTSP ?ㅽ뙣 ?묐떟 泥섎━
                 clearTimeout(cvConnectTimer);
                 hideLoadingSpinner();
-                popupOpenDialog("error", "移대찓???곌껐?곹깭瑜??뺤씤?섏꽭??",4000);
+                popupOpenDialog("error", "카메라 연결상태를 확인하세요.",4000);
                 closePopup();
                 return;
             }
@@ -428,4 +434,3 @@ document.addEventListener("DOMContentLoaded", function () {
         header.style.cursor = "grab";
     });
 });
-

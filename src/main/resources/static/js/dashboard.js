@@ -469,6 +469,39 @@ function createDashboardCard(data) {
 }
 
 let occupancyChartInstance = null;
+let hidChart;
+let peopleCounts = [];
+
+function normalizeTerminal(terminal) {
+    return {
+        terminal_id: terminal?.terminal_id ?? terminal?.terminalId,
+        terminal_name: terminal?.terminal_name ?? terminal?.terminalName
+    };
+}
+
+function getStationEntries() {
+    return terminalList.map(terminal => ({
+        terminal_id: terminal.terminal_id,
+        name: terminal.terminal_name
+    }));
+}
+
+function refreshHidChartLabels() {
+    if (!hidChart) {
+        return;
+    }
+
+    const stationEntries = getStationEntries();
+    const nextCounts = stationEntries.map(entry => {
+        const idx = hidChart.data.labels.findIndex(label => label.startsWith(`${entry.terminal_id} (`));
+        return idx !== -1 ? peopleCounts[idx] ?? 0 : 0;
+    });
+
+    hidChart.data.labels = stationEntries.map(entry => `${entry.terminal_id} (${entry.name})`);
+    peopleCounts = nextCounts;
+    hidChart.data.datasets[0].data = peopleCounts;
+    hidChart.update();
+}
 
 function updateOccupancyStats() {
     const year = document.getElementById('yearSelect').value;
@@ -640,10 +673,9 @@ function getTerminalList(){
         method  : 'GET',
 
         success : function (response){
-            terminalList  = response.map(terminal => ({
-                terminal_id  : terminal.terminal_id,
-                terminal_name: terminal.terminal_name
-            }));
+            terminalList = response
+                .map(normalizeTerminal)
+                .filter(terminal => terminal.terminal_id && terminal.terminal_name);
 
             terminalTotalCnt = terminalList.length;
 
@@ -652,6 +684,7 @@ function getTerminalList(){
                 terminal => `${terminal.terminal_name} (${terminal.terminal_id})`
             );
 
+            refreshHidChartLabels();
             renderCharts();
             hideLoadingSpinner();
         },
@@ -689,14 +722,11 @@ function getStationName(terminalId) {
     return station.terminal_name;
 }
 
-let hidChart;
-let peopleCounts;
 $(document).ready(function () {
     const ctx = $('#hidChartEl')[0].getContext('2d');
-    // Chart.js 인스턴스 생성
-    // 정류장명과 기본 값 0으로 초기화
-    let stationNames =  stationData.map(entry => `${entry.terminal_id} (${entry.name})`);
-    peopleCounts = new Array(stationData.length).fill(0);
+    const stationEntries = getStationEntries();
+    const stationNames = stationEntries.map(entry => `${entry.terminal_id} (${entry.name})`);
+    peopleCounts = new Array(stationEntries.length).fill(0);
 
     // Chart.js 인스턴스 생성
     hidChart = new Chart(ctx, {
@@ -761,7 +791,7 @@ $(document).ready(function () {
             const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
             // 수신된 데이터를 기반으로 peopleCounts 업데이트
             dataArray.forEach(entry => {
-                let idx = stationData.findIndex(station => station.terminal_id === entry.terminal_id);
+                let idx = terminalList.findIndex(station => String(station.terminal_id) === String(entry.terminal_id));
                 if (idx !== -1) {
                     peopleCounts[idx] = entry.people_count; // 해당 정류장의 인원 업데이트
                 }
@@ -777,4 +807,3 @@ $(document).ready(function () {
         hidChart.update();
     }
 });
-

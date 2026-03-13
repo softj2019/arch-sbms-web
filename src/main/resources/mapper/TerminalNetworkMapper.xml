@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.archivsoft.sbms.mapper.TerminalNetworkMapper">
 
-    <insert id="upsertNetworkStatus" parameterType="TerminalNetworkStatusDTO">
+    <insert id="upsertNetworkStatus" parameterType="com.archivsoft.sbms.dto.TerminalNetworkStatusDTO">
         INSERT INTO tb_terminal_network_status (
             terminal_id,
             network_retry_count,
@@ -45,7 +45,7 @@
             last_overview_received_at = NOW()
     </insert>
 
-    <insert id="insertNetworkEvent" parameterType="NetworkEventLogDTO">
+    <insert id="insertNetworkEvent" parameterType="com.archivsoft.sbms.dto.NetworkEventLogDTO">
         INSERT IGNORE INTO tb_terminal_network_event (
             terminal_id,
             event_hash,
@@ -79,7 +79,7 @@
         )
     </insert>
 
-    <insert id="insertNetworkOutageLog" parameterType="NetworkOutageLogDTO">
+    <insert id="insertNetworkOutageLog" parameterType="com.archivsoft.sbms.dto.NetworkOutageLogDTO">
         INSERT IGNORE INTO tb_terminal_network_outage_log (
             terminal_id,
             log_hash,
@@ -116,7 +116,7 @@
         )
     </delete>
 
-    <select id="getNetworkStatusesByTerminalIds" resultType="TerminalNetworkStatusDTO">
+    <select id="getNetworkStatusesByTerminalIds" resultType="com.archivsoft.sbms.dto.TerminalNetworkStatusDTO">
         SELECT      terminal_id,
                     network_retry_count,
                     network_outage_started_at,
@@ -138,7 +138,7 @@
         </foreach>
     </select>
 
-    <select id="getNetworkEventsByTerminalIds" resultType="NetworkEventLogDTO">
+    <select id="getNetworkEventsByTerminalIds" resultType="com.archivsoft.sbms.dto.NetworkEventLogDTO">
         SELECT      id,
                     terminal_id,
                     event_hash,
@@ -165,7 +165,7 @@
                     id DESC
     </select>
 
-    <select id="getNetworkEventsByTerminalId" resultType="NetworkEventLogDTO">
+    <select id="getNetworkEventsByTerminalId" resultType="com.archivsoft.sbms.dto.NetworkEventLogDTO">
         SELECT      id,
                     terminal_id,
                     event_hash,
@@ -189,7 +189,7 @@
         LIMIT       20
     </select>
 
-    <select id="getNetworkOutageLogsByTerminalId" resultType="NetworkOutageLogDTO">
+    <select id="getNetworkOutageLogsByTerminalId" resultType="com.archivsoft.sbms.dto.NetworkOutageLogDTO">
         SELECT      id,
                     terminal_id,
                     log_hash,
