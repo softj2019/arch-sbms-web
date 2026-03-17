@@ -13,6 +13,8 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 @Configuration
 @EnableWebSocketMessageBroker
@@ -30,6 +32,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/websocket").setAllowedOriginPatterns("*");
         registry.addEndpoint("/sockjs-websocket").setAllowedOriginPatterns("*").withSockJS();
+    }
+
+    @Bean
+    public ServletServerContainerFactoryBean createWebSocketContainer() {
+        ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+        container.setMaxTextMessageBufferSize(128 * 1024);
+        container.setMaxBinaryMessageBufferSize(128 * 1024);
+        container.setMaxSessionIdleTimeout(3600000L);
+        return container;
     }
 
     @Override
