@@ -9,7 +9,7 @@
     "srcDir": "/home1/ncloud/arch-sbms",
     "releaseRoot": "/home1/ncloud/sbms-releases",
     "servicePort": 8080,
-    "serviceName": "sbms"
+    "serviceName": "sbms-app"
   },
   {
     "id": "app02",
