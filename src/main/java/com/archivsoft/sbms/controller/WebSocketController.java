@@ -221,6 +221,25 @@ public class WebSocketController {
         return response;
     }
 
+    @MessageMapping("/iot/boot-report")
+    @SendTo("/topic/boot-report")
+    public Map<String, String> receiveBootReport(Map<String, String> payload) {
+        try {
+            String terminalId = payload.getOrDefault("terminalId", "");
+            String actionType = payload.getOrDefault("actionType", "BOOT_REPORT");
+            String command = payload.getOrDefault("command", "");
+            String commandResult = payload.getOrDefault("commandResult", "");
+            String executedBy = payload.getOrDefault("executedBy", terminalId);
+            String status = payload.getOrDefault("status", "SUCCESS");
+
+            deviceMaintenanceLogService.createLogWithResult(terminalId, actionType, command, commandResult, executedBy, status);
+            log.info("boot-report: terminal={} status={}", terminalId, status);
+        } catch (Exception e) {
+            log.warn("boot-report 저장 실패: {}", e.getMessage(), e);
+        }
+        return payload;
+    }
+
     @MessageMapping("/iot/command/result")
     @SendTo("/topic/command/result")
     public Map<String, String> receiveCommandResult(Map<String, String> payload) {
