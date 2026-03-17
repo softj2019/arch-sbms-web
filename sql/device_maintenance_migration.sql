@@ -28,30 +28,28 @@ CREATE TABLE IF NOT EXISTS tb_device_maintenance_log (
     INDEX idx_action_type (action_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 2. 메뉴 링크 등록 (중복 방지 - monitoring/device가 없을 때만)
-INSERT INTO tb_rmmenulink (menu_link_sno, menu_div_cd, link_nm, link_url)
-SELECT COALESCE(MAX(menu_link_sno), 0) + 1, '2', '디바이스 관리', 'monitoring/device'
-FROM tb_rmmenulink
-WHERE NOT EXISTS (SELECT 1 FROM tb_rmmenulink WHERE link_url = 'monitoring/device');
-
--- 3. 메뉴 등록 (시스템 모니터링(id=3) 하위, 중복 방지)
-INSERT INTO tb_rmmenu (record_center_id, menu_id, menu_nm, upper_menu_id, menu_div_cd, menu_sort_sno, use_flag, menu_link_sno, menu_grant_levl, work_dtime)
-SELECT '0000001',
-       CAST(COALESCE(MAX(CAST(m.menu_id AS UNSIGNED)), 0) + 1 AS CHAR),
-       '디바이스 관리',
-       '3',
-       '2',
-       3,
-       '1',
-       (SELECT menu_link_sno FROM tb_rmmenulink WHERE link_url = 'monitoring/device' LIMIT 1),
-       '1',
-       DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')
-FROM tb_rmmenu m
-WHERE NOT EXISTS (
-    SELECT 1 FROM tb_rmmenu rm
-    INNER JOIN tb_rmmenulink rl ON rm.menu_link_sno = rl.menu_link_sno
-    WHERE rl.link_url = 'monitoring/device'
-);
+-- 2. 메뉴 등록 (현재 비활성 - 추후 언급 시 실행)
+-- !! 디바이스 관리 메뉴는 현재 사이드바에 노출하지 않음
+-- !! /monitoring/device 직접 URL 접근으로만 사용
+-- !! 추후 메뉴 노출이 필요할 때 아래 주석 해제 후 실행
+--
+-- INSERT INTO tb_rmmenulink (menu_link_sno, menu_div_cd, link_nm, link_url)
+-- SELECT COALESCE(MAX(menu_link_sno), 0) + 1, '2', '디바이스 관리', 'monitoring/device'
+-- FROM tb_rmmenulink
+-- WHERE NOT EXISTS (SELECT 1 FROM tb_rmmenulink WHERE link_url = 'monitoring/device');
+--
+-- INSERT INTO tb_rmmenu (record_center_id, menu_id, menu_nm, upper_menu_id, menu_div_cd, menu_sort_sno, use_flag, menu_link_sno, menu_grant_levl, work_dtime)
+-- SELECT '0000001',
+--        CAST(COALESCE(MAX(CAST(m.menu_id AS UNSIGNED)), 0) + 1 AS CHAR),
+--        '디바이스 관리', '3', '2', 3, '1',
+--        (SELECT menu_link_sno FROM tb_rmmenulink WHERE link_url = 'monitoring/device' LIMIT 1),
+--        '1', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')
+-- FROM tb_rmmenu m
+-- WHERE NOT EXISTS (
+--     SELECT 1 FROM tb_rmmenu rm
+--     INNER JOIN tb_rmmenulink rl ON rm.menu_link_sno = rl.menu_link_sno
+--     WHERE rl.link_url = 'monitoring/device'
+-- );
 
 -- =====================================================
 -- Phase 5: tb_monitoring 확장 (Pi 고도화 시점에 실행)
