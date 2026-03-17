@@ -53,6 +53,8 @@ public class MenuService {
                     && !currentUri.equals("weather")
                     && !currentUri.equals("error")
                     && !currentUri.equals("denied")
+                    && !currentUri.startsWith("websocket")
+                    && !currentUri.startsWith("sockjs-websocket")
                     && !currentUri.startsWith("monitoring/hid")
                     && !currentUri.startsWith("monitoring/command")
                     && !currentUri.startsWith("monitoring/device")

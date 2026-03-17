@@ -93,7 +93,7 @@ jobs:
 
           # 1. Git pull
           print(f"\n[1/5] git pull ({branch})")
-          run(f"cd {src} && git fetch origin && git checkout {branch} && git pull origin {branch} 2>&1 | tail -5")
+          run(f"cd {src} && git fetch origin && git checkout {branch} 2>/dev/null; git checkout -b {branch} origin/{branch} 2>/dev/null; git reset --hard origin/{branch} 2>&1 | tail -3")
           run(f"cd {src} && git log --oneline -1")
 
           # 2. Build
@@ -176,7 +176,7 @@ jobs:
           svc = standby["serviceName"]
           svc_port = standby["servicePort"]
 
-          run(f"cd {src} && git fetch origin && git checkout {branch} && git pull origin {branch} 2>&1 | tail -5")
+          run(f"cd {src} && git fetch origin && git checkout {branch} 2>/dev/null; git checkout -b {branch} origin/{branch} 2>/dev/null; git reset --hard origin/{branch} 2>&1 | tail -3")
           run(f"cd {src} && git log --oneline -1")
           _, code = run(f"cd {src} && ./gradlew bootJar 2>&1 | tail -15")
           if code != 0: sys.exit(1)
@@ -245,7 +245,7 @@ jobs:
           svc = active["serviceName"]
           svc_port = active["servicePort"]
 
-          run(f"cd {src} && git fetch origin && git checkout {branch} && git pull origin {branch} 2>&1 | tail -5")
+          run(f"cd {src} && git fetch origin && git checkout {branch} 2>/dev/null; git checkout -b {branch} origin/{branch} 2>/dev/null; git reset --hard origin/{branch} 2>&1 | tail -3")
           run(f"cd {src} && git log --oneline -1")
           _, code = run(f"cd {src} && ./gradlew bootJar 2>&1 | tail -15")
           if code != 0: sys.exit(1)
