@@ -31,8 +31,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtBlacklistService jwtBlacklistService;
     @Autowired
     private CommonService commonService;
-//    @Autowired
-//    private IpMacSecurityFilter ipMacSecurityFilter;
+    @Autowired
+    private IpMacSecurityFilter ipMacSecurityFilter;
 
     private final ArchUserDetailService userDetailService;
     private final JwtTokenUtil jwtTokenUtil;
@@ -84,6 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/webjars/**").permitAll()
                 .antMatchers("/weather").permitAll()
                 .antMatchers("/login").permitAll()
+                .antMatchers("/denied").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/uploads/**").permitAll()
                 .antMatchers("/monitoring/hid/**").permitAll()
@@ -102,7 +103,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .headers().frameOptions().disable()
                 .and()
-//            .addFilterBefore(ipMacSecurityFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(ipMacSecurityFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil, userDetailService, jwtBlacklistService),
                         UsernamePasswordAuthenticationFilter.class);
     }

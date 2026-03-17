@@ -69,10 +69,7 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
 
         if (!allowedIp.contains(clientIp)) {
             logger.info("LoginIP [IP 차단] 접속IP : " + clientIp);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Access Denied\"}");
-            response.getWriter().flush();
+            response.sendRedirect("/denied?ip=" + clientIp);
             return;
         }
 
@@ -124,7 +121,8 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
                 uri.equals("/websocket") ||
                 uri.startsWith("/api/auth/login") ||
                 uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|woff2|ttf|map)$") ||
-                uri.startsWith("/login");
+                uri.startsWith("/login") ||
+                uri.startsWith("/denied");
     }
 
     // 사용자 IP 가져오기
