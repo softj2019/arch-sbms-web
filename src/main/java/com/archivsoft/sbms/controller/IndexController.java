@@ -23,4 +23,8 @@ public class IndexController {
     public String login(Model model) {
         return "common/login";
     }
+    @GetMapping("denied")
+    public String denied() {
+        return "common/denied";
+    }
 }
