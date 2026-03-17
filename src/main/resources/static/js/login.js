@@ -37,16 +37,21 @@ function login(){
         // },
         success: function (response) {
             if (response.status === "success") {
-                window.location.href = "/dashboard"; // 대시보드로 이동
+                window.location.href = "/dashboard";
+            } else if (response.status === "ip_denied") {
+                var ip = response.clientIp || '알 수 없음';
+                popupOpenDialog('error', '접근이 제한된 IP(' + ip + ')입니다. 관리자에게 해당 IP를 전달하여 등록을 요청하세요.', 5000);
             } else {
-                popupOpenDialog('error',response.message,2000)
-                if(response.message == null || response.message == "") {
-                    popupOpenDialog('error', '접근권한이없습니다.', 2000);
-                }
+                var msg = response.message || '접근권한이 없습니다.';
+                popupOpenDialog('error', msg, 2000);
             }
         },
-        error: function (xhr, error, status) {
-            popupOpenDialog('error',xhr.responseJSON.message,2000);
+        error: function (xhr) {
+            var msg = '로그인 중 오류가 발생했습니다.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                msg = xhr.responseJSON.message;
+            }
+            popupOpenDialog('error', msg, 2000);
         },
         complete: function () {
             hideLoadingSpinner()

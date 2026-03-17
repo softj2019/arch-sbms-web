@@ -4,6 +4,7 @@ import com.archivsoft.sbms.config.JwtBlacklistService;
 import com.archivsoft.sbms.dto.UserHistoryDTO;
 import com.archivsoft.sbms.entity.SystemUserEntity;
 import com.archivsoft.sbms.mapper.UserMapper;
+import com.archivsoft.sbms.service.ControlAllowedIpService;
 import com.archivsoft.sbms.util.JwtTokenUtil;
 import egovframework.com.cmm.EgovMessageSource;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 @RestController
 @Slf4j
 @RequestMapping("/api/auth")
@@ -38,6 +36,8 @@ public class AuthRestController {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private ControlAllowedIpService allowedIpService;
 
     //    private Map<String, String> userDatabase = new HashMap<>(); // 테스트용 메모리 데이터베이스
     // 사용자 로그인
@@ -79,6 +79,15 @@ public class AuthRestController {
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60);
             response.addCookie(cookie);
+
+            // IP 허용 여부 사전 체크 (로그인 성공 후 페이지 이동 시 차단 방지)
+            List<String> allowedIps = allowedIpService.getIpListByUseFlag(1);
+            if (!allowedIps.contains(clientIp) && user.getRole() != null && user.getRole().getRoleId() != 9) {
+                responseBody.put("status", "ip_denied");
+                responseBody.put("message", "접근이 제한된 IP입니다. 관리자에게 문의하세요.");
+                responseBody.put("clientIp", clientIp);
+                return ResponseEntity.ok(responseBody);
+            }
 
             responseBody.put("status", "success");
             return ResponseEntity.ok(responseBody);
