@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archivsoft.sbms.mapper.DeviceMaintenanceLogMapper">
+
+    <insert id="insertLog" parameterType="DeviceMaintenanceLogDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_device_maintenance_log (
+            terminal_id,
+            action_type,
+            command,
+            executed_by,
+            status,
+            created_at
+        ) VALUES (
+            #{terminalId},
+            #{actionType},
+            #{command},
+            #{executedBy},
+            'PENDING',
+            NOW()
+        )
+    </insert>
+
+    <update id="updateLogResult">
+        UPDATE tb_device_maintenance_log
+        SET command_result = #{commandResult},
+            status = #{status},
+            completed_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="getLogs" parameterType="map" resultType="DeviceMaintenanceLogDTO">
+        SELECT
+            l.id,
+            l.terminal_id       AS terminalId,
+            t.terminal_name     AS terminalName,
+            l.action_type       AS actionType,
+            l.command,
+            l.command_result    AS commandResult,
+            l.executed_by       AS executedBy,
+            l.status,
+            DATE_FORMAT(l.created_at, '%Y-%m-%d %H:%i:%s')   AS createdAt,
+            DATE_FORMAT(l.completed_at, '%Y-%m-%d %H:%i:%s') AS completedAt
+        FROM tb_device_maintenance_log l
+        LEFT JOIN tb_terminal t ON l.terminal_id = t.terminal_id
+        <where>
+            <if test="terminalId != null and terminalId != ''">
+                AND l.terminal_id = #{terminalId}
+            </if>
+            <if test="actionType != null and actionType != ''">
+                AND l.action_type = #{actionType}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND l.created_at &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND l.created_at &lt;= CONCAT(#{endDate}, ' 23:59:59')
+            </if>
+        </where>
+        ORDER BY l.created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="getLogCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_device_maintenance_log l
+        <where>
+            <if test="terminalId != null and terminalId != ''">
+                AND l.terminal_id = #{terminalId}
+            </if>
+            <if test="actionType != null and actionType != ''">
+                AND l.action_type = #{actionType}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND l.created_at &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND l.created_at &lt;= CONCAT(#{endDate}, ' 23:59:59')
+            </if>
+        </where>
+    </select>
+
+</mapper>

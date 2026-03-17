@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{common/layout}">
+<th:block layout:fragment="content">
+  <style>
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .badge-active { background-color: #2ecc71; }
+    .badge-inactive { background-color: #e74c3c; }
+    .badge-unknown { background-color: #95a5a6; }
+    .badge-pending { background-color: #f39c12; }
+    .badge-success { background-color: #2ecc71; }
+    .badge-failed { background-color: #e74c3c; }
+    .badge-timeout { background-color: #95a5a6; }
+
+    .control_panel {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 15px 0;
+      align-items: center;
+    }
+    .control_panel button {
+      min-width: 140px;
+    }
+    .control_panel .custom_cmd_wrap {
+      display: flex;
+      gap: 5px;
+      flex: 1;
+      min-width: 300px;
+    }
+    .control_panel .custom_cmd_wrap input {
+      flex: 1;
+    }
+
+    .filter_wrap {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .filter_wrap label {
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .filter_wrap select,
+    .filter_wrap input {
+      padding: 4px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    #command_result_area {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 13px;
+      padding: 12px;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin: 10px 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* 확인 모달 */
+    #confirmModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    #confirmModal.on { display: flex; }
+    #confirmModal .confirm_box {
+      background: #fff;
+      padding: 24px;
+      border-radius: 10px;
+      min-width: 380px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    #confirmModal h4 { margin: 0 0 15px; }
+    #confirmModal .confirm_info {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+    #confirmModal .confirm_btns {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+  </style>
+
+  <div class="content_title">
+    <h3 class="page_title">디바이스 관리</h3>
+    <ol class="page_breadcrumb">
+      <li>HOME</li>
+      <li><a href="#">시스템 모니터링</a></li>
+      <li><a href="#">디바이스 관리</a></li>
+    </ol>
+  </div>
+
+  <div class="content_area">
+    <!-- 검색 영역 -->
+    <div class="search_wrap">
+      <ul>
+        <li>
+          <p>터미널 ID</p>
+          <div class="rowbox">
+            <input type="text" id="s_terminalId" placeholder="터미널 ID를 입력해주세요">
+          </div>
+        </li>
+        <li>
+          <p>터미널명</p>
+          <div class="rowbox">
+            <input type="text" id="s_terminalNm" placeholder="터미널명을 입력해주세요">
+          </div>
+        </li>
+      </ul>
+      <div class="srch_btn">
+        <div class="type_grp type_single">
+          <button type="button" class="btn_def btn_point_clr" onclick="loadDeviceList()">조회</button>
+          <button type="button" class="btn_def btn_red_clr" onclick="clearSearch()">초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 디바이스 헬스 그리드 -->
+    <div class="area_title">
+      <h4 class="left_grp">
+        <span class="sub_title">디바이스 상태</span>
+        <span class="sub_script">총 건수: <span id="device_count" class="num">0</span>건</span>
+      </h4>
+    </div>
+    <div class="grid_board">
+      <div id="device_grid"></div>
+    </div>
+
+    <!-- 서비스 제어 패널 -->
+    <div class="area_title mt_40">
+      <h4 class="left_grp">
+        <span class="sub_title">서비스 제어</span>
+        <span class="sub_script" style="color:#e74c3c;" id="selected_info">디바이스를 선택하세요</span>
+      </h4>
+    </div>
+    <div class="control_panel">
+      <button type="button" class="btn_def btn_point_clr" onclick="sendPresetCommand('RESTART_CV2', 'sudo systemctl restart cv2_ffmpeg')">
+        cv2_ffmpeg 재시작
+      </button>
+      <button type="button" class="btn_def btn_point_clr" onclick="sendPresetCommand('RESTART_MAIN_CTL', 'sudo systemctl restart main_ctl')">
+        main_ctl 재시작
+      </button>
+      <button type="button" class="btn_def btn_point_clr" onclick="sendPresetCommand('GIT_DEPLOY', 'cd /home/admin/gunpo && git fetch origin prod && git reset --hard origin/prod && sudo systemctl restart main_ctl && sudo systemctl restart cv2_ffmpeg')">
+        Git 배포
+      </button>
+      <div class="custom_cmd_wrap">
+        <input type="text" id="custom_command" placeholder="커스텀 명령어 입력">
+        <button type="button" class="btn_def btn_point_clr" onclick="sendCustomCommand()">전송</button>
+      </div>
+    </div>
+
+    <!-- 명령 결과 영역 -->
+    <div id="command_result_area">명령 실행 결과가 여기에 표시됩니다.</div>
+
+    <!-- 유지보수 이력 -->
+    <div class="area_title mt_40">
+      <h4 class="left_grp">
+        <span class="sub_title">유지보수 이력</span>
+        <span class="sub_script">총 건수: <span id="log_count" class="num">0</span>건</span>
+      </h4>
+    </div>
+
+    <div class="filter_wrap">
+      <label>날짜</label>
+      <input type="date" id="log_startDate">
+      <span>~</span>
+      <input type="date" id="log_endDate">
+      <label>터미널</label>
+      <input type="text" id="log_terminalId" placeholder="터미널 ID" style="width:120px;">
+      <label>액션</label>
+      <select id="log_actionType">
+        <option value="">전체</option>
+        <option value="RESTART_CV2">RESTART_CV2</option>
+        <option value="RESTART_MAIN_CTL">RESTART_MAIN_CTL</option>
+        <option value="GIT_DEPLOY">GIT_DEPLOY</option>
+        <option value="CUSTOM_COMMAND">CUSTOM_COMMAND</option>
+      </select>
+      <button type="button" class="btn_def btn_point_clr" onclick="loadMaintenanceLogs(0)">조회</button>
+    </div>
+    <div class="grid_board">
+      <div id="log_grid"></div>
+      <div id="log_pagination" class="tui-pagination"></div>
+    </div>
+  </div>
+
+  <!-- 확인 팝업 -->
+  <div id="confirmModal">
+    <div class="confirm_box">
+      <h4>명령 실행 확인</h4>
+      <div class="confirm_info">
+        <p><strong>대상:</strong> <span id="confirm_target"></span></p>
+        <p><strong>액션:</strong> <span id="confirm_action"></span></p>
+        <p><strong>명령:</strong> <span id="confirm_command"></span></p>
+      </div>
+      <div class="confirm_btns">
+        <button type="button" class="btn_def" onclick="closeConfirmModal()">취소</button>
+        <button type="button" class="btn_def btn_point_clr" onclick="executeConfirmedCommand()">실행</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+  <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+  <script type="text/javascript" th:src="@{/js/device.js(v=${#dates.format(#dates.createNow(), 'yyyyMMddHHmmss')})}"></script>
+</th:block>
+</html>
