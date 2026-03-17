@@ -68,7 +68,7 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
         logger.info("LoginIP [IP 요청] 접속IP : " + clientIp);
 
         if (!allowedIp.contains(clientIp)) {
-            logger.info("LoginIP [IP 차단] 접속IP : " + clientIp);
+            logger.info("LoginIP [IP 차단] 접속IP : " + clientIp + ", URI : " + requestURI);
             response.sendRedirect("/denied?ip=" + clientIp);
             return;
         }
