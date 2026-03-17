@@ -1,0 +1,101 @@
+# =============================================================
+# 라즈베리파이(Python) 배포 파이프라인
+# 트리거: prod 브랜치 push
+# =============================================================
+
+name: Pi Deploy
+
+on:
+  push:
+    branches: [prod]
+    paths:
+      - 'docker/**'
+      - 'install/**'
+      - 'ops/**'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: '배포 대상'
+        required: true
+        type: choice
+        options:
+          - single-26037
+          - group-a
+          - group-b
+          - all
+      terminal_id:
+        description: 'Terminal ID (single 모드시)'
+        required: false
+        default: '26037'
+
+env:
+  PACKAGE_DIR: dist
+  PACKAGE_NAME: sbms-pi
+  RELEASE_CHANNEL: prod
+  INVENTORY_FILE: ops/inventory/prod-terminals.json
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate scripts
+        run: bash ops/validate.sh
+
+  package:
+    name: Package
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build release package
+        run: bash ops/package_release.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pi-release
+          path: dist/
+          retention-days: 7
+
+  deploy-canary:
+    name: Deploy Canary (26037)
+    needs: package
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: pi-canary
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: pi-release
+          path: dist/
+      - name: Deploy to 26037
+        run: bash ops/deploy.sh single 26037
+
+  deploy-manual:
+    name: Deploy (${{ github.event.inputs.target }})
+    if: github.event_name == 'workflow_dispatch'
+    needs: package
+    runs-on: ubuntu-latest
+    environment: pi-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: pi-release
+          path: dist/
+      - name: Deploy
+        run: |
+          TARGET="${{ github.event.inputs.target }}"
+          case "$TARGET" in
+            single-*)
+              bash ops/deploy.sh single "${{ github.event.inputs.terminal_id }}"
+              ;;
+            group-*)
+              GROUP=$(echo "$TARGET" | sed 's/group-/prod-/')
+              bash ops/deploy.sh group "$GROUP"
+              ;;
+            all)
+              bash ops/deploy.sh all
+              ;;
+          esac

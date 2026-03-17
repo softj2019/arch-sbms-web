@@ -1,0 +1,360 @@
+# =============================================================
+# 운영서버(Spring Boot) Active-Standby 무중단 배포
+#
+# 트리거:
+#   dev push    → Standby 자동 빌드+배포
+#   master push → 빌드만 (배포는 수동 승인)
+#   수동 dispatch → 전체 제어 (deploy/switch/rollback/status)
+# =============================================================
+
+name: Server Deploy
+
+on:
+  push:
+    branches: [dev, master]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'mcu-pi/**'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: '실행할 작업'
+        required: true
+        type: choice
+        options:
+          - deploy-standby
+          - deploy-active
+          - deploy-both
+          - switch
+          - rollback-standby
+          - rollback-active
+          - status
+      target_branch:
+        description: '배포 브랜치 (기본: dev)'
+        required: false
+        default: 'dev'
+
+env:
+  SERVER_SSH_PASS: ${{ secrets.SERVER_SSH_PASS }}
+  DEPLOY_BRANCH: ${{ github.event.inputs.target_branch || github.ref_name }}
+
+jobs:
+  # ─────────────────────────────────────────────
+  # 빌드 + Standby 배포
+  # ─────────────────────────────────────────────
+  build-and-deploy-standby:
+    name: Build & Deploy Standby
+    runs-on: ubuntu-latest
+    if: >
+      (github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && contains(fromJSON('["deploy-standby","deploy-both"]'), github.event.inputs.action))
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip3 install paramiko
+
+      - name: Deploy to Standby
+        run: |
+          python3 << 'PYEOF'
+          import paramiko, json, sys, os, time
+          from pathlib import Path
+
+          inv = json.loads(Path("ops/inventory/server-inventory.json").read_text())
+          branch = os.environ.get("DEPLOY_BRANCH", "dev")
+          password = os.environ.get("SERVER_SSH_PASS", "")
+
+          if not password:
+              print("::error::SERVER_SSH_PASS secret이 설정되지 않았습니다")
+              sys.exit(1)
+
+          standby = next(s for s in inv if s["role"] == "standby")
+          print(f"::group::Deploy to {standby['id']} ({standby['host']})")
+
+          client = paramiko.SSHClient()
+          client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+          client.connect(standby["host"], port=standby["port"],
+                         username=standby["user"], password=password, timeout=15)
+
+          def run(cmd, timeout=600):
+              stdin, stdout, stderr = client.exec_command(cmd, timeout=timeout)
+              out = stdout.read().decode('utf-8', errors='replace').strip()
+              err = stderr.read().decode('utf-8', errors='replace').strip()
+              code = stdout.channel.recv_exit_status()
+              if out:
+                  print(out)
+              if code != 0:
+                  print(f"STDERR: {err}", file=sys.stderr)
+              return out, code
+
+          ts = time.strftime("%Y%m%d-%H%M%S")
+          src = standby["srcDir"]
+          rel_root = standby["releaseRoot"]
+          app_dir = standby["appDir"]
+          svc = standby["serviceName"]
+          port = standby["servicePort"]
+          release_dir = f"{rel_root}/{branch}-{ts}"
+
+          # 1. Git pull
+          print(f"\n=== [1/5] git pull ({branch}) ===")
+          run(f"cd {src} && git fetch origin && git checkout {branch} && git pull origin {branch} 2>&1 | tail -5")
+          out, _ = run(f"cd {src} && git log --oneline -1")
+
+          # 2. Build
+          print(f"\n=== [2/5] Gradle build ===")
+          _, code = run(f"cd {src} && ./gradlew bootJar 2>&1 | tail -15")
+          if code != 0:
+              print("::error::빌드 실패")
+              sys.exit(1)
+
+          # 3. Release
+          print(f"\n=== [3/5] Release ({release_dir}) ===")
+          run(f"mkdir -p {release_dir}/logs && cp {src}/build/libs/*.jar {release_dir}/app.jar && ln -sfn {release_dir} {app_dir}")
+          run(f"ls -lh {app_dir}/app.jar")
+
+          # 4. Restart
+          print(f"\n=== [4/5] Service restart ===")
+          run(f"sudo systemctl restart {svc}", timeout=30)
+
+          # 5. Health check
+          print(f"\n=== [5/5] Health check ===")
+          ok = False
+          for i in range(30):
+              time.sleep(1)
+              out, _ = run(f"curl -s -o /dev/null -w '%{{http_code}}' http://localhost:{port}/login 2>/dev/null || echo 000")
+              if out.strip() in ("200", "302"):
+                  print(f"✅ HTTP {out.strip()} OK ({i+1}s)")
+                  ok = True
+                  break
+          if not ok:
+              print("::error::헬스체크 실패")
+              run(f"sudo systemctl status {svc} --no-pager -l 2>&1 | tail -20")
+              sys.exit(1)
+
+          client.close()
+          print("::endgroup::")
+          print(f"✅ Standby 배포 완료: {standby['id']}")
+          PYEOF
+
+  # ─────────────────────────────────────────────
+  # Active 서버 배포 (수동 승인)
+  # ─────────────────────────────────────────────
+  deploy-active:
+    name: Deploy Active
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' &&
+      contains(fromJSON('["deploy-active","deploy-both"]'), github.event.inputs.action)
+    needs: [build-and-deploy-standby]
+    # deploy-both일 때만 standby 의존, deploy-active는 독립
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip3 install paramiko
+      - name: Deploy to Active
+        run: |
+          python3 << 'PYEOF'
+          import paramiko, json, sys, os, time
+          from pathlib import Path
+
+          inv = json.loads(Path("ops/inventory/server-inventory.json").read_text())
+          branch = os.environ.get("DEPLOY_BRANCH", "dev")
+          password = os.environ.get("SERVER_SSH_PASS", "")
+          active = next(s for s in inv if s["role"] == "active")
+
+          client = paramiko.SSHClient()
+          client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+          client.connect(active["host"], port=active["port"],
+                         username=active["user"], password=password, timeout=15)
+
+          def run(cmd, timeout=600):
+              stdin, stdout, stderr = client.exec_command(cmd, timeout=timeout)
+              out = stdout.read().decode('utf-8', errors='replace').strip()
+              code = stdout.channel.recv_exit_status()
+              if out: print(out)
+              return out, code
+
+          ts = time.strftime("%Y%m%d-%H%M%S")
+          src, rel_root, app_dir = active["srcDir"], active["releaseRoot"], active["appDir"]
+          svc, port = active["serviceName"], active["servicePort"]
+
+          print(f"=== Deploy to {active['id']} ({active['host']}) ===")
+          run(f"cd {src} && git fetch origin && git checkout {branch} && git pull origin {branch} 2>&1 | tail -5")
+          run(f"cd {src} && git log --oneline -1")
+          _, code = run(f"cd {src} && ./gradlew bootJar 2>&1 | tail -15")
+          if code != 0:
+              sys.exit(1)
+
+          release_dir = f"{rel_root}/{branch}-{ts}"
+          run(f"mkdir -p {release_dir}/logs && cp {src}/build/libs/*.jar {release_dir}/app.jar && ln -sfn {release_dir} {app_dir}")
+          run(f"sudo systemctl restart {svc}", timeout=30)
+
+          ok = False
+          for i in range(30):
+              time.sleep(1)
+              out, _ = run(f"curl -s -o /dev/null -w '%{{http_code}}' http://localhost:{port}/login 2>/dev/null || echo 000")
+              if out.strip() in ("200", "302"):
+                  print(f"✅ HTTP {out.strip()} OK ({i+1}s)")
+                  ok = True
+                  break
+          if not ok:
+              print("::error::Active 헬스체크 실패")
+              sys.exit(1)
+
+          client.close()
+          print(f"✅ Active 배포 완료: {active['id']}")
+          PYEOF
+
+  # ─────────────────────────────────────────────
+  # 역할 전환 (Active ↔ Standby)
+  # ─────────────────────────────────────────────
+  switch-roles:
+    name: Switch Active ↔ Standby
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'switch'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: pip3 install paramiko
+      - name: Switch roles
+        run: |
+          python3 << 'PYEOF'
+          import json, sys
+          from pathlib import Path
+
+          inv_path = Path("ops/inventory/server-inventory.json")
+          inv = json.loads(inv_path.read_text())
+
+          current_active = next(s["id"] for s in inv if s["role"] == "active")
+          current_standby = next(s["id"] for s in inv if s["role"] == "standby")
+
+          for s in inv:
+              if s["role"] == "active":
+                  s["role"] = "standby"
+              elif s["role"] == "standby":
+                  s["role"] = "active"
+
+          inv_path.write_text(json.dumps(inv, indent=2, ensure_ascii=False))
+          print(f"전환: {current_active}→standby, {current_standby}→active")
+          print("⚠️  LB(gunpo-lb) 타겟 전환이 필요합니다!")
+          PYEOF
+      - name: Commit role change
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add ops/inventory/server-inventory.json
+          git diff --cached --quiet || git commit -m "ops: switch active/standby roles"
+          git push
+
+  # ─────────────────────────────────────────────
+  # 롤백
+  # ─────────────────────────────────────────────
+  rollback:
+    name: Rollback
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' &&
+      contains(fromJSON('["rollback-standby","rollback-active"]'), github.event.inputs.action)
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip3 install paramiko
+      - name: Rollback
+        run: |
+          python3 << 'PYEOF'
+          import paramiko, json, sys, os, time
+          from pathlib import Path
+
+          inv = json.loads(Path("ops/inventory/server-inventory.json").read_text())
+          password = os.environ.get("SERVER_SSH_PASS", "")
+          action = "${{ github.event.inputs.action }}"
+          role = "standby" if action == "rollback-standby" else "active"
+          target = next(s for s in inv if s["role"] == role)
+
+          client = paramiko.SSHClient()
+          client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+          client.connect(target["host"], port=target["port"],
+                         username=target["user"], password=password, timeout=15)
+
+          def run(cmd, timeout=120):
+              stdin, stdout, stderr = client.exec_command(cmd, timeout=timeout)
+              out = stdout.read().decode('utf-8', errors='replace').strip()
+              if out: print(out)
+              return out
+
+          rel_root = target["releaseRoot"]
+          app_dir = target["appDir"]
+          svc = target["serviceName"]
+          port = target["servicePort"]
+
+          print(f"=== Rollback {target['id']} ({role}) ===")
+          # 이전 릴리스로 복귀 (현재 -1)
+          run(f"""
+              cd {rel_root}
+              DIRS=$(ls -1d */ 2>/dev/null | sort | head -n -1 | tail -1 | tr -d '/')
+              if [ -z "$DIRS" ]; then echo "이전 릴리스 없음"; exit 1; fi
+              echo "롤백 대상: $DIRS"
+              ln -sfn {rel_root}/$DIRS {app_dir}
+              sudo systemctl restart {svc}
+          """)
+
+          time.sleep(15)
+          out = run(f"curl -s -o /dev/null -w '%{{http_code}}' http://localhost:{port}/login 2>/dev/null || echo 000")
+          print(f"헬스체크: HTTP {out}")
+
+          client.close()
+          PYEOF
+
+  # ─────────────────────────────────────────────
+  # 상태 확인
+  # ─────────────────────────────────────────────
+  status:
+    name: Server Status
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'status'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip3 install paramiko
+      - name: Check status
+        run: |
+          python3 << 'PYEOF'
+          import paramiko, json, sys, os
+          from pathlib import Path
+
+          inv = json.loads(Path("ops/inventory/server-inventory.json").read_text())
+          password = os.environ.get("SERVER_SSH_PASS", "")
+
+          for server in inv:
+              print(f"\n{'='*50}")
+              print(f"{server['id']} ({server['host']}) role={server['role']}")
+              print('='*50)
+
+              try:
+                  client = paramiko.SSHClient()
+                  client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                  client.connect(server["host"], port=server["port"],
+                                 username=server["user"], password=password, timeout=10)
+
+                  cmd = f"""
+                      echo "Branch: $(cd {server['srcDir']} && git branch --show-current 2>/dev/null)"
+                      echo "Commit: $(cd {server['srcDir']} && git log --oneline -1 2>/dev/null)"
+                      echo "JAR: $(ls -lh {server['appDir']}/app.jar 2>/dev/null | awk '{{print $5,$6,$7,$8}}')"
+                      echo "Service: $(systemctl is-active {server['serviceName']} 2>/dev/null)"
+                      echo "HTTP: $(curl -s -o /dev/null -w '%{{http_code}}' http://localhost:{server['servicePort']}/login 2>/dev/null)"
+                      echo "Uptime: $(ps -o etime= -p $(pgrep -f app.jar) 2>/dev/null || echo 'N/A')"
+                      echo "Symlink: $(readlink {server['appDir']} 2>/dev/null)"
+                  """
+                  stdin, stdout, stderr = client.exec_command(cmd, timeout=15)
+                  print(stdout.read().decode('utf-8', errors='replace').strip())
+                  client.close()
+              except Exception as e:
+                  print(f"  ❌ 연결 실패: {e}")
+          PYEOF
