@@ -18,18 +18,21 @@ public class WebSocketController {
     private final SettingService settingService;
     private final WeatherService weatherService;
     private final ControlAllowedIpService allowedIpService;
+    private final DeviceMaintenanceLogService deviceMaintenanceLogService;
     public WebSocketController(
             MonitoringService monitoringService,
             HidLogService hidLogService,
             SettingService settingService,
             WeatherService weatherService,
-            ControlAllowedIpService allowedIpService
+            ControlAllowedIpService allowedIpService,
+            DeviceMaintenanceLogService deviceMaintenanceLogService
     ) {
         this.monitoringService = monitoringService;
         this.hidLogService = hidLogService;
         this.settingService = settingService;
         this.weatherService = weatherService;
         this.allowedIpService = allowedIpService;
+        this.deviceMaintenanceLogService = deviceMaintenanceLogService;
     }
 
     @MessageMapping("/iot/overview")
@@ -109,6 +112,11 @@ public class WebSocketController {
     @MessageMapping("/cv/stream")
     @SendTo("/topic/cv/stream")
     public Map<String, Object> handleStream(@Payload Map<String, Object> frameData) {
+        String terminalId = String.valueOf(frameData.getOrDefault("terminalId", ""));
+        String action = String.valueOf(frameData.getOrDefault("action", ""));
+        boolean hasImage = frameData.get("image") != null;
+
+        log.info("CV stream message received. terminalId={}, action={}, hasImage={}", terminalId, action, hasImage);
         return frameData;
     }
     @MessageMapping("/udp/data")
@@ -216,7 +224,19 @@ public class WebSocketController {
     @MessageMapping("/iot/command/result")
     @SendTo("/topic/command/result")
     public Map<String, String> receiveCommandResult(Map<String, String> payload) {
-        return payload; // 브라우저로 전송됨
+        // logId가 존재하면 유지보수 이력 업데이트
+        String logIdStr = payload.get("logId");
+        if (logIdStr != null && !logIdStr.isEmpty()) {
+            try {
+                Long logId = Long.parseLong(logIdStr);
+                String commandResult = payload.getOrDefault("commandResult", "");
+                String status = commandResult.contains("error") || commandResult.contains("fail") ? "FAILED" : "SUCCESS";
+                deviceMaintenanceLogService.updateResult(logId, commandResult, status);
+            } catch (Exception e) {
+                log.warn("유지보수 이력 업데이트 실패. logId={}", logIdStr, e);
+            }
+        }
+        return payload;
     }
 }
 

@@ -30,4 +30,8 @@ public class MonitoringController {
     public String command(Model model) {
         return "monitoring/command";
     }
+    @GetMapping("device")
+    public String device(Model model) {
+        return "monitoring/device";
+    }
 }

@@ -9,6 +9,7 @@
 		<setting name="jdbcTypeForNull" value="NULL" />
 		<setting name="callSettersOnNulls" value="true"/>
 		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		<setting name="vfsImpl" value="org.mybatis.spring.boot.autoconfigure.SpringBootVFS"/>
 	</settings>
     
 	<typeAliases>
@@ -23,6 +24,8 @@
 		<typeAlias type="com.archivsoft.sbms.dto.ControlLogDTO"			alias="ControlLogDTO"/>
 		<typeAlias type="com.archivsoft.sbms.dto.ControlMessageDTO"		alias="ControlMessageDTO"/>
 		<typeAlias type="com.archivsoft.sbms.dto.ControlAllowedIpDTO"	alias="ControlAllowedIpDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.DeviceMaintenanceLogDTO" alias="DeviceMaintenanceLogDTO"/>
+		<typeAlias type="com.archivsoft.sbms.dto.DeviceStatusDTO"		alias="DeviceStatusDTO"/>
 		<package   name="com.archivsoft.sbms.dto" />
 	</typeAliases>
 
