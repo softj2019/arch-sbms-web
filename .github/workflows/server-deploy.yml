@@ -45,7 +45,7 @@ jobs:
   # ─────────────────────────────────────────────
   build-and-deploy-standby:
     name: Build & Deploy Standby
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, sbms]
     if: >
       (github.event_name == 'push') ||
       (github.event_name == 'workflow_dispatch' && contains(fromJSON('["deploy-standby","deploy-both"]'), github.event.inputs.action))
@@ -53,7 +53,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: pip3 install paramiko
+        run: pip3 install paramiko 2>/dev/null || true
 
       - name: Deploy to Standby
         run: |
@@ -142,7 +142,7 @@ jobs:
   # ─────────────────────────────────────────────
   deploy-active:
     name: Deploy Active
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, sbms]
     if: >
       github.event_name == 'workflow_dispatch' &&
       contains(fromJSON('["deploy-active","deploy-both"]'), github.event.inputs.action)
@@ -152,7 +152,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: pip3 install paramiko
+        run: pip3 install paramiko 2>/dev/null || true
       - name: Deploy to Active
         run: |
           python3 << 'PYEOF'
@@ -212,7 +212,7 @@ jobs:
   # ─────────────────────────────────────────────
   switch-roles:
     name: Switch Active ↔ Standby
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, sbms]
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'switch'
     environment: production
     steps:
@@ -220,7 +220,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies
-        run: pip3 install paramiko
+        run: pip3 install paramiko 2>/dev/null || true
       - name: Switch roles
         run: |
           python3 << 'PYEOF'
@@ -256,7 +256,7 @@ jobs:
   # ─────────────────────────────────────────────
   rollback:
     name: Rollback
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, sbms]
     if: >
       github.event_name == 'workflow_dispatch' &&
       contains(fromJSON('["rollback-standby","rollback-active"]'), github.event.inputs.action)
@@ -264,7 +264,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: pip3 install paramiko
+        run: pip3 install paramiko 2>/dev/null || true
       - name: Rollback
         run: |
           python3 << 'PYEOF'
@@ -316,13 +316,13 @@ jobs:
   # ─────────────────────────────────────────────
   status:
     name: Server Status
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, sbms]
     if: >
       github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'status'
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: pip3 install paramiko
+        run: pip3 install paramiko 2>/dev/null || true
       - name: Check status
         run: |
           python3 << 'PYEOF'
