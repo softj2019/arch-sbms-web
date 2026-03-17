@@ -1,0 +1,26 @@
+[
+  {
+    "id": "app01",
+    "host": "10.10.10.11",
+    "port": 10022,
+    "user": "ncloud",
+    "role": "active",
+    "appDir": "/home1/ncloud/sbms-app/current",
+    "srcDir": "/home1/ncloud/arch-sbms",
+    "releaseRoot": "/home1/ncloud/sbms-releases",
+    "servicePort": 8080,
+    "serviceName": "sbms"
+  },
+  {
+    "id": "app02",
+    "host": "10.10.10.12",
+    "port": 10022,
+    "user": "ncloud",
+    "role": "standby",
+    "appDir": "/home1/ncloud/sbms-app/current",
+    "srcDir": "/home1/ncloud/arch-sbms",
+    "releaseRoot": "/home1/ncloud/sbms-releases",
+    "servicePort": 8080,
+    "serviceName": "sbms"
+  }
+]
