@@ -12,6 +12,8 @@ public interface DeviceMaintenanceLogMapper {
 
     void insertLog(DeviceMaintenanceLogDTO log);
 
+    void insertLogWithResult(DeviceMaintenanceLogDTO log);
+
     void updateLogResult(@Param("id") Long id,
                          @Param("commandResult") String commandResult,
                          @Param("status") String status);

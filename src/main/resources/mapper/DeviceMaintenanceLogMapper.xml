@@ -21,6 +21,14 @@
         )
     </insert>
 
+    <insert id="insertLogWithResult" parameterType="DeviceMaintenanceLogDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_device_maintenance_log (
+            terminal_id, action_type, command, command_result, executed_by, status, created_at, completed_at
+        ) VALUES (
+            #{terminalId}, #{actionType}, #{command}, #{commandResult}, #{executedBy}, #{status}, NOW(), NOW()
+        )
+    </insert>
+
     <update id="updateLogResult">
         UPDATE tb_device_maintenance_log
         SET command_result = #{commandResult},

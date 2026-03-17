@@ -31,6 +31,21 @@ public class DeviceMaintenanceLogService {
         return logDTO;
     }
 
+    public DeviceMaintenanceLogDTO createLogWithResult(String terminalId, String actionType,
+                                                         String command, String commandResult,
+                                                         String executedBy, String status) {
+        DeviceMaintenanceLogDTO logDTO = DeviceMaintenanceLogDTO.builder()
+                .terminalId(terminalId)
+                .actionType(actionType)
+                .command(command)
+                .commandResult(commandResult)
+                .executedBy(executedBy)
+                .status(status)
+                .build();
+        mapper.insertLogWithResult(logDTO);
+        return logDTO;
+    }
+
     public void updateResult(Long logId, String commandResult, String status) {
         mapper.updateLogResult(logId, commandResult, status);
     }
