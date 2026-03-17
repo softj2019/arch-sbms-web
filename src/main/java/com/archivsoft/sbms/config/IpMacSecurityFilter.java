@@ -109,6 +109,7 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
                 uri.startsWith("/images/") ||
                 uri.startsWith("/lib/jquery/") ||
                 uri.startsWith("/font/") ||
+                uri.startsWith("/api/iot/") ||
                 uri.startsWith("/api/air/recent") ||
                 uri.startsWith("/api/upload/") ||
                 uri.startsWith("/api/setting/") ||
@@ -118,7 +119,8 @@ public class IpMacSecurityFilter extends OncePerRequestFilter {
                 uri.endsWith("devtools.json") ||
                 uri.contains("/uploads/") ||
                 uri.equals("/favicon.ico") ||
-                uri.equals("/websocket") ||
+                uri.startsWith("/websocket") ||
+                uri.startsWith("/sockjs-websocket") ||
                 uri.startsWith("/api/auth/login") ||
                 uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|woff2|ttf|map)$") ||
                 uri.startsWith("/login") ||
