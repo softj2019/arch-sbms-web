@@ -1,0 +1,22 @@
+name: Daily Maintenance Report
+
+on:
+  schedule:
+    - cron: '0 22 * * *'  # UTC 22:00 = KST 07:00
+  workflow_dispatch:
+
+jobs:
+  report:
+    name: Generate Daily Report
+    runs-on: [self-hosted, linux, sbms]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip3 install paramiko 2>/dev/null || true
+
+      - name: Generate and post report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SERVER_SSH_PASS: ${{ secrets.SERVER_SSH_PASS }}
+        run: python3 ops/daily_report_agent.py
