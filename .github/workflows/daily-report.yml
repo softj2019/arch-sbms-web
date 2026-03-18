@@ -17,6 +17,6 @@ jobs:
 
       - name: Generate and post report
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           SERVER_SSH_PASS: ${{ secrets.SERVER_SSH_PASS }}
         run: python3 ops/daily_report_agent.py
