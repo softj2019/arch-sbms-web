@@ -1,4 +1,11 @@
+# =============================================================
+# 통합 CI/CD 파이프라인
+#   1) 운영서버(Spring Boot) - Active-Standby 무중단 배포
+#   2) 라즈베리파이(Python)  - 롤링 배포
+# =============================================================
+
 stages:
+  - build
   - validate
   - package
   - deploy
@@ -25,11 +32,163 @@ variables:
   PACKAGE_NAME: "sbms-pi"
   RELEASE_CHANNEL: "prod"
   INVENTORY_FILE: "ops/inventory/prod-terminals.json"
+  SERVER_INVENTORY: "ops/inventory/server-inventory.json"
+  SERVER_SSH_PASS: "${SERVER_SSH_PASS}"
+  DEPLOY_BRANCH: "${CI_COMMIT_BRANCH}"
+
+# =============================================================
+# 운영서버(Spring Boot) 파이프라인
+# =============================================================
+
+# --- Build: dev/master push 시 자동 ---
+build:server:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+  script:
+    - pip3 install paramiko --quiet
+    - |
+      python3 - <<'PY'
+      import paramiko, json, sys, os
+      from pathlib import Path
+
+      inv = json.loads(Path(os.environ.get("SERVER_INVENTORY", "ops/inventory/server-inventory.json")).read_text())
+      branch = os.environ.get("DEPLOY_BRANCH", "dev")
+      password = os.environ.get("SERVER_SSH_PASS", "Archiv1!")
+
+      # Standby 서버에서 빌드
+      standby = next(s for s in inv if s["role"] == "standby")
+      print(f"[build] target={standby['id']} ({standby['host']}) branch={branch}")
+
+      client = paramiko.SSHClient()
+      client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+      client.connect(standby["host"], port=standby["port"], username=standby["user"], password=password, timeout=15)
+
+      cmds = [
+          f"cd {standby['srcDir']} && git fetch origin && git checkout {branch} && git pull origin {branch} 2>&1 | tail -5",
+          f"cd {standby['srcDir']} && git log --oneline -1",
+          f"cd {standby['srcDir']} && ./gradlew bootJar 2>&1 | tail -10",
+          f"ls -lh {standby['srcDir']}/build/libs/*.jar",
+      ]
+
+      for cmd in cmds:
+          stdin, stdout, stderr = client.exec_command(cmd, timeout=600)
+          out = stdout.read().decode('utf-8', errors='replace').strip()
+          err = stderr.read().decode('utf-8', errors='replace').strip()
+          code = stdout.channel.recv_exit_status()
+          if out:
+              print(out)
+          if code != 0:
+              print(f"STDERR: {err}", file=sys.stderr)
+              client.close()
+              sys.exit(code)
+
+      client.close()
+      print("[build] SUCCESS")
+      PY
+
+# --- Deploy: Standby에 배포 (dev push 시 자동, master는 수동) ---
+deploy:server-standby:
+  stage: deploy
+  needs:
+    - build:server
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+  environment:
+    name: server/standby
+    on_stop: rollback:server-standby
+  script:
+    - pip3 install paramiko --quiet
+    - bash ops/server-deploy.sh deploy-standby
+
+# --- Deploy: Active에 배포 (수동 승인 필요) ---
+deploy:server-active:
+  stage: deploy
+  needs:
+    - build:server
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+  environment:
+    name: server/active
+  script:
+    - pip3 install paramiko --quiet
+    - |
+      ACTIVE_ID=$(python3 -c "
+      import json; from pathlib import Path
+      inv = json.loads(Path('$SERVER_INVENTORY').read_text())
+      print(next(s['id'] for s in inv if s['role'] == 'active'))
+      ")
+      bash ops/server-deploy.sh deploy-single "$ACTIVE_ID"
+
+# --- Verify: 서버 상태 확인 ---
+verify:server:
+  stage: verify
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+  script:
+    - pip3 install paramiko --quiet
+    - bash ops/server-deploy.sh status
+
+# --- Switch: Active ↔ Standby 전환 (수동, 주의 필요) ---
+deploy:server-switch:
+  stage: deploy
+  needs:
+    - deploy:server-standby
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+  environment:
+    name: server/switch
+  script:
+    - pip3 install paramiko --quiet
+    - bash ops/server-deploy.sh switch
+    - bash ops/server-deploy.sh status
+    - echo "!! LB(gunpo-lb) 타겟 전환이 필요합니다 !!"
+
+# --- Rollback: Standby 롤백 ---
+rollback:server-standby:
+  stage: rollback
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+  environment:
+    name: server/standby
+    action: stop
+  script:
+    - pip3 install paramiko --quiet
+    - |
+      STANDBY_ID=$(python3 -c "
+      import json; from pathlib import Path
+      inv = json.loads(Path('$SERVER_INVENTORY').read_text())
+      print(next(s['id'] for s in inv if s['role'] == 'standby'))
+      ")
+      bash ops/server-deploy.sh rollback "$STANDBY_ID"
+
+# =============================================================
+# 라즈베리파이(Python) 파이프라인 - 기존 유지
+# =============================================================
 
 validate:python:
   stage: validate
   rules:
-    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "prod"
     - if: $CI_MERGE_REQUEST_IID
   script:
     - bash ops/validate.sh
@@ -48,7 +207,7 @@ package:prod:
     paths:
       - dist/
 
-deploy:26037:
+deploy:pi-26037:
   stage: deploy
   needs:
     - package:prod
@@ -59,7 +218,7 @@ deploy:26037:
   script:
     - bash ops/deploy.sh single 26037
 
-deploy:group-a:
+deploy:pi-group-a:
   stage: deploy
   needs:
     - package:prod
@@ -71,7 +230,7 @@ deploy:group-a:
   script:
     - bash ops/deploy.sh group prod-a
 
-deploy:group-b:
+deploy:pi-group-b:
   stage: deploy
   needs:
     - package:prod
@@ -83,7 +242,7 @@ deploy:group-b:
   script:
     - bash ops/deploy.sh group prod-b
 
-deploy:all:
+deploy:pi-all:
   stage: deploy
   needs:
     - package:prod
@@ -95,23 +254,10 @@ deploy:all:
   script:
     - bash ops/deploy.sh all
 
-verify:single:
+verify:pi-26037:
   stage: verify
   needs:
-    - deploy:26037
-  rules:
-    - if: $CI_COMMIT_BRANCH == "prod"
-      when: manual
-  environment:
-    name: production/single
-  script:
-    - test -n "$TARGET_TERMINAL_ID"
-    - bash ops/verify_device.sh single "$TARGET_TERMINAL_ID"
-
-verify:26037:
-  stage: verify
-  needs:
-    - deploy:26037
+    - deploy:pi-26037
   rules:
     - if: $CI_COMMIT_BRANCH == "prod"
       when: manual
@@ -120,7 +266,7 @@ verify:26037:
   script:
     - bash ops/verify_device.sh single 26037
 
-verify:group-a:
+verify:pi-group-a:
   stage: verify
   rules:
     - if: $CI_COMMIT_BRANCH == "prod"
@@ -130,7 +276,7 @@ verify:group-a:
   script:
     - bash ops/verify_device.sh group prod-a
 
-verify:all:
+verify:pi-all:
   stage: verify
   rules:
     - if: $CI_COMMIT_BRANCH == "prod"
@@ -140,18 +286,7 @@ verify:all:
   script:
     - bash ops/verify_device.sh all
 
-rollback:single:
-  stage: rollback
-  rules:
-    - if: $CI_COMMIT_BRANCH == "prod"
-      when: manual
-  environment:
-    name: production/single
-  script:
-    - test -n "$TARGET_TERMINAL_ID"
-    - bash ops/rollback.sh single "$TARGET_TERMINAL_ID"
-
-rollback:26037:
+rollback:pi-26037:
   stage: rollback
   rules:
     - if: $CI_COMMIT_BRANCH == "prod"
@@ -161,7 +296,7 @@ rollback:26037:
   script:
     - bash ops/rollback.sh single 26037
 
-rollback:group-a:
+rollback:pi-group-a:
   stage: rollback
   rules:
     - if: $CI_COMMIT_BRANCH == "prod"
